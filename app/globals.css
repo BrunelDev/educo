@@ -69,6 +69,18 @@
   --color-white-800: #464646;
   --color-white-900: #3d3d3d;
   --color-white-950: #292929;
+
+  --color-crimson-50: #fff0f3;
+  --color-crimson-100: #ffdde3;
+  --color-crimson-200: #ffc1cd;
+  --color-crimson-300: #ff95a9;
+  --color-crimson-400: #ff5978;
+  --color-crimson-500: #ff264f;
+  --color-crimson-600: #fc0634;
+  --color-crimson-700: #e4002b;
+  --color-crimson-800: #af0525;
+  --color-crimson-900: #900c25;
+  --color-crimson-950: #50000f;
 }
 
 :root {
