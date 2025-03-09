@@ -87,7 +87,7 @@ enum MeetingType {
 }
 
 interface MeetingCardProps {
-  meetingType: MeetingType
+  meetingType: MeetingType;
   title: string;
   subtitle: string;
   date: string;
@@ -99,6 +99,21 @@ interface MeetingCardProps {
   isFinished?: boolean;
 }
 
+enum ProjectStatus {
+  Ongoing = "En cours",
+  Completed = "Terminée",
+}
+
+interface ProjectProps {
+  title: string;
+  description: string;
+  link: string;
+  status: ProjectStatus;
+}
+interface Project {
+  project: ProjectProps;
+}
+
 export type {
   Associate,
   AssociateProps,
@@ -108,10 +123,12 @@ export type {
   MeetingComponentProps,
   Notification,
   NotificationItemProps,
+  Project,
+  ProjectProps,
   SearchBarProps,
   TabsProps,
   Webinar,
   WebinarCardProps,
 };
 
-export { MeetingType, NotificationType, TabsState, TagType };
+export { MeetingType, NotificationType, ProjectStatus, TabsState, TagType };
