@@ -81,6 +81,32 @@
   --color-crimson-800: #af0525;
   --color-crimson-900: #900c25;
   --color-crimson-950: #50000f;
+
+  --animate-tab-grow-in: grow-in 0.3s ease-out;
+  @keyframes grow-in {
+    0% {
+      opacity: 0;
+      width: 0;
+    }
+
+    100% {
+      opacity: 1;
+      width: 40px;
+    }
+  }
+
+  --animate-tab-grow-out: grow-out 0.3s ease-out;
+  @keyframes grow-out {
+    0% {
+      opacity: 1;
+      width: 40px;
+    }
+
+    100% {
+      opacity: 0;
+      width: 0;
+    }
+  }
 }
 
 :root {
