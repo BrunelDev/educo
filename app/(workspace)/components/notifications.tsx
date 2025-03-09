@@ -57,7 +57,7 @@ export default function Notifications() {
         useState<boolean>(false);
     
   return (
-    <main className="z-50">
+    <main className="z-[9999999999]">
       {displayNotifications ? (
         <NotificationComponent
           handleClick={() => {

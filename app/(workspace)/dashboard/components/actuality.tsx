@@ -61,6 +61,7 @@ const actualities = [
 export default function Actuality() {
   return (
     <div className="p-3 rounded-[12px] min-w-[276px] w-full  bg-[#FFFFFF99] flex flex-col gap-3">
+
       {actualities.map((actuality, index) => (
         <ActualityComponent
           key={actuality.title + index}

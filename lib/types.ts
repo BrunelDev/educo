@@ -65,25 +65,53 @@ interface Webinar {
   webinar: WebinarCardProps;
 }
 
-interface AssociateProps  {
+interface AssociateProps {
   profileImageUrl: string;
   name: string;
   email: string;
   id: string;
 }
 interface Associate {
-  associate : AssociateProps;
+  associate: AssociateProps;
+}
+
+interface Attendee {
+  name: string;
+  imageUrl: string;
+}
+enum MeetingType {
+  CSSCT = "CSSCT",
+  Ordinary = "Ordinaire",
+  Extraordinal = "Extraordinaire",
+  Others = "Autres",
+}
+
+interface MeetingCardProps {
+  meetingType: MeetingType
+  title: string;
+  subtitle: string;
+  date: string;
+  time: string;
+  attendees: Attendee[];
+  remainingAttendees?: number;
+  isOnline?: boolean;
+  isInPerson?: boolean;
+  isFinished?: boolean;
 }
 
 export type {
+  Associate,
+  AssociateProps,
+  Attendee,
   Meeting,
+  MeetingCardProps,
   MeetingComponentProps,
   Notification,
   NotificationItemProps,
   SearchBarProps,
   TabsProps,
+  Webinar,
   WebinarCardProps,
-  Webinar, Associate, AssociateProps
 };
 
-export { NotificationType, TabsState, TagType };
+export { MeetingType, NotificationType, TabsState, TagType };

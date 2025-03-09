@@ -5,8 +5,17 @@ import Image from "next/image";
 export default function WebinarCard({ webinar }: Webinar) {
   return (
     <div
-      className={`bg-[url(/webinarCard-bg.png)] h-[380px] w-[330px] rounded-[12px] relative`}
+      className={`h-[380px] w-[330px] rounded-[12px] relative group overflow-hidden`}
+      
+
     >
+      <Image
+          width={380}
+          height={380}
+          src={webinar.backgroundImageUrl}
+          alt="host profile"
+          className="absolute -z-10 rounded-[12px] group-hover:scale-105 duration-300"
+        />
       <WebinarCardBotton webinar={webinar} />
     </div>
   );

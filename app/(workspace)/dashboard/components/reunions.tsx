@@ -56,7 +56,11 @@ const meetings: Meeting[] = [
 export default function Reunions() {
   return (
     <div className="flex flex-col gap-4">
-      <h6>Réunins à venir</h6>
+      <div className="flex justify-between items-center">
+      <h3 className="font-semibold text-[14px]">Réunins à venir</h3>
+<h6 className="underline text-xs text-coral-500">Tout Voir</h6>
+      </div>
+      
       <div className="flex flex-col gap-4">{meetings.map((meeting, index) => (
         <ReunionComponent key={meeting.id + index} meeting={meeting} />
       ))}</div>

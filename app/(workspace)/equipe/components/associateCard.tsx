@@ -22,8 +22,8 @@ export default function AssociateCard({ associate }: Associate) {
 
           <h6 className="text-xl font-semibold text-white-800">{associate.name}</h6>
           <div className="flex justify-between">
-      <h6>{associate.email}</h6>
-              <Button className="bg-white-100"><h6>Message</h6></Button>
+      <h6 className="font-medium text-xs">{associate.email}</h6>
+              <Button className="bg-white-100 text-white-800 text-xs font-semibold h-[28px] w-fit py[6px] px-[8px] p-x"><h6>Message</h6></Button>
           </div>
     </div>
   );
