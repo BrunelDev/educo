@@ -113,11 +113,45 @@ interface ProjectProps {
 interface Project {
   project: ProjectProps;
 }
+enum FileType {
+  img,
+  other,
+}
+
+interface FileProps {
+  name: string;
+  id: number;
+  type: FileType;
+}
+interface File {
+  file: FileProps;
+}
+interface FolderProps {
+  name: string;
+  id: number;
+}
+interface Folder {
+  folder: FolderProps;
+}
+
+interface DocumentProps {
+  name: string;
+  id: number;
+}
+interface Document {
+  document: DocumentProps;
+}
 
 export type {
   Associate,
   AssociateProps,
   Attendee,
+  Document,
+  DocumentProps,
+  File,
+  FileProps,
+  Folder,
+  FolderProps,
   Meeting,
   MeetingCardProps,
   MeetingComponentProps,
@@ -131,4 +165,11 @@ export type {
   WebinarCardProps,
 };
 
-export { MeetingType, NotificationType, ProjectStatus, TabsState, TagType };
+export {
+  FileType,
+  MeetingType,
+  NotificationType,
+  ProjectStatus,
+  TabsState,
+  TagType,
+};
