@@ -3,7 +3,9 @@ import { Button } from "@/components/ui/button";
 import { MeetingCardProps, MeetingType } from "@/lib/types";
 import { useState } from "react";
 import MeetingCard from "./components/meetingCard";
-
+import { DialogComponent } from "@/app/_components/dialogComponent";
+import CreateMeeting from "./components/createMeeting";
+export {DialogComponent} from "@/app/_components/dialogComponent"
 export default function Reunions() {
   const [filterValue, setFilterValue] = useState<string>("all");
   const meetings: MeetingCardProps[] = [
@@ -152,6 +154,8 @@ export default function Reunions() {
         ))}
         </div>
       </div>
+      <DialogComponent dialogTitle={null}  className={"sm:max-w-[980px] flex items-center justify-center p-0"} dialoTrigger={<Button>Créer une nouvelle réunion</Button>} dialogContent={<CreateMeeting/>}/>
+      
       
     </div>
   );

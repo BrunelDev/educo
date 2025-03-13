@@ -1,11 +1,11 @@
 import {
   PopoverContent as Content,
-  Popover,
+  Popover as PopoverComponent,
   PopoverTrigger as Trigger,
 } from "@/components/ui/popover";
 import { JSX } from "react";
 
-export function PopoverDemo({
+export function Popover({
   PopoverContent,
   PopoverTrigger,
 }: {
@@ -13,9 +13,9 @@ export function PopoverDemo({
   PopoverTrigger: JSX.Element;
 }) {
   return (
-    <Popover>
+    <PopoverComponent>
       <Trigger asChild>{PopoverTrigger}</Trigger>
-      <Content className="w-80">{PopoverContent}</Content>
-    </Popover>
+      <Content className="w-fit p-0">{PopoverContent}</Content>
+    </PopoverComponent>
   );
 }

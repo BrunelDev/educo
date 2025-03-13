@@ -4,11 +4,17 @@ import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import Image from "next/image";
+import { register } from "@/lib/functions";
+import { ComponentPropsWithoutRef, useState } from "react";
 
 export function RegisterForm({
   className,
   ...props
-}: React.ComponentPropsWithoutRef<"form">) {
+}: ComponentPropsWithoutRef<"form">) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("")
   return (
     <form className={cn("flex flex-col gap-6 w-full", className)} {...props}>
       <div className="gap-2 w-full">
@@ -18,6 +24,10 @@ export function RegisterForm({
         <div className="grid gap-2">
           <Label htmlFor="email">Email</Label>
           <Input
+            value={email}
+            onChange={(e) => {
+              setEmail(e.target.value)
+            }}
             id="email"
             type="email"
             placeholder="m@example.com"
@@ -29,13 +39,17 @@ export function RegisterForm({
           <div className="flex items-center">
             <Label htmlFor="password">Mot de passe</Label>
           </div>
-          <Input id="password" type="password" required />
+          <Input value={password} onChange={(e) => {
+            setPassword(e.target.value)
+          }} id="password" type="password" required />
           
         </div><div className="grid gap-2">
           <div className="flex items-center">
             <Label htmlFor="password">Confirmez le mot de passe</Label>
           </div>
-          <Input id="password" type="password" required />
+          <Input value={confirmPassword} onChange={(e) => {
+            setConfirmPassword(e.target.value)
+          }} id="password" type="password" required />
           
         </div>
         <Button
@@ -70,12 +84,27 @@ export function RegisterForm({
       </div>
       <div className="text-center text-sm">
       Vous avez un compte ?{" "}
-        <Link
-          href="/login"
+        <Button
+          onSubmit={() => {
+            if (password !== confirmPassword) {
+              setError("Les mots de passe ne correspondent pas.");
+              return;
+            }
+            register(email, password).then(res => {
+              if (res.token) {
+                setError("Inscrit");
+                console.log(res.token)
+                localStorage.setItem("access_token", res.token)
+              } else {
+                setError("Erreur");
+                console.log(error)
+              }
+            });
+          }}
           className="text-coral-500 font-medium underline-offset-4 hover:underline"
         >
           Se connecter
-        </Link>
+        </Button>
       </div>
     </form>
   );
