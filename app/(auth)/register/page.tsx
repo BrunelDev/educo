@@ -1,3 +1,4 @@
+"use client"
 import { RegisterForm } from "@/app/_components/register-form";
 import TempLogo from "@/app/_components/temLogo";
 import Image from "next/image";

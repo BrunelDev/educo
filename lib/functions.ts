@@ -1,54 +1,62 @@
 import { api, endpoints } from "./api";
 
-interface AuthResponse {
-  token: string;
-  user: {
-    id: number;
-    email: string;
-  };
-}
-
-export const login = async (
-  email: string,
-  password: string
-): Promise<AuthResponse> => {
+export const login = async (email: string, password: string) => {
   try {
-    const response = await api.post(endpoints.auth.login, {
-      email, // Remove unnecessary nesting
-      password, // Remove unnecessary nesting
-    });
-
-    // Store token upon successful login
-    if (response.data.token) {
-      localStorage.setItem("token", response.data.token);
+    const response = await fetch(
+      "http://192.168.100.2:8000/api/auth/utilisateurs/connexion/",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      }
+    );
+    if (response.ok) {
+      const res = await response.json();
+      localStorage.setItem("userInfo", JSON.stringify(res));
+      return res;
     }
-
-    return response.data;
+    else {
+      const res = await response.json();
+      throw new Error(res.message);
+    }
+    return;
   } catch (error: unknown) {
     if (error instanceof Error) {
-      throw new Error(`Login failed: ${error.message}`);
+      console.log("Error");
+      throw new Error(error.message);
     }
     throw new Error("An unknown error occurred during login");
   }
 };
 
-export const register = async (
-  email: string,
-  password: string
-): Promise<AuthResponse> => {
+export const register = async (email: string, password: string) => {
   try {
-    const response = await api.post(endpoints.auth.register, {
-      email,
-      password,
-    });
-    if (response.status === 201) {
-      return response.data;
+    const response = await fetch(
+      "http://192.168.100.2:8000/api/auth/utilisateurs/inscriptions/",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      }
+    );
+    if (response.ok) {
+      return await response.json();
     } else {
-      throw new Error("Registration failed, email already exists");
+      throw new Error("Inscription échouée : Cet email est déja utilisé.");
     }
   } catch (error: unknown) {
     if (error instanceof Error) {
-      throw new Error(`Registration failed: ${error.message}`);
+      throw new Error(error.message);
     }
     throw new Error("An unknown error occurred during registration");
   }

@@ -1,3 +1,4 @@
+"use client"
 import { LoginForm } from "@/app/_components/login-form";
 import TempLogo from "@/app/_components/temLogo";
 import Image from "next/image";

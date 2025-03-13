@@ -1,22 +1,59 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { cn } from "@/lib/utils";
-import Link from "next/link";
-import Image from "next/image";
 import { register } from "@/lib/functions";
-import { ComponentPropsWithoutRef, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
-export function RegisterForm({
-  className,
-  ...props
-}: ComponentPropsWithoutRef<"form">) {
+export function RegisterForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("")
+  const [error, setError] = useState("error");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const router = useRouter();
+
   return (
-    <form className={cn("flex flex-col gap-6 w-full", className)} {...props}>
+    <form
+      className="flex flex-col gap-6 w-full"
+      onSubmit={async (e) => {
+        e.preventDefault(); // Prevent form default submission
+
+        try {
+          // Validate passwords match
+          if (password !== confirmPassword) {
+            setError("Les mots de passe ne correspondent pas");
+            return;
+          }
+
+          // Validate password strength if needed
+          if (password.length < 8) {
+            setError("Le mot de passe doit contenir au moins 8 caractères");
+            return;
+          }
+
+          // Attempt registration
+          const response = await register(email, password);
+
+          if (response?.message) {
+            setError(response.message);
+            console.log(response.message);
+            router.push("/login")
+            return;
+          }
+          return
+        } catch (err : unknown) {
+          // Handle specific error cases
+          if (err instanceof Error) {
+            setError(err.message);
+            console.log(err.message + '---');
+          } else {
+            setError("Une erreur est survenue lors de l'inscription");
+          }
+        }
+      }}
+    >
       <div className="gap-2 w-full">
         <h1 className="text-2xl font-bold">Créez votre compte</h1>
       </div>
@@ -26,7 +63,7 @@ export function RegisterForm({
           <Input
             value={email}
             onChange={(e) => {
-              setEmail(e.target.value)
+              setEmail(e.target.value);
             }}
             id="email"
             type="email"
@@ -39,18 +76,29 @@ export function RegisterForm({
           <div className="flex items-center">
             <Label htmlFor="password">Mot de passe</Label>
           </div>
-          <Input value={password} onChange={(e) => {
-            setPassword(e.target.value)
-          }} id="password" type="password" required />
-          
-        </div><div className="grid gap-2">
+          <Input
+            value={password}
+            onChange={(e) => {
+              setPassword(e.target.value);
+            }}
+            id="password"
+            type="password"
+            required
+          />
+        </div>
+        <div className="grid gap-2">
           <div className="flex items-center">
-            <Label htmlFor="password">Confirmez le mot de passe</Label>
+            <Label htmlFor="confirmPassword">Confirmez le mot de passe</Label>
           </div>
-          <Input value={confirmPassword} onChange={(e) => {
-            setConfirmPassword(e.target.value)
-          }} id="password" type="password" required />
-          
+          <Input
+            value={confirmPassword}
+            onChange={(e) => {
+              setConfirmPassword(e.target.value);
+            }}
+            id="confirmPassword"
+            type="password"
+            required
+          />
         </div>
         <Button
           type="submit"
@@ -58,9 +106,12 @@ export function RegisterForm({
         >
           S’inscrire
         </Button>
+        {error && <div className="p-2 bg-red-500 rounded-lg">
+          <p className="text-white text-sm">{error}</p>
+        </div>}
         <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
           <span className="relative z-10 bg-background px-2 text-white-800">
-          Ou s’inscrire avec
+            Ou s’inscrire avec
           </span>
         </div>
         <div className="flex justify-center items-center gap-5">
@@ -83,28 +134,13 @@ export function RegisterForm({
         </div>
       </div>
       <div className="text-center text-sm">
-      Vous avez un compte ?{" "}
-        <Button
-          onSubmit={() => {
-            if (password !== confirmPassword) {
-              setError("Les mots de passe ne correspondent pas.");
-              return;
-            }
-            register(email, password).then(res => {
-              if (res.token) {
-                setError("Inscrit");
-                console.log(res.token)
-                localStorage.setItem("access_token", res.token)
-              } else {
-                setError("Erreur");
-                console.log(error)
-              }
-            });
-          }}
+        Vous avez un compte ?{" "}
+        <Link
+          href="/login"
           className="text-coral-500 font-medium underline-offset-4 hover:underline"
         >
           Se connecter
-        </Button>
+        </Link>
       </div>
     </form>
   );
