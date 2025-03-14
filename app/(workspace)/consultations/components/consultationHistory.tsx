@@ -1,87 +1,93 @@
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableFooter,
-    TableHead,
-    TableHeader,
-    TableRow
-} from "@/components/ui/table"
-  
-  const invoices = [
-    {
-      invoice: "INV001",
-      paymentStatus: "Paid",
-      totalAmount: "$250.00",
-      paymentMethod: "Credit Card",
-    },
-    {
-      invoice: "INV002",
-      paymentStatus: "Pending",
-      totalAmount: "$150.00",
-      paymentMethod: "PayPal",
-    },
-    {
-      invoice: "INV003",
-      paymentStatus: "Unpaid",
-      totalAmount: "$350.00",
-      paymentMethod: "Bank Transfer",
-    },
-    {
-      invoice: "INV004",
-      paymentStatus: "Paid",
-      totalAmount: "$450.00",
-      paymentMethod: "Credit Card",
-    },
-    {
-      invoice: "INV005",
-      paymentStatus: "Paid",
-      totalAmount: "$550.00",
-      paymentMethod: "PayPal",
-    },
-    {
-      invoice: "INV006",
-      paymentStatus: "Pending",
-      totalAmount: "$200.00",
-      paymentMethod: "Bank Transfer",
-    },
-    {
-      invoice: "INV007",
-      paymentStatus: "Unpaid",
-      totalAmount: "$300.00",
-      paymentMethod: "Credit Card",
-    },
-  ]
-  
-  export default function History() {
-    return (
-      <Table>
-        
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-[100px]">Consultation</TableHead>
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { ConsultationProps, ConsultationType } from "@/lib/types";
+
+
+const consultations: ConsultationProps[] = [
+  {
+    consultationType: ConsultationType.Orientation,
+    createdOn: "2022-01-01",
+    documentReceived: "Oui",
+    date: "2022-01-15",
+    status: "Terminé",
+    id: "1",
+  },
+  {
+    consultationType: ConsultationType.Situation,
+    createdOn: "2022-02-01",
+    documentReceived: "Non",
+    date: "2022-02-10",
+    status: "En attente",
+    id: "2",
+  },
+  {
+    consultationType: ConsultationType.Politique,
+    createdOn: "2022-03-01",
+    documentReceived: "Oui",
+    date: "2022-03-15",
+    status: "Terminé",
+    id: "3",
+  },
+  {
+    consultationType: ConsultationType.Gestion,
+    createdOn: "2022-04-01",
+    documentReceived: "Oui",
+    date: "2022-04-15",
+    status: "Terminé",
+    id: "4",
+  },
+];
+
+export default function History() {
+  return (
+    <Table>
+      <TableHeader>
+          <TableRow className="border rounded-2xl">
+            <TableHead className="w-[400px]">Consultation</TableHead>
             <TableHead>Créé le</TableHead>
             <TableHead>Document recu</TableHead>
-            <TableHead className="text-right">Date</TableHead><TableHead className="text-right">Status</TableHead><TableHead className="text-right">Action</TableHead>
+            <TableHead className="text-right">Date</TableHead>
+            <TableHead className="text-right">Status</TableHead>
+            <TableHead className="text-right">Action</TableHead>
           </TableRow>
-        </TableHeader>
-        <TableBody>
-          {invoices.map((invoice) => (
-            <TableRow key={invoice.invoice}>
-              <TableCell className="font-medium">{invoice.invoice}</TableCell>
-              <TableCell>{invoice.paymentStatus}</TableCell>
-              <TableCell>{invoice.paymentMethod}</TableCell>
-              <TableCell className="text-right">{invoice.totalAmount}</TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-        <TableFooter>
-          <TableRow>
-            <TableCell colSpan={3}>Total</TableCell>
-            <TableCell className="text-right">$2,500.00</TableCell>
+      </TableHeader>
+      <TableBody>
+        {consultations.map((consultation) => (
+          <TableRow key={consultation.id + consultation.date}>
+            <TableCell className="font-medium">
+              {consultation.consultationType}
+            </TableCell>
+            <TableCell>{consultation.createdOn}</TableCell>
+            <TableCell className="text-left">
+              {consultation.documentReceived}
+            </TableCell>
+            <TableCell className="text-right">{consultation.date}</TableCell>
+            <TableCell className="w-full flex justify-end">
+              <div
+                className={`${
+                  consultation.status === "En attente"
+                    ? "bg-crimson-400"
+                    : "bg-white-50"
+                } w-fit py-1 px-2 flex justify-center items-center rounded-full place-self-end`}
+              >
+                <h6
+                  className={`${
+                    consultation.status === "En attente" ? "text-white" : ""
+                  }`}
+                >
+                  {consultation.status}
+                </h6>
+              </div>
+            </TableCell>
           </TableRow>
-        </TableFooter>
-      </Table>
-    )
-  }
-  
+        ))}
+      </TableBody>
+    </Table>
+  );
+}

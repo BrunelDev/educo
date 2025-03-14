@@ -5,7 +5,7 @@ import Notifications from "./components/notifications"
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider>
-      <AppSidebar />
+      <AppSidebar/>
       <main className="bg-[url(/workspace-bg.svg)] bg-no-repeat bg-cover bg-center w-full p-8 text-white-800">
         <SidebarTrigger />
         <div className="z-0">

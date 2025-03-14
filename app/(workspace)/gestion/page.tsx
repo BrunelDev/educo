@@ -61,7 +61,7 @@ const projects: ProjectProps[] = [
   }
 ];
   return (
-    <div className='bg-[#ffffff78] py-5 px-4 rounded-[12px] w-full h-[85vh]'>
+    <div>
       <h6>Vos projets</h6>
       <div className='flex justify-between gap-y-6 flex-wrap'>
       {projects.map((project, index) => (

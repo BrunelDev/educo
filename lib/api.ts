@@ -1,12 +1,21 @@
 import axios from "axios";
-
+interface User {
+  token : string;
+  id: number;
+  email: string;
+  profile_image: string | null;
+  first_name: string;
+  last_name: string;
+}
+const userInfo : User = JSON.parse(localStorage.getItem("userInfo") as string)
+  
 
 // Create axios instance with custom config
 export const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || "http://192.168.100.2:8000/api/",
   headers: {
       "Content-Type": "application/json",
-      "Authorization" : "Bearer" + localStorage.getItem("access_token")
+      "Authorization" : "Bearer " + (userInfo?.token || '')
   },
 });
 

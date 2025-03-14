@@ -1,3 +1,4 @@
+"use client"
 import { Calendar, Home, Inbox, Search, Settings } from "lucide-react";
 
 import {
@@ -5,12 +6,12 @@ import {
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 
 // Menu items.
 const items = [
@@ -62,8 +63,10 @@ const items = [
 ];
 
 export function AppSidebar() {
+  const path = usePathname()
+  
   return (
-    <Sidebar>
+    <Sidebar className="w-[210px]">
       <SidebarContent>
         <SidebarGroup>
             <div className="flex justify-center">
@@ -75,11 +78,15 @@ export function AppSidebar() {
                 className="py-4 border-b border-white-200"
               />
             </div>
-          <SidebarGroupContent>
-            <SidebarMenu className="gap-4 mx-2 w-[169px] pb-4 border-b">
-              {items.map((item) => (
+          <SidebarGroupContent className="">
+            <SidebarMenu className="gap-4 px-2yy w-full pb-4 border-b my-5">
+              {
+                items.map((item) => (
+                  
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
+                  <SidebarMenuButton asChild className={
+                    
+                    `hover:bg-gradient-to-r hover:from-[#FFDDE3] hover:to-[#FFDDE300] w-full ${path.includes(item.url) ? "bg-gradient-to-r from-[#FFDDE3] to-[#FFDDE300]" : null} w-full py-2 px-3`}>
                     <a href={item.url}>
                       <item.icon />
                       <span>{item.title}</span>

@@ -25,10 +25,11 @@ export function LoginForm() {
             return;
           }
           const response = await login(email, password);
+          console.log(response);
 
           if (response) {
             setMessage("Connexion réussie");
-            router.push("/dashboard");
+            //router.push("/dashboard");
             return;
           }
           return;

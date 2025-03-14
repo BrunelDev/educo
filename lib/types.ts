@@ -142,10 +142,51 @@ interface Document {
   document: DocumentProps;
 }
 
+interface ParticipantProps {
+  name: string;
+  role: string;
+  profileImage: string;
+  id: string;
+}
+interface Participant {
+  participant: ParticipantProps;
+}
+
+enum ConsultationType {
+  Orientation = "Orientations stratégiques de l’entreprise",
+  Situation = "Situation économique et financière",
+  Politique = "Politique sociale, conditions de travail et emploi",
+  Gestion = "Gestion de la qualité et des processus",
+  Accord = "Accords et plans de sauvegarde de l’emploi (PSE)",
+  Introduction = "Introduction de nouvelles technologies",
+  Modification = "Modifications importantes des conditions de travail",
+  Fusion = "Fusion, acquisition, cession d’entreprise",
+}
+
+interface ConsultationProps {
+  consultationType: ConsultationType;
+  createdOn: string;
+  documentReceived: string;
+  date: string;
+  status: "En attente" | "Terminé";
+  id: string;
+}
+
+interface ConsultationDialogProps {
+  consultationType: ConsultationType;
+  description: string;
+  process: string[];
+}
+
+interface ConsultationDialog {
+  consultation: ConsultationDialogProps;
+}
+
 export type {
   Associate,
   AssociateProps,
   Attendee,
+  ConsultationProps,
   Document,
   DocumentProps,
   File,
@@ -157,15 +198,19 @@ export type {
   MeetingComponentProps,
   Notification,
   NotificationItemProps,
+  Participant,
+  ParticipantProps,
   Project,
   ProjectProps,
   SearchBarProps,
   TabsProps,
   Webinar,
   WebinarCardProps,
+  ConsultationDialog,ConsultationDialogProps
 };
 
 export {
+  ConsultationType,
   FileType,
   MeetingType,
   NotificationType,
