@@ -22,20 +22,60 @@ enum TagType {
   Online = "En ligne",
   InPerson = "En présence",
 }
-interface Meeting {
-  id: number;
-  type: string;
-  date: string;
-  time: string;
-  title: string;
+//Meeting--------------------------------------------------------
+enum InvitationStatus {
+  EN_ATTENTE = "EN_ATTENTE",
+  ACCEPTE = "ACCEPTE",
+  REFUSE = "REFUSE",
+}
+
+// Interface for meeting participants
+interface MeetingParticipant {
+  utilisateur: number;
+  est_hote: boolean;
+  statut_invitation: InvitationStatus;
+}
+
+// Interface for meeting documents
+interface MeetingDocument {
+  fichier: string;
+  nom_fichier: string;
+  type_fichier?:
+    | "pdf"
+    | "doc"
+    | "docx"
+    | "xls"
+    | "xlsx"
+    | "ppt"
+    | "pptx"
+    | "image";
+}
+
+// Interface for agenda items
+interface AgendaItem {
   description: string;
-  tags: TagType[];
-  participants: string[];
+}
+
+// Main meeting interface
+interface Meeting {
+  id : number
+  type_reunion: string;
+  titre: string;
+  objet: string;
+  emplacement: string;
+  lien_reunion: string;
+  date_heure: string | Date;
+  frequence: string;
+  participants: MeetingParticipant[];
+  documents: MeetingDocument[];
+  ordre_du_jour: AgendaItem[];
 }
 
 interface MeetingComponentProps {
   meeting: Meeting;
 }
+//Meeting--------------------------------------------------------
+
 
 interface TabsProps {
   activeTab: TabsState;
@@ -49,6 +89,7 @@ interface SearchBarProps {
   value: string;
   handleChange: (value: string) => void;
   placeholder: string;
+  className?: string;
 }
 
 interface WebinarCardProps {
@@ -181,12 +222,100 @@ interface ConsultationDialogProps {
 interface ConsultationDialog {
   consultation: ConsultationDialogProps;
 }
+interface MessageHeaderProps {
+  conversationName: string;
+  speakers: string[] | string;
+  conversationImageUrl: string;
+}
+
+interface ConversationListProps {
+  conversations: Array<{
+    _id: string;
+    messages: Array<{
+      title: string;
+      text: string;
+      type?: "text" | "image" | "audio" | "video";
+      createdAt?: Date;
+      user?: {
+        _id: string;
+        name: string;
+        avatar?: string;
+      };
+      files?: Array<{ url: string; name: string; type: string }>;
+    }>;
+    unreadCount?: number;
+    lastActivity?: Date;
+  }>;
+}
+
+// Enum for message types
+enum MessageType {
+  TEXT = "texte",
+  IMAGE = "image",
+  AUDIO = "audio",
+  FILE = "fichier",
+}
+
+// Interface for User (sender)
+interface User {
+  id: number;
+  name: string;
+  avatar?: string;
+}
+
+// Interface for Room
+interface Room {
+  id: number;
+  name: string;
+  participants: User[];
+}
+
+// Interface for Message
+interface Message {
+  id: number;
+  room: Room;
+  sender: User;
+  content?: string;
+  type_message: MessageType;
+  fichier?: {
+    url: string;
+    name: string;
+    type: string;
+  };
+  image?: {
+    url: string;
+    name: string;
+    dimensions?: {
+      width: number;
+      height: number;
+    };
+  };
+  audio?: {
+    url: string;
+    name: string;
+    duration?: number;
+  };
+  timestamp: Date;
+  is_read: boolean;
+  is_deleted: boolean;
+}
+
+// Props interface for MessageBox component
+interface MessageBoxProps {
+  message: Message;
+  onRead?: (messageId: number) => void;
+  onDelete?: (messageId: number) => void;
+  className?: string;
+}
 
 export type {
   Associate,
   AssociateProps,
   Attendee,
+  ConsultationDialog,
+  ConsultationDialogProps,
   ConsultationProps,
+  ConversationListProps,
   Document,
   DocumentProps,
   File,
@@ -196,23 +325,28 @@ export type {
   Meeting,
   MeetingCardProps,
   MeetingComponentProps,
+  Message,
+  MessageBoxProps,
+  MessageHeaderProps,
   Notification,
   NotificationItemProps,
   Participant,
   ParticipantProps,
   Project,
   ProjectProps,
+  Room,
   SearchBarProps,
   TabsProps,
+  User,
   Webinar,
   WebinarCardProps,
-  ConsultationDialog,ConsultationDialogProps
 };
 
 export {
   ConsultationType,
   FileType,
   MeetingType,
+  MessageType,
   NotificationType,
   ProjectStatus,
   TabsState,

@@ -1,14 +1,17 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { MeetingCardProps, MeetingType } from "@/lib/types";
-import { useState } from "react";
+import { MeetingType } from "@/lib/types";
+import { useEffect, useState } from "react";
 import MeetingCard from "./components/meetingCard";
 import { DialogComponent } from "@/app/_components/dialogComponent";
 import CreateMeeting from "./components/createMeeting";
-export {DialogComponent} from "@/app/_components/dialogComponent"
+export { DialogComponent } from "@/app/_components/dialogComponent"
+import { useMeetingStore } from "@/store/meetings"
+import {getMeetings} from "@/lib/api/reunion"
+
 export default function Reunions() {
   const [filterValue, setFilterValue] = useState<string>("all");
-  const meetings: MeetingCardProps[] = [
+  /*const meetings: MeetingCardProps[] = [
     {
       title: "Réunion CSE Mensuelle",
       subtitle: "Discussion des points clés du mois",
@@ -56,7 +59,7 @@ export default function Reunions() {
       isFinished: false,
       meetingType: MeetingType.Ordinary,
     },
-  ];
+  ];*/
   type FilterType = "all" | MeetingType;
 
   // Filter function
@@ -66,19 +69,19 @@ export default function Reunions() {
         return meetings;
       case MeetingType.Ordinary:
         return meetings.filter(
-          (meeting) => meeting.meetingType === MeetingType.Ordinary
+          (meeting) => meeting.type_reunion === MeetingType.Ordinary
         );
       case MeetingType.Extraordinal:
         return meetings.filter(
-          (meeting) => meeting.meetingType === MeetingType.Extraordinal
+          (meeting) => meeting.type_reunion === MeetingType.Extraordinal
         );
       case MeetingType.Others:
         return meetings.filter(
-          (meeting) => meeting.meetingType === MeetingType.Others
+          (meeting) => meeting.type_reunion === MeetingType.Others
         );
       case MeetingType.CSSCT:
         return meetings.filter(
-          (meeting) => meeting.meetingType === MeetingType.CSSCT
+          (meeting) => meeting.type_reunion === MeetingType.CSSCT
         );
       default:
         return meetings;
@@ -88,7 +91,24 @@ export default function Reunions() {
     setFilterValue(filterValue);
     setFilteredMeetings(filterMeetings(filterValue as FilterType));
   };
+
+  const { meetings, setMeetings } = useMeetingStore()
   const [filteredMeeting, setFilteredMeetings] = useState(meetings);
+  useEffect(() => {
+    const handler = async () => {
+      try {
+        const data = await getMeetings()
+      setMeetings(data)
+        
+      } catch (error : unknown) {
+        console.error("Error fetching meetings:", (error as Error).message);
+        
+      }
+      
+    }
+    handler()
+    
+  }, [])
   return (
     <div className="flex flex-col gap-5">
       <div className="flex flex-row gap-2">

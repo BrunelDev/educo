@@ -29,8 +29,8 @@ export const endpoints = {
     logout: "/auth/logout",
   },
   meetings: {
-    list: "/meetings",
-    create: "/meetings",
+    list: "/reunions/",
+    create: "/reunions/creer/",
     update: (id: string) => `/meetings/${id}`,
     delete: (id: string) => `/meetings/${id}`,
   },

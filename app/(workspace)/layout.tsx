@@ -6,8 +6,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider>
       <AppSidebar/>
-      <main className="bg-[url(/workspace-bg.svg)] bg-no-repeat bg-cover bg-center w-full p-8 text-white-800">
-        <SidebarTrigger />
+      <main className="bg-[url(/workspace-bg.svg)] bg-no-repeat bg-cover bg-center w-full p-8 text-white-800 relative">
+        <SidebarTrigger/>
         <div className="z-0">
         {children}
         </div>

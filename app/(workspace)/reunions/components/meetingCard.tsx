@@ -1,12 +1,10 @@
-import { MeetingCardProps } from "@/lib/types";
+import { Meeting} from "@/lib/types";
 import { CalendarDays, Check, Ellipsis } from "lucide-react";
 import Image from "next/image";
 
-interface Meeting {
-  meeting: MeetingCardProps;
-}
 
-export default function MeetingCard({ meeting }: Meeting) {
+
+export default function MeetingCard({ ...meeting }: Meeting) {
   return (
     <div className="bg-[#FFFFFF99] rounded-[8px] py-2 px-3 w-[350px] flex flex-col gap-2">
       <div className="flex justify-between items-start">
@@ -48,7 +46,7 @@ export default function MeetingCard({ meeting }: Meeting) {
       </div>
       <div className="flex justify-between items-center">
         <div className="flex -space-x-2">
-          {meeting.attendees.map((attendee, index) => (
+          {meeting.participants.map((attendee, index) => (
             <Image
               key={index}
               src={attendee.imageUrl ? "/userProfile-img.png" : "null"}

@@ -234,7 +234,7 @@ const StepTwo = () => {
 
 const StepFour = () => {
   return (
-    <div>
+    <div className="w-full">
       <Editor />
     </div>
   );
