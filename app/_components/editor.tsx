@@ -139,7 +139,7 @@ const editorConfig = {
 
 export default function Editor() {
   return (
-    <LexicalComposer initialConfig={editorConfig}>
+    <LexicalComposer initialConfig={editorConfig} >
       <div className="editor-container border w-full">
         <ToolbarPlugin />
         <div className="editor-inner">

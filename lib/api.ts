@@ -23,7 +23,9 @@ export const api = axios.create({
 
 // API endpoints
 export const endpoints = {
+  
   auth: {
+    users: "auth/utilisateurs/",
     login: "/auth/utilisateurs/connexion/",
     register: "auth/utilisateurs/inscription/",
     logout: "/auth/logout",

@@ -57,15 +57,10 @@ export default function Equipe() {
           />{" "}
           <div className="w-full">
           <DialogComponent
-          dialoTrigger={
-            <Button variant={"default"} className="cursor-pointer bg-gradient-to-r from-[#FE6539] to-crimson-400">
-              <Plus /> Ajouter un membre
-            </Button>
-          }
-          dialogContent={
-            <AddMemberDialog/>
-          }
-        />
+              dialoTrigger={<Button variant={"default"} className="cursor-pointer bg-gradient-to-r from-[#FE6539] to-crimson-400">
+                <Plus /> Ajouter un membre
+              </Button>}
+              dialogContent={<AddMemberDialog />} dialogTitle={null}        />
           </div>
         
         </div>

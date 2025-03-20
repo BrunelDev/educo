@@ -169,8 +169,8 @@ export default function Reunions() {
       <div>
         <h6 className="mb-4">Historique des Réunions</h6>
         <div className="w-full flex flex-row flex-wrap gap-5">
-        {meetings.map((meeting, index) => (
-          <MeetingCard meeting={meeting} key={meeting.title + index} />
+        {meetings?.map((meeting, index) => (
+          <MeetingCard meeting={meeting} key={meeting.titre + index} />
         ))}
         </div>
       </div>

@@ -33,7 +33,7 @@ enum InvitationStatus {
 interface MeetingParticipant {
   utilisateur: number;
   est_hote: boolean;
-  statut_invitation: InvitationStatus;
+  statut_invitation?  : InvitationStatus;
 }
 
 // Interface for meeting documents
@@ -58,7 +58,7 @@ interface AgendaItem {
 
 // Main meeting interface
 interface Meeting {
-  id : number
+  id: number;
   type_reunion: string;
   titre: string;
   objet: string;
@@ -75,7 +75,6 @@ interface MeetingComponentProps {
   meeting: Meeting;
 }
 //Meeting--------------------------------------------------------
-
 
 interface TabsProps {
   activeTab: TabsState;
@@ -192,6 +191,18 @@ interface ParticipantProps {
 interface Participant {
   participant: ParticipantProps;
 }
+interface Error1 {
+  title?: string;
+  purpose?: string;
+  location?: string;
+  link?: string;
+}
+
+interface Error2 {
+  date?: string;
+  time?: string;
+  frequency?: string;
+}
 
 enum ConsultationType {
   Orientation = "Orientations stratégiques de l’entreprise",
@@ -230,7 +241,7 @@ interface MessageHeaderProps {
 
 interface ConversationListProps {
   conversations: Array<{
-    _id: string;
+    id: string;
     messages: Array<{
       title: string;
       text: string;
@@ -307,6 +318,11 @@ interface MessageBoxProps {
   onDelete?: (messageId: number) => void;
   className?: string;
 }
+interface FileInputChangeEvent extends React.ChangeEvent<HTMLInputElement> {
+  target: HTMLInputElement & {
+    files: FileList;
+  };
+}
 
 export type {
   Associate,
@@ -318,7 +334,10 @@ export type {
   ConversationListProps,
   Document,
   DocumentProps,
+  Error1,
+  Error2,
   File,
+  FileInputChangeEvent,
   FileProps,
   Folder,
   FolderProps,

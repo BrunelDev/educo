@@ -1,4 +1,4 @@
-import { Meeting} from "@/lib/types";
+import { Meeting } from "@/lib/types";
 import { CalendarDays, Check, Ellipsis } from "lucide-react";
 import Image from "next/image";
 
@@ -11,13 +11,13 @@ export default function MeetingCard({ ...meeting }: Meeting) {
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-coral-100"></div>{" "}
-            <h6 className="text-xs font-semibold">{meeting.meetingType}</h6>
+            <h6 className="text-xs font-semibold">{meeting.type_reunion}</h6>
           </div>
           <h3 className="font-bold">
-            {meeting.title}
+            {meeting.titre}
           </h3>
           <p className="text-sm text-gray-600 text-nowrap">
-            {meeting.subtitle}
+            {meeting.objet}
           </p>
         </div>
         <Ellipsis />
@@ -27,17 +27,17 @@ export default function MeetingCard({ ...meeting }: Meeting) {
               
               <div className="w-fit flex gap-2 text-xs">
               <CalendarDays size={14}/>
-                  <h6>{meeting.date}</h6>
-                  <h6>{meeting.time}</h6>
+                  <h6>{meeting.date_heure.toLocaleString()}</h6>
+                  <h6>{meeting.date_heure.toLocaleString()}</h6>
               </div>
 
         <div className="flex gap-2">
-          {meeting.isOnline && (
+          {meeting.emplacement == "En ligne" && (
             <span className="px-3 py-1 bg-white rounded-full text-sm text-gray-600">
               En ligne
             </span>
           )}
-          {meeting.isInPerson && (
+          {meeting.emplacement == "En Physique" && (
             <span className="px-3 py-1 bg-white rounded-full text-sm text-gray-600">
               En présence
             </span>
@@ -49,7 +49,7 @@ export default function MeetingCard({ ...meeting }: Meeting) {
           {meeting.participants.map((attendee, index) => (
             <Image
               key={index}
-              src={attendee.imageUrl ? "/userProfile-img.png" : "null"}
+              src={attendee. ? "/userProfile-img.png" : "null"}
               alt={`Attendee ${index + 1}`}
               width={32}
               height={32}
