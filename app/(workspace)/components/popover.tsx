@@ -8,13 +8,15 @@ import { JSX } from "react";
 export function Popover({
   PopoverContent,
   PopoverTrigger,
+  className,
 }: {
   PopoverContent: JSX.Element;
-  PopoverTrigger: JSX.Element;
+    PopoverTrigger: JSX.Element;
+    className? : string;
 }) {
   return (
     <PopoverComponent>
-      <Trigger asChild>{PopoverTrigger}</Trigger>
+      <Trigger asChild className={className ? className : ""}>{PopoverTrigger}</Trigger>
       <Content className="w-fit p-0">{PopoverContent}</Content>
     </PopoverComponent>
   );

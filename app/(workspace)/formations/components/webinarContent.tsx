@@ -1,8 +1,9 @@
-import { WebinarCardProps } from "@/lib/types";
 import WebinarCard from "./webinarCard";
+import { useEffect, useState } from "react";
+import { getWebinaires, WebinairesResponse } from "@/lib/api/formations";
 
 export default function WebinarContent() {
-  const webinars: WebinarCardProps[] = [
+  /*const webinars: WebinarCardProps[] = [
     {
       tag: "Comptabilité",
       title: "Maîtriser la Comptabilité du CSE en 3 Étapes",
@@ -36,7 +37,22 @@ export default function WebinarContent() {
       backgroundImageUrl: "/webinarCard-bg.png",
       id: "1249",
     },
-  ];
+  ];*/
+  const [webinars, setWebinars] = useState<WebinairesResponse>() 
+  useEffect(() => {
+    const fun = async () => {
+      try {
+        const response = await getWebinaires();
+        setWebinars(response);
+        console.log(response);
+        
+      } catch (error: unknown) {
+        console.error("Error fetching webinars", error);
+        
+      }
+    }
+    fun()
+  }, [])
   return (
       <div className="flex flex-col gap-3">
           <h4 className="font-bold text-[18px]">Regardez nos sessions d&apos;experts à la demande</h4>
@@ -48,16 +64,17 @@ export default function WebinarContent() {
       <div>
         <h6 className="mb-3 text-sm font-semibold">À venir</h6>
         <div className="flex flex-wrap justify-between">
-          {webinars.map((webinar, index) => (
+          {webinars?.results.map((webinar, index) => (
             <WebinarCard webinar={webinar} key={webinar.id + index} />
           ))}
         </div>
       </div><div>
+        
               <h6 className="mb-3 text-sm font-semibold">
               Recommandés pour vous
         </h6>
         <div className="flex flex-wrap justify-between">
-          {webinars.map((webinar, index) => (
+          {webinars?.results.map((webinar, index) => (
             <WebinarCard webinar={webinar} key={webinar.id + index} />
           ))}
         </div>

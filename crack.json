@@ -1,0 +1,46 @@
+{
+	"count": 2,
+	"next": null,
+	"previous": null,
+	"results": [
+		{
+			"id": 1,
+			"titre": "Comprendre la Comptabilité du CSE en 3 étapes (Mise à jour)",
+			"description": "Apprenez les bases de la comptabilité pour le CSE avec un expert (version mise à jour).",
+			"image": "https://mongodb.com/images/comptabilite_cse_updated.jpg",
+			"formateur_nom": "William Anderson",
+			"formateur_profession": "Expert-Comptable spécialisé en CSE",
+			"date": "2025-04-01T14:00:00Z",
+			"duree": "1h 45min",
+			"utilisateur": 2,
+			"ressources": [
+				{
+					"id": 1,
+					"titre": "Audit UX/UI des pages livres du site GLOBE",
+					"type_ressource": "DOCUMENT",
+					"url": "https://mongodb.com/files/audit_ux_ui.pdf",
+					"webinaire": 1,
+					"utilisateur": 2,
+					"date_creation": "2025-03-20T04:13:26.896134Z",
+					"date_modification": "2025-03-20T04:13:26.896157Z"
+				}
+			],
+			"date_creation": "2025-03-20T04:10:59.969061Z",
+			"date_modification": "2025-03-20T04:12:22.552837Z"
+		},
+		{
+			"id": 2,
+			"titre": "Nouvelle loi sur le dialogue social en entreprise – Ce qui change en 2025",
+			"description": "https://mailtrap.io/blog/free-smtp-servers/#:~:text=By%20definition%2C%20free%20SMTP%20(Simple,for%20small%2Dscale%20email%20operations.",
+			"image": "https://mailtrap.io/blog/free-smtp-servers/#:~:text=By%20definition%2C%20free%20SMTP%20(Simple,for%20small%2Dscale%20email%20operations.",
+			"formateur_nom": "Brunel",
+			"formateur_profession": "Avorton",
+			"date": "2025-03-21T10:04:08Z",
+			"duree": "2heures",
+			"utilisateur": 3,
+			"ressources": [],
+			"date_creation": "2025-03-21T10:04:16.093499Z",
+			"date_modification": "2025-03-21T10:04:16.093513Z"
+		}
+	]
+}

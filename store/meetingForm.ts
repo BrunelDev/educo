@@ -1,50 +1,55 @@
 import { MeetingType } from "@/lib/types";
 import { create } from "zustand";
 
-interface MeetingFormState {
+export interface MeetingFormState {
   // Step 1 - General Information
-  meetingType: MeetingType;
-  title: string;
-  purpose: string;
-  locations: ("physique" | "enligne")[];
-  meetingLink?: string;
+  type_reunion: MeetingType;
+  titre: string;
+  objet: string;
+  emplacement: string;
+  lien_reunion?: string;
 
   // Step 2 - Schedule
-  dateTime: string;
-  frequency: "once" | "weekly" | "monthly";
+  date_heure: string;
+  frequence: "once" | "weekly" | "monthly";
   documents: Array<{
-    file: File;
-    fileUrl: string;
+    fichier: string;
+    nom_fichier: string;
+    type_document: string;
   }>;
 
   // Step 3 - Participants
   participants: Array<{
     utilisateur: number;
     est_hote: boolean;
-    statut_invitation: "EN_ATTENTE" | "ACCEPTE" | "REFUSE";
+    statut_invitation: "EN_ATTENTE" | "ACCEPTE" | "REFUSE" | null;
   }>;
 
   // Step 4 - Agenda
-  agenda: Array<{
+  ordre_du_jour: Array<{
     description: string;
   }>;
 
   // Form Actions
   updateStep1: (
     data: Partial<{
-      meetingType: MeetingType;
-      title: string;
-      purpose: string;
-      locations: ("physique" | "enligne")[];
-      meetingLink: string;
+      type_reunion: MeetingType;
+      titre: string;
+      objet: string;
+      emplacement: string;
+      lien_reunion: string;
     }>
   ) => void;
 
   updateStep2: (
     data: Partial<{
-      dateTime: string;
-      frequency: "once" | "weekly" | "monthly";
-      documents: Array<{ file: File; fileUrl: string }>;
+      date_heure: string;
+      frequence: "once" | "weekly" | "monthly";
+      documents: Array<{
+        fichier: string;
+        nom_fichier: string;
+        type_document: string;
+      }>;
     }>
   ) => void;
 
@@ -52,26 +57,26 @@ interface MeetingFormState {
     participants: Array<{
       utilisateur: number;
       est_hote: boolean;
-      statut_invitation: "EN_ATTENTE" | "ACCEPTE" | "REFUSE";
+      statut_invitation: "EN_ATTENTE" | "ACCEPTE" | "REFUSE" | null;
     }>
   ) => void;
 
-  updateStep4: (agenda: Array<{ description: string }>) => void;
+  updateStep4: (ordre_du_jour: Array<{ description: string }>) => void;
 
   resetForm: () => void;
 }
 
 const initialState = {
-  meetingType: MeetingType.Ordinary,
-  title: "",
-  purpose: "",
-  locations: [],
-  meetingLink: "",
-  dateTime: "",
-  frequency: "once" as const,
+  type_reunion: MeetingType.Ordinary,
+  titre: "",
+  objet: "",
+  emplacement: "",
+  lien_reunion: "",
+  date_heure: "",
+  frequence: "once" as const,
   documents: [],
   participants: [],
-  agenda: [],
+  ordre_du_jour: [],
 };
 
 export const useMeetingForm = create<MeetingFormState>((set) => ({
@@ -95,10 +100,10 @@ export const useMeetingForm = create<MeetingFormState>((set) => ({
       participants,
     })),
 
-  updateStep4: (agenda) =>
+  updateStep4: (ordre_du_jour) =>
     set((state) => ({
       ...state,
-      agenda,
+      ordre_du_jour,
     })),
 
   resetForm: () => set(initialState),

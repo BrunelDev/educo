@@ -1,0 +1,99 @@
+import api, { endpoints } from "../api";
+interface User {
+    id: number;
+    email: string;
+    first_name: string;
+    last_name: string;
+    image: string | null;
+}
+
+interface Team {
+    id: number;
+    nom: string;
+    description: string;
+    createur: User;
+    membres: User[];
+    date_creation: string;
+    date_modification: string;
+}
+
+interface TeamApiResponse {
+    count: number;
+    next: string | null;
+    previous: string | null;
+    results: Team[];
+}
+
+export const getTeams = async () : Promise<TeamApiResponse> => {
+    try {
+        const response = await api.get(endpoints.equipes.base);
+        return response.data
+        
+    } catch (error: unknown) {
+        console.error("Error getting item",(error as Error).message)
+        return {
+            count: 0,
+            next: null,
+            previous: null,
+            results: []
+        };
+        
+    }
+}
+export const addMemberToTeam = async (members : number) : Promise<Team> => {
+    try {
+        const response = await api.post(endpoints.equipes.base, {members});
+        console.log(response.data);
+        return response.data;
+        
+
+    } catch (error) {
+        console.error("Error adding members to team", (error as Error).message);
+        return {
+            id: 0,
+            nom: "",
+            description: "",
+            createur: {
+                id: 0,
+                email: "",
+                first_name: "",
+                last_name: "",
+                image: null
+            },
+            membres: [],
+            date_creation: "",
+            date_modification: ""
+        }
+
+        
+    }
+}
+
+export const createTeam = async (nom : string, description : string, membre_ids : number[] ) : Promise<Team> => {
+    try {
+      const response = await api.post(endpoints.equipes.base, {
+        nom,
+        description,
+        membre_ids,
+      });
+        return response.data;
+      
+    } catch (error) {
+      console.error("Error creating team", error);
+      throw error;
+      
+    }
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+export type { User, Team, TeamApiResponse };

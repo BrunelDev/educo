@@ -2,12 +2,13 @@
 import { Button } from "@/components/ui/button";
 import { AssociateProps } from "@/lib/types";
 import { Plus } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SearchBar from "../components/searchBar";
 import AssociateCard from "./components/associateCard";
 import Contact from "./components/contact";
 import { DialogComponent } from "@/app/_components/dialogComponent";
 import AddMemberDialog from "./components/addMemberDialog";
+import { getTeams, TeamApiResponse } from "@/lib/api/equipe";
 
 export default function Equipe() {
   const associates: AssociateProps[] = [
@@ -43,6 +44,21 @@ export default function Equipe() {
     },
   ];
   const [searchValue, setSearchValue] = useState<string>("");
+  const [teams, setTeams] = useState<TeamApiResponse>()
+
+  useEffect(() => {
+    const fetchTeams = async () => {
+      try {
+        const response = await getTeams()
+        console.log(response)
+        setTeams(response)
+        } catch (error : unknown) {
+          
+        }
+    }
+    fetchTeams()
+    
+  }, [])
   return (
     <div className="flex flex-col gap-6">
       <h6>Equipe</h6>

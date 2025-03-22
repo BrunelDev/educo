@@ -36,11 +36,32 @@ export const endpoints = {
     update: (id: string) => `/meetings/${id}`,
     delete: (id: string) => `/meetings/${id}`,
   },
-  documents: {
-    list: "/documents",
-    upload: "/documents/upload",
-    download: (id: string) => `/documents/${id}`,
+  fichiers: {
+    dossiers: {
+      list: "/fichiers/dossiers/",
+      create: "/dossiers/creer/",
+      update: (id: string) => `/dossiers/${id}`,
+      delete: (id: string) => `/dossiers/${id}`,
+    }
+    
   },
+  formations: {
+    webinaires: {
+      list: "/formations/webinaires/",
+      create: "/webinaires/creer/",
+      update: (id: string) => `/webinaires/${id}`,
+      delete: (id: string) => `/webinaires/${id}`,
+    }
+  },
+  equipes: {
+    base: "/equipe/equipes/",
+    /*create: "/equipe/equipes/",
+    add_member: "/equipe/equipes/" ,*/
+    update: (id: string) => `/equipe/${id}/`,
+    delete: (id: string) => `/equipe/equipes/${id}/`,
+  }
 };
+
+
 
 export default api;

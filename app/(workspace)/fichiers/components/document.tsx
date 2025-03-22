@@ -1,6 +1,12 @@
 import { Popover } from "@/app/(workspace)/components/popover";
 import { Document } from "@/lib/types";
-import { Download, Ellipsis, FilePenLine, Trash2 } from "lucide-react";
+import {
+  Download,
+  Ellipsis,
+  FilePenLine,
+  LucideIcon,
+  Trash2,
+} from "lucide-react";
 import Image from "next/image";
 
 export default function DocumentCard({ document }: Document) {
@@ -14,7 +20,7 @@ export default function DocumentCard({ document }: Document) {
       />
       <h6 className="text-center">{document.name}</h6>
       <Popover
-        PopoverContent={<PopoverContent />}
+        PopoverContent={<PopoverContent content={[]} />}
         PopoverTrigger={
           <div className="w-6 h-6 justify-center items-center rounded-sm cursor-pointer flex hover:bg-coral-50 absolute top-2 right-2 duration-200">
             <Ellipsis className="" size={18} />
@@ -24,22 +30,60 @@ export default function DocumentCard({ document }: Document) {
     </div>
   );
 }
-
-const PopoverContent = () => {
+interface PopoverContent {
+  label: string;
+  handleClick: () => void;
+  icon: LucideIcon;
+}
+interface PopoverContentProps {
+  content: PopoverContent[];
+}
+const deleteItem = () => {
+  console.log("delete");
+};
+const download = () => {
+  console.log("delete");
+};
+const rename = () => {
+  console.log("delete");
+};
+const defaultPopoverContent = [
+  {
+    label: "Télécharger",
+    icon: Download,
+    handleClick: download,
+  },
+  {
+    label: "Renommer",
+    icon: FilePenLine,
+    handleClick: rename,
+  },
+  {
+    label: "Supprimer",
+    icon: Trash2,
+    handleClick: deleteItem,
+  },
+];
+export const PopoverContent = ({
+  content = defaultPopoverContent,
+}: PopoverContentProps) => {
   return (
     <div className="py-2 px-1 text-sm w-[125px] flex flex-col gap-[6px]">
-      <div className="hover:bg-gray-100 cursor-pointer rounded-[4px] px-2 flex  items-center justify-around py-1">
-        <Download size={18}/>
-        <h6>Télécharger</h6>
-      </div>
-      <div className="hover:bg-gray-100 cursor-pointer rounded-[4px] flex items-center justify-around px-2 py-1">
-        <FilePenLine size={18}/>
-        <h6>Renommer</h6>
-      </div>
-      <div className="hover:bg-gray-100 cursor-pointer rounded-[4px] flex justify-around items-center text-red-500 px-2 py-1">
-        <Trash2 size={18}/>
-        <h6>Supprimer</h6>
-      </div>
+      {content.map((content, i) => {
+        const Icon = content.icon;
+        return (
+          <div
+            key={content.label + i}
+            className="hover:bg-gray-100 cursor-pointer rounded-[4px] px-2 flex  items-center justify-around py-1"
+            onClick={() => {
+              content.handleClick();
+            }}
+          >
+            {Icon ? <Icon size={18} /> : null}
+            <h6>{content.label}</h6>
+          </div>
+        );
+      })}
     </div>
   );
 };

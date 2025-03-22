@@ -1,14 +1,17 @@
-import { File, FileType } from "@/lib/types";
+import { Fichier } from "@/lib/api/fichiers";
+import { FileType } from "@/lib/types";
 import { EllipsisVertical, FileText, Image as ImageIcon } from "lucide-react";
 import Image from "next/image";
-
-export default function FileCard({ file }: File) {
+interface FileCardProps {
+  file : Fichier
+}
+export default function FileCard({ file }: FileCardProps) {
   return (
     <div className="py-3 px-2 w-[233px] bg-[#FFFFFF99] rounded-[8px] flex flex-col gap-2">
       <div className="flex justify-between">
-        {file.type === FileType.img ? <ImageIcon /> : <FileText />}
+        {file.type_fichier === FileType.img.toString().toUpperCase() ? <ImageIcon /> : <FileText />}
 
-        <h6 className="truncate w-[70%]">{file.name}</h6>
+        <h6 className="truncate w-[70%]">{file.nom}</h6>
         <EllipsisVertical size={18} />
       </div>
       <Image

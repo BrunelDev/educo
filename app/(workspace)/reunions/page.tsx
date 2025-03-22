@@ -92,13 +92,14 @@ export default function Reunions() {
     setFilteredMeetings(filterMeetings(filterValue as FilterType));
   };
 
-  const { meetings, setMeetings } = useMeetingStore()
+  const {meetings, setMeetings} = useMeetingStore()
   const [filteredMeeting, setFilteredMeetings] = useState(meetings);
   useEffect(() => {
     const handler = async () => {
       try {
         const data = await getMeetings()
-      setMeetings(data)
+        setMeetings(data?.results)
+        console.log(data?.results);
         
       } catch (error : unknown) {
         console.error("Error fetching meetings:", (error as Error).message);
@@ -108,7 +109,7 @@ export default function Reunions() {
     }
     handler()
     
-  }, [])
+  }, [setMeetings])
   return (
     <div className="flex flex-col gap-5">
       <div className="flex flex-row gap-2">
@@ -162,14 +163,14 @@ export default function Reunions() {
         <h6 className="mb-4">Réunions à venir</h6>
         <div className="w-full flex flex-row flex-wrap gap-5">
         {filteredMeeting.map((meeting, index) => (
-          <MeetingCard meeting={meeting} key={meeting.title + index} />
+          <MeetingCard meeting={meeting} key={meeting.titre + index} />
         ))}
         </div>
       </div>
       <div>
         <h6 className="mb-4">Historique des Réunions</h6>
         <div className="w-full flex flex-row flex-wrap gap-5">
-        {meetings?.map((meeting, index) => (
+        {meetings.length>0 && meetings?.map((meeting, index) => (
           <MeetingCard meeting={meeting} key={meeting.titre + index} />
         ))}
         </div>

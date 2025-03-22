@@ -10,14 +10,17 @@ import { StepProgress } from "./stepProgress";
 
 import Editor from "@/app/_components/editor";
 import { handleFileUpload } from "@/app/actions/actions";
+import { createMeeting } from "@/lib/api/reunion";
+import { getAllusers, User } from "@/lib/api/users";
 import { Error1, Error2, FileInputChangeEvent, MeetingType } from "@/lib/types";
 import { useFileStore } from "@/store/files";
-import FileComponent from "./fileComponent";
+import { useMeetingForm } from "@/store/meetingForm";
 import Image from "next/image";
-import { getAllusers, User, UserApiResponse } from "@/lib/api/users";
+import FileComponent from "./fileComponent";
 
 export default function CreateMeeting() {
   const [currentStep, setCurrentStep] = useState(1);
+  const formData = useMeetingForm();
   const steps = [
     {
       number: 1,
@@ -64,7 +67,7 @@ export default function CreateMeeting() {
     setForm2Error(errors);
     return Object.keys(errors).length === 0;
   };
-
+  const {} = useMeetingForm();
   return (
     <div className="flex flex-col gap-6 py-10 px-20 w-[900px]">
       <StepProgress steps={steps} />
@@ -73,7 +76,9 @@ export default function CreateMeeting() {
           <StepOne errors={form1Error} setErrors={setForm1Error} />
         ) : currentStep === 2 ? (
           <StepTwo errors={form2Error} setErrors={setForm2Error} />
-        ) : currentStep === 3 ? <StepThree/> : currentStep === 4 ? (
+        ) : currentStep === 3 ? (
+          <StepThree />
+        ) : currentStep === 4 ? (
           <StepFour />
         ) : null}
       </div>
@@ -103,17 +108,25 @@ export default function CreateMeeting() {
                 return;
               }
             }
-            setCurrentStep(Math.min(4, currentStep + 1));
 
             if (currentStep === 4) {
-              const filesToUpload = filesList.map((item) => item.file);
-              await handleFileUpload(filesToUpload);
-              console.log("etape finale soumission");
+              try {
+                const filesToUpload = filesList.map((item) => item.file);
+                await handleFileUpload(filesToUpload);
+                await createMeeting(formData);
+                // Optionally reset form or redirect after success
+                console.log("Meeting created successfully");
+              } catch (error) {
+                console.error("Error creating meeting:", error);
+              }
+              return;
             }
+
+            setCurrentStep(Math.min(4, currentStep + 1));
           }}
           className="px-4 py-2 bg-rose-500 text-white rounded-md hover:bg-rose-600 transition-colors"
         >
-          Suivant
+          {currentStep === 4 ? "Submit" : "Suivant"}
         </Button>
       </div>
     </div>
@@ -127,20 +140,32 @@ const StepOne = ({
   errors: Error1;
   setErrors: (error: Error1) => void;
 }) => {
+  const { type_reunion, titre, objet, emplacement, lien_reunion, updateStep1 } =
+    useMeetingForm();
+
   // Meeting type state
-  const [meetingType, setMeetingType] = useState<MeetingType>(
-    MeetingType.Ordinary
+  const [localMeetingType, setLocalMeetingType] =
+    useState<MeetingType>(type_reunion);
+  const [localMeetingTitle, setLocalMeetingTitle] = useState<string>(
+    titre || "Réunion ordinaire du CSE"
+  );
+  const [localMeetingPurpose, setLocalMeetingPurpose] =
+    useState<string>(objet);
+  const [localLocation, setLocalLocation] = useState<string>(emplacement);
+  const [localMeetingLink, setLocalMeetingLink] = useState<string>(
+    lien_reunion || ""
   );
 
-  // Meeting title and purpose states
-  const [meetingTitle, setMeetingTitle] = useState<string>(
-    "Réunion ordinaire du CSE"
-  );
-  const [meetingPurpose, setMeetingPurpose] = useState<string>("");
-
-  // Location states
-  const [location, setLocation] = useState<string[]>([]);
-  const [meetingLink, setMeetingLink] = useState<string>("");
+  // Update store whenever local state changes
+  useEffect(() => {
+    updateStep1({
+      type_reunion: localMeetingType,
+      titre: localMeetingTitle,
+      objet: localMeetingPurpose,
+      emplacement: localLocation ,
+      lien_reunion: localMeetingLink,
+    });
+  }, [localMeetingType, localMeetingTitle, localMeetingPurpose, localLocation, localMeetingLink, updateStep1]);
 
   // Form validation state
 
@@ -151,33 +176,39 @@ const StepOne = ({
     const newErrors: Error1 = {};
 
     // Title validation
-    if (!meetingTitle.trim()) {
+    if (!localMeetingTitle.trim()) {
       newErrors.title = "Le titre est requis";
     }
 
     // Purpose validation
-    if (!meetingPurpose.trim()) {
+    if (!localMeetingPurpose.trim()) {
       newErrors.purpose = "L'objet est requis";
-    } else if (meetingPurpose.length < 10) {
+    } else if (localMeetingPurpose.length < 10) {
       newErrors.purpose = "L'objet doit contenir au moins 10 caractères";
     }
 
     // Location validation
-    if (location.length === 0) {
+    if (localLocation.length === 0) {
       newErrors.location = "Sélectionnez au moins un type d'emplacement";
     }
 
     // Meeting link validation
-    if (location.includes("enligne")) {
-      if (!meetingLink) {
+    if (localLocation.includes("enligne")) {
+      if (!localMeetingLink) {
         newErrors.link = "Le lien est requis pour une réunion en ligne";
-      } else if (!isValidUrl(meetingLink)) {
+      } else if (!isValidUrl(localMeetingLink)) {
         newErrors.link = "Le lien n'est pas valide";
       }
     }
 
     setErrors(newErrors);
-  }, [meetingTitle, meetingPurpose, location, meetingLink, setErrors]);
+  }, [
+    localMeetingTitle,
+    localMeetingPurpose,
+    localLocation,
+    localMeetingLink,
+    setErrors,
+  ]);
 
   // Helper function to validate URL
   const isValidUrl = (url: string) => {
@@ -195,9 +226,9 @@ const StepOne = ({
     <div className="flex flex-col gap-5">
       <div className="">
         <RadioGroup
-          value={meetingType}
+          value={localMeetingType}
           defaultValue={MeetingType.Ordinary}
-          onValueChange={(value: MeetingType) => setMeetingType(value)}
+          onValueChange={(value: MeetingType) => setLocalMeetingType(value)}
           className="flex flex-row gap-6"
         >
           <div className="flex items-center space-x-2">
@@ -227,8 +258,8 @@ const StepOne = ({
           className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 ${
             errors.title ? "border-red-500" : "border-gray-300"
           }`}
-          value={meetingTitle}
-          onChange={(e) => setMeetingTitle(e.target.value)}
+          value={localMeetingTitle}
+          onChange={(e) => setLocalMeetingTitle(e.target.value)}
         >
           <option>Réunion ordinaire du CSE</option>
         </select>
@@ -242,9 +273,9 @@ const StepOne = ({
         <label className="text-sm font-medium text-gray-700">Objet</label>
         <Input
           type="text"
-          value={meetingPurpose}
+          value={localMeetingPurpose}
           onChange={(e) => {
-            setMeetingPurpose(e.target.value);
+            setLocalMeetingPurpose(e.target.value);
           }}
           placeholder="Suivi des activités du CSE"
           className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
@@ -260,13 +291,14 @@ const StepOne = ({
           <label className="flex items-center">
             <Input
               type="checkbox"
-              value="physique"
-              checked={location.includes("physique")}
+              value="PHYSIQUE"
+              checked={localLocation === "PHYSIQUE"}
               onChange={(e) => {
                 if (e.target.checked) {
-                  setLocation([...location, "physique"]);
+                  setLocalLocation("PHYSIQUE");
                 } else {
-                  setLocation(location.filter((l) => l !== "physique"));
+                  setLocalLocation("")
+                  
                 }
               }}
               className="w-4 h-4 text-blue-600 rounded"
@@ -278,12 +310,14 @@ const StepOne = ({
             <Input
               type="checkbox"
               value="enligne"
-              checked={location.includes("enligne")}
+              checked={localLocation.includes("enligne")}
               onChange={(e) => {
                 if (e.target.checked) {
-                  setLocation([...location, "enligne"]);
+                  setLocalLocation([...localLocation, "enligne"]);
                 } else {
-                  setLocation(location.filter((l) => l !== "enligne"));
+                  setLocalLocation(
+                    localLocation.filter((l) => l !== "enligne")
+                  );
                 }
               }}
               className="w-4 h-4 text-blue-600 rounded"
@@ -303,9 +337,9 @@ const StepOne = ({
         <Input
           required
           type="text"
-          value={meetingLink}
+          value={localMeetingLink}
           onChange={(e) => {
-            setMeetingLink(e.target.value);
+            setLocalMeetingLink(e.target.value);
           }}
           className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
         />
@@ -319,60 +353,43 @@ const StepOne = ({
 
 const StepTwo = ({
   errors,
-  setErrors,
 }: {
   errors: Error2;
   setErrors: (error: Error2) => void;
 }) => {
+  const { date_heure, frequence, updateStep2 } = useMeetingForm();
   const { filesList, addFileWithUrl, removeFileWithUrl } = useFileStore();
-  const [meetingDate, setMeetingDate] = useState<string>("");
-  const [meetingTime, setMeetingTime] = useState<string>("");
-  const [frequency, setFrequency] = useState<string>("once");
-  const [, setFile] = useState<File | undefined>(undefined);
-  const [, setFileUrl] = useState<string | undefined>(undefined);
+
+  const [localDate, setLocalDate] = useState<string>('');
+  const [localTime, setLocalTime] = useState<string>('');
+  const [localFrequency, setLocalFrequency] = useState<
+    "once" | "weekly" | "monthly"
+  >(frequence as "once");
 
   useEffect(() => {
-    const newErrors: Error2 = {};
-
-    // Date validation
-    if (!meetingDate) {
-      newErrors.date = "La date est requise";
-    } else {
-      const selectedDate = new Date(meetingDate);
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-
-      if (selectedDate < today) {
-        newErrors.date = "La date ne peut pas être dans le passé";
-      }
+    if (localDate && localTime) {
+      const combinedDateTime = new Date(`${localDate}T${localTime}`).toISOString();
+      updateStep2({
+        date_heure: combinedDateTime,
+        frequence: localFrequency,
+        documents: filesList.map((f) => ({ 
+          nom_fichier: "le nom", 
+          fichier: f.fileUrl, 
+          type_document: "fichier" 
+        })),
+      });
     }
-
-    // Time validation
-    if (!meetingTime) {
-      newErrors.time = "L'heure est requise";
-    }
-
-    // Frequency validation
-    if (!frequency) {
-      newErrors.frequency = "La fréquence est requise";
-    }
-
-    setErrors(newErrors);
-  }, [meetingDate, meetingTime, frequency, setErrors]);
+  }, [localDate, localTime, localFrequency, filesList, updateStep2]);
 
   const handleFileInputChange = (e: FileInputChangeEvent): void => {
     const newFile = e.target.files[0];
-    setFile(newFile);
     /*if (fileUrl && filesList.length > 0 && .includes(fileUrl)) {
       URL.revokeObjectURL(fileUrl);
     }*/
     if (newFile) {
       const url = URL.createObjectURL(newFile);
-      setFileUrl(url);
       addFileWithUrl(newFile, url);
       console.log(url);
-    } else {
-      setFileUrl(undefined);
     }
   };
   return (
@@ -382,8 +399,8 @@ const StepTwo = ({
           <label className="font-medium text-white-800 text-xs">Date</label>
           <Input
             type="date"
-            value={meetingDate}
-            onChange={(e) => setMeetingDate(e.target.value)}
+            value={localDate}
+            onChange={(e) => setLocalDate(e.target.value)}
             className={errors.date ? "border-red-500" : ""}
           />
           {errors.date && (
@@ -394,8 +411,8 @@ const StepTwo = ({
           <label className="font-medium text-white-800 text-xs">Heure</label>
           <Input
             type="time"
-            value={meetingTime}
-            onChange={(e) => setMeetingTime(e.target.value)}
+            value={localTime}
+            onChange={(e) => setLocalTime(e.target.value)}
             className={errors.time ? "border-red-500" : ""}
           />
           {errors.time && (
@@ -407,8 +424,8 @@ const StepTwo = ({
             Fréquence
           </label>
           <select
-            value={frequency}
-            onChange={(e) => setFrequency(e.target.value)}
+            value={localFrequency}
+            onChange={(e) => setLocalFrequency(e.target.value)}
             className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 ${
               errors.frequency ? "border-red-500" : ""
             }`}
@@ -459,25 +476,34 @@ const StepTwo = ({
   );
 };
 
-const StepThree =  () => {
-  const [users, setUsers] = useState<User[]>([])
+const StepThree = () => {
+  const { participants, updateStep3 } = useMeetingForm();
+  const [localParticipants, setLocalParticipants] = useState(participants);
+
+  useEffect(() => {
+    updateStep3(localParticipants);
+  }, [localParticipants]);
+
+  const [users, setUsers] = useState<User[]>([]);
   useEffect(() => {
     const fun = async () => {
       try {
-        const storedData = JSON.parse(localStorage.getItem("userInfo") || "")
-        console.log("token", storedData)
-        const response = await getAllusers()
+        let storedData = "";
+        if (typeof window !== "undefined") {
+          storedData = JSON.parse(localStorage.getItem("userInfo") || "");
+        }
+
+        console.log("token", storedData);
+        const response = await getAllusers();
         setUsers(response.results);
       } catch (error) {
         console.error(error);
       }
-    }
+    };
     fun();
-  }, [])
+  }, []);
   return (
     <div className="flex flex-col gap-4 rounded-[12px] py-10 px-20 w-full">
-     
-      
       <div className=" flex gap-2 items-center">
         <Input
           type="email"
@@ -491,37 +517,41 @@ const StepThree =  () => {
         </Button>
       </div>
       <div>
-              <h6 className="font-medium text-[10px]">Qui a accès ?</h6>
-              <div className=" mt-3 flex flex-col gap-3">
-                  {users.map((user, index) => (
-          <div key={index} className="flex justify-between">
-            <div className="flex gap-3">
-              <div className="h-[28px] w-[28px] flex items-center justify-center border border-dashed rounded-full">
-                <Image
-                  src={"user-icon.svg"}
-                  width={16}
-                  height={19}
-                  alt="user icon"
-                />
-              </div>
+        <h6 className="font-medium text-[10px]">Qui a accès ?</h6>
+        <div className=" mt-3 flex flex-col gap-3">
+          {users.map((user, index) => (
+            <div key={index} className="flex justify-between">
+              <div className="flex gap-3">
+                <div className="h-[28px] w-[28px] flex items-center justify-center border border-dashed rounded-full">
+                  <Image
+                    src={"user-icon.svg"}
+                    width={16}
+                    height={19}
+                    alt="user icon"
+                  />
+                </div>
 
-              {user.email}
-                          </div>
-                          <div className="h-5 w-5 rounded-sm flex justify-center items-center hover:bg-coral-50 cursor-pointer">
-                        <Input
-                        type="checkbox"/>
-                          </div>
-            
-          </div>
-        ))}
+                {user.email}
               </div>
-        
+              <div className="h-5 w-5 rounded-sm flex justify-center items-center hover:bg-coral-50 cursor-pointer">
+                <Input type="checkbox" />
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
-}
+};
 
 const StepFour = () => {
+  const { ordre_du_jour, updateStep4 } = useMeetingForm();
+  const [localAgenda, setLocalAgenda] = useState(ordre_du_jour);
+
+  useEffect(() => {
+    updateStep4(localAgenda);
+  }, [localAgenda, updateStep4]);
+
   return (
     <div className="w-full">
       <Editor />

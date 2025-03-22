@@ -2,9 +2,11 @@ import { Meeting } from "@/lib/types";
 import { CalendarDays, Check, Ellipsis } from "lucide-react";
 import Image from "next/image";
 
+interface MeetingCatdProps {
+  meeting: Meeting;
+}
 
-
-export default function MeetingCard({ ...meeting }: Meeting) {
+export default function MeetingCard({meeting} : MeetingCatdProps) {
   return (
     <div className="bg-[#FFFFFF99] rounded-[8px] py-2 px-3 w-[350px] flex flex-col gap-2">
       <div className="flex justify-between items-start">
@@ -49,7 +51,7 @@ export default function MeetingCard({ ...meeting }: Meeting) {
           {meeting.participants.map((attendee, index) => (
             <Image
               key={index}
-              src={attendee. ? "/userProfile-img.png" : "null"}
+              src={attendee.utilisateur ? "/userProfile-img.png" : "null"}
               alt={`Attendee ${index + 1}`}
               width={32}
               height={32}

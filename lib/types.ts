@@ -33,22 +33,20 @@ enum InvitationStatus {
 interface MeetingParticipant {
   utilisateur: number;
   est_hote: boolean;
-  statut_invitation?  : InvitationStatus;
+  statut_invitation?: InvitationStatus;
+  utilisateur_details: {
+    id: number;
+    email: string;
+				nom_complet: string,
+				photo: string
+			}
 }
 
 // Interface for meeting documents
 interface MeetingDocument {
   fichier: string;
   nom_fichier: string;
-  type_fichier?:
-    | "pdf"
-    | "doc"
-    | "docx"
-    | "xls"
-    | "xlsx"
-    | "ppt"
-    | "pptx"
-    | "image";
+  type_fichier?: MessageType
 }
 
 // Interface for agenda items
