@@ -11,7 +11,7 @@ export interface MeetingFormState {
 
   // Step 2 - Schedule
   date_heure: string;
-  frequence: "once" | "weekly" | "monthly";
+  frequence: string;
   documents: Array<{
     fichier: string;
     nom_fichier: string;
@@ -44,7 +44,7 @@ export interface MeetingFormState {
   updateStep2: (
     data: Partial<{
       date_heure: string;
-      frequence: "once" | "weekly" | "monthly";
+      frequence: string;
       documents: Array<{
         fichier: string;
         nom_fichier: string;
@@ -73,7 +73,7 @@ const initialState = {
   emplacement: "",
   lien_reunion: "",
   date_heure: "",
-  frequence: "once" as const,
+  frequence: "",
   documents: [],
   participants: [],
   ordre_du_jour: [],

@@ -63,8 +63,7 @@ export default function WebinarContent() {
       </h6>
       <div>
         <h6 className="mb-3 text-sm font-semibold">À venir</h6>
-        <div className="flex flex-wrap justify-between">
-          {webinars?.results.map((webinar, index) => (
+        <div className="flex flex-wrap gap-5">  {webinars?.results.map((webinar, index) => (
             <WebinarCard webinar={webinar} key={webinar.id + index} />
           ))}
         </div>
@@ -73,7 +72,7 @@ export default function WebinarContent() {
               <h6 className="mb-3 text-sm font-semibold">
               Recommandés pour vous
         </h6>
-        <div className="flex flex-wrap justify-between">
+        <div className="flex flex-wrap gap-5">
           {webinars?.results.map((webinar, index) => (
             <WebinarCard webinar={webinar} key={webinar.id + index} />
           ))}

@@ -113,7 +113,7 @@ export default function FichiersPage() {
     <div className="flex flex-col gap-10 bg-[#FFFFFF99] rounded-[12px] py-5 px-4 min-h-[690px] relative">
       <Popover
         className="absolute right-6 -top-11"
-        PopoverContent={<PopoverContent />}
+        PopoverContent={<PopoverContent content={[]} />}
         PopoverTrigger={
           <Button className="bg-gradient-to-r from-[#FE6539] to-crimson-400">Nouveau</Button>
         }
@@ -128,11 +128,11 @@ export default function FichiersPage() {
           <FolderCard key={folder.id + index} folder={folder} />
         ))}
       </div>
-      <div className="flex flex-wrap justify-between gap-y-5">
+      {/*<div className="flex flex-wrap justify-between gap-y-5">
         {files.map((file, index) => (
           <FileCard key={file.id + index} file={file} />
         ))}
-      </div>
+      </div>*/}
     </div>
   );
 }

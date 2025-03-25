@@ -313,10 +313,9 @@ const StepOne = ({
               checked={localLocation.includes("enligne")}
               onChange={(e) => {
                 if (e.target.checked) {
-                  setLocalLocation([...localLocation, "enligne"]);
+                  setLocalLocation("enligne");
                 } else {
-                  setLocalLocation(
-                    localLocation.filter((l) => l !== "enligne")
+                  setLocalLocation(""
                   );
                 }
               }}
@@ -357,14 +356,12 @@ const StepTwo = ({
   errors: Error2;
   setErrors: (error: Error2) => void;
 }) => {
-  const { date_heure, frequence, updateStep2 } = useMeetingForm();
+  const { /*date_heure,*/ frequence, updateStep2 } = useMeetingForm();
   const { filesList, addFileWithUrl, removeFileWithUrl } = useFileStore();
 
   const [localDate, setLocalDate] = useState<string>('');
   const [localTime, setLocalTime] = useState<string>('');
-  const [localFrequency, setLocalFrequency] = useState<
-    "once" | "weekly" | "monthly"
-  >(frequence as "once");
+  const [localFrequency, setLocalFrequency] = useState<string>(frequence);
 
   useEffect(() => {
     if (localDate && localTime) {
@@ -443,12 +440,12 @@ const StepTwo = ({
         <label className="font-medium text-white-800 text-xs">
           Pièces jointes
         </label>
-        <div className="relative rounded-[8px] overflow-hidden">
+        <div className="relative rounded-[8px] overflow-hidden border border-dashed border-white-300">
           <Input
             name="media"
             onChange={handleFileInputChange}
             type="file"
-            className="w-full h-[136px] border border-white-300 bg-white-50 border-dashed cursor-pointer"
+            className="w-full h-[136px] bg-white-50 cursor-pointer"
           />
           <div className="absolute top-0 left-0 w-full h-[135px] bg-white-50 flex flex-col gap-2 justify-center items-center pointer-events-none">
             <CirclePlus />
@@ -478,11 +475,11 @@ const StepTwo = ({
 
 const StepThree = () => {
   const { participants, updateStep3 } = useMeetingForm();
-  const [localParticipants, setLocalParticipants] = useState(participants);
+  const [localParticipants, /*setLocalParticipants*/] = useState(participants);
 
   useEffect(() => {
     updateStep3(localParticipants);
-  }, [localParticipants]);
+  }, [localParticipants, updateStep3]);
 
   const [users, setUsers] = useState<User[]>([]);
   useEffect(() => {
@@ -546,7 +543,7 @@ const StepThree = () => {
 
 const StepFour = () => {
   const { ordre_du_jour, updateStep4 } = useMeetingForm();
-  const [localAgenda, setLocalAgenda] = useState(ordre_du_jour);
+  const [localAgenda, /*setLocalAgenda*/] = useState(ordre_du_jour);
 
   useEffect(() => {
     updateStep4(localAgenda);

@@ -4,10 +4,8 @@ import { NextResponse } from "next/server";
 export async function middleware(request: NextRequest) {
   const token = request.cookies.get("token")?.value;
 
-  // If accessing workspace pages and no token exists, redirect to login
+
   if (request.nextUrl.pathname.startsWith("/workspace")) {
-    console.log("je suis deja remplacable")
-    // Remove parentheses
     if (!token) {
       return NextResponse.redirect(new URL("/login", request.url));
     }

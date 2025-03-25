@@ -5,6 +5,7 @@ import ConsultationDialogContent from "./components/consultationDialogContent";
 import History from "./components/consultationHistory";
 import ConsultationTitle from "./components/consultationTitle";
 
+
 export default function Consultation() {
   const consultationTiltes = [
     {
@@ -51,10 +52,11 @@ L’entreprise doit fournir aux élus du CSE un rapport d’orientation straté
       `📌 Format de la consultationCette consultation se déroule en réunion plénière, où l’employeur présente les orientations stratégiques et répond aux questions des élus. Ces derniers doivent ensuite rendre un avis motivé, qui sera transmis à la direction`,
     ],
   };
+  
   return (
     <div>
       <h6>Consultations obligatoires</h6>
-      <div className="flex flex-wrap justify-between gap-y-4">
+      <div className="flex flex-wrap gap-2 mb-8">
         {consultationTiltes.map((consultationTitle, index) => (
           <DialogComponent
             key={consultationTitle.title + index}
@@ -74,7 +76,9 @@ L’entreprise doit fournir aux élus du CSE un rapport d’orientation straté
         <History />
       </div>
       <DialogComponent
-        className={"sm:max-w-[980px] flex items-center justify-center py-10 px-20"}
+        className={
+          "sm:max-w-[980px] flex items-center justify-center py-10 px-20"
+        }
         dialoTrigger={<Button>Nouvelle Consultation</Button>}
         dialogContent={
           <ConsultationDialogContent consultation={defaultConsultation} />

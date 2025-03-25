@@ -1,6 +1,6 @@
 import api, { endpoints } from "../api";
 
-interface Ressource {
+export interface Ressource {
   id: number;
   titre: string;
   type_ressource: string;
@@ -33,6 +33,13 @@ export interface WebinairesResponse {
   results: Webinaire[];
 }
 
+export interface RessourcesResponse {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: Ressource[];
+}
+
 const endpoint = endpoints.formations.webinaires.list;
 
 export const getWebinaires = async (
@@ -49,3 +56,13 @@ export const getWebinaires = async (
     throw error;
   }
 };
+
+export const getRessources = async () : Promise<RessourcesResponse> => {
+  try {
+    const response = await api.get(endpoints.formations.ressources.base);
+    return response.data;
+  } catch (error) {
+    console.error("Failed to get Ressources", (error as Error).message)
+    throw error
+  }
+}

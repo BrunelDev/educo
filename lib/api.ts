@@ -51,14 +51,18 @@ export const endpoints = {
       create: "/webinaires/creer/",
       update: (id: string) => `/webinaires/${id}`,
       delete: (id: string) => `/webinaires/${id}`,
+    },
+    ressources: {
+      base : "/formations/ressources/"
+      
     }
   },
   equipes: {
-    base: "/equipe/equipes/",
-    /*create: "/equipe/equipes/",
-    add_member: "/equipe/equipes/" ,*/
-    update: (id: string) => `/equipe/${id}/`,
-    delete: (id: string) => `/equipe/equipes/${id}/`,
+    base: "equipe/equipes/",
+    
+  },
+  consultations: {
+    base : "consultations/"
   }
 };
 

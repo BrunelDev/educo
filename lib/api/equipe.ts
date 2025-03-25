@@ -40,9 +40,9 @@ export const getTeams = async () : Promise<TeamApiResponse> => {
         
     }
 }
-export const addMemberToTeam = async (members : number) : Promise<Team> => {
+export const addMembersToTeam = async ( membres_ids : number[], teamId? : number,) : Promise<Team> => {
     try {
-        const response = await api.post(endpoints.equipes.base, {members});
+        const response = await api.post(endpoints.equipes.base +`${teamId}/membres/`, {membres_ids});
         console.log(response.data);
         return response.data;
         
@@ -65,6 +65,18 @@ export const addMemberToTeam = async (members : number) : Promise<Team> => {
             date_modification: ""
         }
 
+        
+    }
+}
+
+export const removeFromTeam = async (id : number) => {
+    try {
+        const response = await api.delete(endpoints.equipes.base + `${id}/`)
+        return response.data
+        
+    } catch (error: unknown) {
+        console.error("Error deleting from team", error);
+        throw error;
         
     }
 }
