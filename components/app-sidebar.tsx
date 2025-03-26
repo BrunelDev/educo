@@ -1,16 +1,18 @@
 "use client";
-import { Users , LayoutGrid , Sparkles , NotepadText , CircleCheck,GraduationCap,MessageSquareMore, FolderClosed, UsersRound    } from "lucide-react";
+import { Users, LayoutGrid, Sparkles, NotepadText, CircleCheck, GraduationCap, MessageSquareMore, FolderClosed, UsersRound, ChevronRight } from "lucide-react";
+import Image from "next/image";
 
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import Image from "next/image";
+import { AuthResponse } from "@/app/types/auth";
 
 // Menu items.
 const items = [
@@ -62,6 +64,9 @@ const items = [
 ];
 
 export function AppSidebar() {
+  const userInfo: AuthResponse = JSON.parse(
+    localStorage.getItem("userInfo") || ""
+  );
   return (
     <Sidebar className="w-[210px]">
       <SidebarContent>
@@ -96,6 +101,21 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      <SidebarFooter>
+        <div className="flex justify-between items-center px-2 py-1 hover:pl-4 hover:bg-white-100 duration-200 rounded-[8px]">
+          <div className="flex items-center gap-5 ">
+          <Image width={32} height={32}  src={
+            userInfo.user.image ? userInfo.user.image : "/userProfile-img.png"
+          } alt={"user profile image"} />
+            <h1 className="text-white-800 font-semibold ">
+            {userInfo.user.first_name ? userInfo.user.first_name : "John"}{" "}
+            {userInfo.user.last_name ? userInfo.user.last_name : "Doe"}
+          </h1>
+          </div>
+          <ChevronRight/>
+          
+        </div>
+      </SidebarFooter>
     </Sidebar>
   );
 }
