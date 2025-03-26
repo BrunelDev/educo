@@ -1,8 +1,16 @@
+export interface User {
+        id: number;
+        email: string;
+        first_name: string;
+        last_name: string;
+        telephone: string;
+        type_utilisateur: "EMPLOYE" | "ADMIN" | "MEMBRE_CSE";
+        image: string | null;
+        est_actif: boolean;
+      }
+      
 export interface AuthResponse {
-  isAuthenticated: boolean;
-  user?: {
-    id: number;
-    username: string;
-    email: string;
-  };
-}
+        token: string;
+        refresh: string;
+        user: User;
+      }

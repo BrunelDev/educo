@@ -13,7 +13,7 @@ export function DialogComponent({dialoTrigger, dialogContent, className, dialogT
       <DialogTrigger asChild>
         {dialoTrigger}
       </DialogTrigger>
-      <DialogTitle>{dialogTitle}</DialogTitle>
+      <DialogTitle className="absolute">{dialogTitle}</DialogTitle>
       <DialogContent className={`${className}`}>
         {dialogContent}
       </DialogContent>
