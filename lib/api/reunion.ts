@@ -3,9 +3,7 @@ import api, { endpoints } from "../api";
 import { Meeting } from "../types";
 const endpoint = endpoints.meetings;
 
-
-
-export const getMeetings  = async (page: number = 1) : Promise<Meeting[]> => {
+export const getMeetings = async (page: number = 1): Promise<Meeting[]> => {
   try {
     const response = await api.get(endpoint.list, {
       params: {
@@ -29,7 +27,6 @@ export const getOneMeting = async (id: number) => {
   }
 };
 
-
 export const createMeeting = async (meeting: MeetingFormState) => {
   try {
     const response = await api.post(endpoint.create, meeting);
@@ -38,5 +35,4 @@ export const createMeeting = async (meeting: MeetingFormState) => {
     console.error("Error creating meeting", error);
     throw error;
   }
-
-}
+};

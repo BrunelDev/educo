@@ -1,3 +1,5 @@
+"use client"
+import { User } from "@/app/types/auth";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -8,31 +10,39 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { updateProfile } from "@/lib/api/users";
+import { getCookies, setCookie } from "@/lib/utils/cookies";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
 const formSchema = z.object({
-  firstName: z.string().min(2, "First name must be at least 2 characters"),
-  lastName: z.string().min(2, "Last name must be at least 2 characters"),
+  first_name: z.string().min(2, "First name must be at least 2 characters"),
+  last_name: z.string().min(2, "Last name must be at least 2 characters"),
   email: z.string().email("Invalid email address"),
-  numero: z.string().min(8, "Phone number must be at least 8 digits"),
-  profilePicture: z.string().optional(),
+  telephone: z.string().min(8, "Phone number must be at least 8 digits"),
+  image: z.string().optional(),
 });
 
 export function ProfileForm() {
+const userInfo : User = JSON.parse(getCookies("userInfo") || "{}")
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      firstName: "",
-      lastName: "",
-      email: "",
-      numero: "",
-      profilePicture: "",
+      first_name: userInfo.first_name,
+      last_name: userInfo.last_name,
+      email: userInfo.email,
+      telephone: userInfo.telephone,
+      image: userInfo.image || "",
     },
   });
-
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    console.log(values)
+    const res = await updateProfile(values)
+    setCookie("userInfo", JSON.stringify(res.user))
+    console.log(res.message)
+    
     console.log(values);
     // Handle form submission here
   }
@@ -43,7 +53,7 @@ export function ProfileForm() {
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <FormField
             control={form.control}
-            name="firstName"
+            name="first_name"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Prénom</FormLabel>
@@ -57,7 +67,7 @@ export function ProfileForm() {
 
           <FormField
             control={form.control}
-            name="lastName"
+            name="last_name"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Nom</FormLabel>
@@ -85,7 +95,7 @@ export function ProfileForm() {
 
           <FormField
             control={form.control}
-            name="numero"
+            name="telephone"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Téléphone</FormLabel>
@@ -99,7 +109,7 @@ export function ProfileForm() {
 
           <FormField
             control={form.control}
-            name="profilePicture"
+            name="image"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Photo de profile</FormLabel>

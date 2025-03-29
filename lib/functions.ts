@@ -1,9 +1,10 @@
-import { api, endpoints } from "./api";
+import api, { endpoints } from "./api";
+import { getCookies } from "./utils/cookies";
 
 export const login = async (email: string, password: string) => {
   try {
     const response = await fetch(
-      "http://192.168.100.2:8000/api/auth/utilisateurs/connexion/",
+      "http://localhost:8000/api/auth/utilisateurs/connexion/",
       {
         method: "POST",
         headers: {
@@ -17,14 +18,15 @@ export const login = async (email: string, password: string) => {
     );
     if (response.ok) {
       const res = await response.json();
-      localStorage.setItem("userInfo", JSON.stringify(res));
+      document.cookie = `access_token=${res.token};path=/`;
+      document.cookie = `refresh_token=${res.refresh};path=/`;
+      document.cookie = `userInfo=${JSON.stringify(res.user)};path=/`;
+      
       return res;
-    }
-    else {
+    } else {
       const res = await response.json();
       throw new Error(res.message);
     }
-    return;
   } catch (error: unknown) {
     if (error instanceof Error) {
       console.log("Error");
@@ -37,7 +39,7 @@ export const login = async (email: string, password: string) => {
 export const register = async (email: string, password: string) => {
   try {
     const response = await fetch(
-      "http://192.168.100.2:8000/api/auth/utilisateurs/inscriptions/",
+      "http://localhost:8000/api/auth/utilisateurs/inscriptions/",
       {
         method: "POST",
         headers: {
@@ -65,7 +67,12 @@ export const register = async (email: string, password: string) => {
 export const logout = async (): Promise<void> => {
   try {
     await api.post(endpoints.auth.logout);
-    localStorage.removeItem("token");
+    document.cookie =
+      "userInfo=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    document.cookie =
+      "access_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    document.cookie =
+      "refresh_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
   } catch (error: unknown) {
     if (error instanceof Error) {
       throw new Error(`Logout failed: ${error.message}`);
@@ -73,5 +80,3 @@ export const logout = async (): Promise<void> => {
     throw new Error("An unknown error occurred during logout");
   }
 };
-
-

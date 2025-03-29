@@ -1,16 +1,21 @@
 "use client";
+import { getTeams, Team, User } from "@/lib/api/equipe";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SearchBar from "../../components/searchBar";
+import { useMessageStore } from "@/store/message";
+import { Conversation, ConversationResponse, getConversationList } from "@/lib/api/message";
 
 export default function ConversationsList() {
-    const [serachValue, setSearchValue] = useState<string>("");
-    const discussionList: DiscussionProps[] = [
-        { id: "1", lastMessage: "Bonjour", lastMessageHour: "10:45", speakerName: "John Doe", speakerImageUrl: "/userProfile-img.png", isLastMessageRead: true },
-        { id: "2", lastMessage: "Salut", lastMessageHour: "11:45", speakerName: "Jane Doe", speakerImageUrl: "/userProfile-img.png", isLastMessageRead: false },
-        { id: "3", lastMessage: "Comment allez-vous?", lastMessageHour: "12:45", speakerName: "Alice Doe", speakerImageUrl: "/userProfile-img.png", isLastMessageRead: true },
-        { id: "4", lastMessage: "Je suis content", lastMessageHour: "13:45", speakerName: "Bob Doe", speakerImageUrl: "/userProfile-img.png", isLastMessageRead: false },
-    ]
+  const [serachValue, setSearchValue] = useState<string>("");
+  const [conversations, setConversations] = useState<ConversationResponse>();
+  useEffect(() => {
+    const fetchData = async () => {
+      const response = await getConversationList();
+      setConversations(response);
+    };
+    fetchData();
+  }, []);
   return (
     <div className="h-[calc(100vh-93px)] w-[280px] flex flex-col gap-3 pt-4 px-2 text-xs">
       <h6 className="text-lg font-semibold">Messages</h6>
@@ -32,17 +37,17 @@ export default function ConversationsList() {
           lastMessageHour={"10:45"}
           lastSpeakerName={"John"}
         />
-          </div>
-          <div className="flex flex-col gap-3">
-              <h6 className="font-semibold">Discussion</h6>
-          <div className="flex flex-col gap-3">
-          {discussionList.map((discussion) => (
-              <Discussion {...discussion} key={discussion.lastMessage + discussion.id}/>
-          ))}
-          </div>
-          </div>
-          
-          
+      </div>
+      <div className="flex flex-col gap-3">
+        <h6 className="font-semibold">Discussion</h6>
+        <div className="flex flex-col gap-3">
+          {conversations ? conversations.results.map((discussion) => (
+            <Discussion
+             {...discussion}
+            key={JSON.stringify(discussion.participants) + discussion.id}            />
+          )) : null}
+        </div>
+      </div>
     </div>
   );
 }
@@ -86,38 +91,38 @@ const TeamGroup = ({ ...props }: TeamGroupProps) => {
   );
 };
 
-
 interface DiscussionProps {
-    id: string;
-    lastMessage: string;
-    lastMessageHour: string;
-    speakerName: string;
-    speakerImageUrl: string;
-    isLastMessageRead : boolean;
-    
+  id: string;
+  lastMessage: string;
+  lastMessageHour: string;
+  speakerName: string;
+  speakerImageUrl: string;
+  isLastMessageRead: boolean;
 }
 
-
-
-const Discussion = ({...props} : DiscussionProps) => {
-    return (
-        <div className="flex flex-col gap-3 hover:bg-[#ffffffd4] p-2 rounded-[8px]">
-<div className="w-full flex justify-between items-center ">
-        <div className="flex gap-2 items-center">
+const Discussion = ({ ...props }: Conversation ) => {
+  const { 
+    setActiveConversation,  
+  } = useMessageStore();
+  
+  return (
+    <div className="flex flex-col gap-3 hover:bg-[#ffffffd4] p-2 rounded-[8px]" onClick={() => {
+      setActiveConversation(props)
+    }}>
+      <div className="w-full flex justify-between items-center ">
+        <div className="flex w-2/3 gap-2 items-center">
           <Image
-            src={props.speakerImageUrl}
+            src={props.participants.filter((participant)=>participant._id === 3)[0].avatar || "/userProfile-img.png"}
             width={28}
             height={28}
             alt="group icon"
             className="rounded-full"
           />
-          <h6>{props.speakerName}</h6>
+          <h6 className="gap-2 truncate">{props.participants.filter((participant)=>participant._id === 3)[0].name || "John Doe"}</h6>
         </div>
-        <h6>{props.lastMessageHour}</h6>
-            </div>
-            <p className="w-full truncate">
-                {props.lastMessage}
-            </p>
-        </div>
-    )
-}
+        <h6 className="w-[33px] truncate">{`props.lastMessageHour`}</h6>
+      </div>
+      <p className="w-full truncate">{`props.lastMessage`}</p>
+    </div>
+  );
+};

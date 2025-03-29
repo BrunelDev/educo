@@ -12,7 +12,9 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { AuthResponse } from "@/app/types/auth";
+import {User } from "@/app/types/auth";
+import Link from "next/link";
+import { getCookies } from "@/lib/utils/cookies"
 
 // Menu items.
 const items = [
@@ -64,8 +66,8 @@ const items = [
 ];
 
 export function AppSidebar() {
-  const userInfo: AuthResponse = JSON.parse(
-    localStorage.getItem("userInfo") || ""
+  const userInfo: User = JSON.parse(
+    getCookies("userInfo") || "{}"
   );
   return (
     <Sidebar className="w-[210px]">
@@ -102,19 +104,19 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
-        <div className="flex justify-between items-center px-2 py-1 hover:pl-4 hover:bg-white-100 duration-200 rounded-[8px]">
+        <Link href={"/profile"} className="flex justify-between items-center px-2 py-1 hover:pl-4 hover:bg-white-100 duration-200 rounded-[8px]">
           <div className="flex items-center gap-5 ">
           <Image width={32} height={32}  src={
-            userInfo.user.image ? userInfo.user.image : "/userProfile-img.png"
+            userInfo.image ? userInfo.image : "/userProfile-img.png"
           } alt={"user profile image"} />
             <h1 className="text-white-800 font-semibold ">
-            {userInfo.user.first_name ? userInfo.user.first_name : "John"}{" "}
-            {userInfo.user.last_name ? userInfo.user.last_name : "Doe"}
+            {userInfo.first_name ? userInfo.first_name : "John"}{" "}
+            {userInfo.last_name ? userInfo.last_name : "Doe"}
           </h1>
           </div>
           <ChevronRight/>
           
-        </div>
+        </Link>
       </SidebarFooter>
     </Sidebar>
   );

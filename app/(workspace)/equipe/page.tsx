@@ -53,6 +53,7 @@ export default function Equipe() {
         const response = await getTeams();
         console.log(response);
         setTeams(response);
+        console.log("team", teams)
       } catch (error: unknown) {
         console.error("Failed to fetch teams", error);
       }
@@ -94,7 +95,7 @@ export default function Equipe() {
                   <Plus /> Ajouter un membre
                 </Button>
               }
-              dialogContent={<AddMemberDialog teamId={teams?.results[0].id} />}
+              dialogContent={teams?.results[0] ? <AddMemberDialog teamId={teams?.results[0].id} /> : <div></div>}
               dialogTitle={null}
             />
           </div>

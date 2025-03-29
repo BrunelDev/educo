@@ -1,4 +1,5 @@
 import { Input } from "@/components/ui/input";
+import { MessageType } from "@/lib/types";
 import EmojiPicker, { EmojiClickData } from "emoji-picker-react";
 import { Mic, Paperclip, Smile } from "lucide-react";
 import React, { useRef, useState } from "react";

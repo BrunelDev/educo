@@ -1,8 +1,14 @@
+"use client";
+import { User } from "@/lib/api/users";
 import { MessageHeaderProps } from "@/lib/types";
+import { getCookies } from "@/lib/utils/cookies";
+import { useMessageStore } from "@/store/message";
 import { Ellipsis } from "lucide-react";
 import Image from "next/image";
 
-export default function MessageHeader({ ...props }: MessageHeaderProps) {
+const MessageHeader = ({ ...props }: MessageHeaderProps) => {
+  const { activeConversation } = useMessageStore();
+  const userInfo: User = JSON.parse(getCookies("userInfo") || "{}");
   return (
     <div className="flex justify-between items-center mx-6 py-6 border-b">
       <div className="flex items-center gap-3">
@@ -14,13 +20,22 @@ export default function MessageHeader({ ...props }: MessageHeaderProps) {
           className="rounded-full"
         />
         <div className="flex flex-col justify-self-start">
-          <h6 className="text-sm font-semibold text-start">{props.conversationName}</h6>
+          <h6 className="text-sm font-semibold text-start">
+            {activeConversation
+              ? activeConversation?.participants.filter(
+                  (participant) => participant._id === userInfo.id
+                )[0]?.name
+              : "John Doe"}
+          </h6>
           {Array.isArray(props.speakers) ? (
             <div className="flex gap-1">
-              {props.speakers.map((speaker, index) => (
-                  <h6 key={speaker + index} className="text-xs">{speaker}{
-                      index < props.speakers.length - 1? "," : ""
-                  }</h6>
+              {activeConversation?.participants.map((speaker, index) => (
+                <h6 key={speaker._id + index} className="text-xs">
+                  {(speaker && speaker.name) || "John Does"}
+                  {index < activeConversation?.participants.length - 1
+                    ? ","
+                    : ""}
+                </h6>
               ))}
             </div>
           ) : null}
@@ -29,4 +44,6 @@ export default function MessageHeader({ ...props }: MessageHeaderProps) {
       <Ellipsis size={18} />
     </div>
   );
-}
+};
+
+export default MessageHeader;

@@ -13,6 +13,7 @@ import { handleFileUpload } from "@/app/actions/actions";
 import { createMeeting } from "@/lib/api/reunion";
 import { getAllusers, User } from "@/lib/api/users";
 import { Error1, Error2, FileInputChangeEvent, MeetingType } from "@/lib/types";
+import { getCookies } from "@/lib/utils/cookies";
 import { useFileStore } from "@/store/files";
 import { useMeetingForm } from "@/store/meetingForm";
 import Image from "next/image";
@@ -149,8 +150,7 @@ const StepOne = ({
   const [localMeetingTitle, setLocalMeetingTitle] = useState<string>(
     titre || "Réunion ordinaire du CSE"
   );
-  const [localMeetingPurpose, setLocalMeetingPurpose] =
-    useState<string>(objet);
+  const [localMeetingPurpose, setLocalMeetingPurpose] = useState<string>(objet);
   const [localLocation, setLocalLocation] = useState<string>(emplacement);
   const [localMeetingLink, setLocalMeetingLink] = useState<string>(
     lien_reunion || ""
@@ -162,10 +162,17 @@ const StepOne = ({
       type_reunion: localMeetingType,
       titre: localMeetingTitle,
       objet: localMeetingPurpose,
-      emplacement: localLocation ,
+      emplacement: localLocation,
       lien_reunion: localMeetingLink,
     });
-  }, [localMeetingType, localMeetingTitle, localMeetingPurpose, localLocation, localMeetingLink, updateStep1]);
+  }, [
+    localMeetingType,
+    localMeetingTitle,
+    localMeetingPurpose,
+    localLocation,
+    localMeetingLink,
+    updateStep1,
+  ]);
 
   // Form validation state
 
@@ -297,8 +304,7 @@ const StepOne = ({
                 if (e.target.checked) {
                   setLocalLocation("PHYSIQUE");
                 } else {
-                  setLocalLocation("")
-                  
+                  setLocalLocation("");
                 }
               }}
               className="w-4 h-4 text-blue-600 rounded"
@@ -315,8 +321,7 @@ const StepOne = ({
                 if (e.target.checked) {
                   setLocalLocation("enligne");
                 } else {
-                  setLocalLocation(""
-                  );
+                  setLocalLocation("");
                 }
               }}
               className="w-4 h-4 text-blue-600 rounded"
@@ -359,20 +364,22 @@ const StepTwo = ({
   const { /*date_heure,*/ frequence, updateStep2 } = useMeetingForm();
   const { filesList, addFileWithUrl, removeFileWithUrl } = useFileStore();
 
-  const [localDate, setLocalDate] = useState<string>('');
-  const [localTime, setLocalTime] = useState<string>('');
+  const [localDate, setLocalDate] = useState<string>("");
+  const [localTime, setLocalTime] = useState<string>("");
   const [localFrequency, setLocalFrequency] = useState<string>(frequence);
 
   useEffect(() => {
     if (localDate && localTime) {
-      const combinedDateTime = new Date(`${localDate}T${localTime}`).toISOString();
+      const combinedDateTime = new Date(
+        `${localDate}T${localTime}`
+      ).toISOString();
       updateStep2({
         date_heure: combinedDateTime,
         frequence: localFrequency,
-        documents: filesList.map((f) => ({ 
-          nom_fichier: "le nom", 
-          fichier: f.fileUrl, 
-          type_document: "fichier" 
+        documents: filesList.map((f) => ({
+          nom_fichier: "le nom",
+          fichier: f.fileUrl,
+          type_document: "fichier",
         })),
       });
     }
@@ -427,9 +434,9 @@ const StepTwo = ({
               errors.frequency ? "border-red-500" : ""
             }`}
           >
-            <option value="once">Une fois</option>
-            <option value="weekly">Hebdomadaire</option>
-            <option value="monthly">Mensuel</option>
+            <option value="Une fois">Une fois</option>
+            <option value="Hebdomadaire">Hebdomadaire</option>
+            <option value="Mensuel">Mensuel</option>
           </select>
           {errors.frequency && (
             <p className="text-red-500 text-sm mt-1">{errors.frequency}</p>
@@ -475,7 +482,7 @@ const StepTwo = ({
 
 const StepThree = () => {
   const { participants, updateStep3 } = useMeetingForm();
-  const [localParticipants, /*setLocalParticipants*/] = useState(participants);
+  const [localParticipants /*setLocalParticipants*/] = useState(participants);
 
   useEffect(() => {
     updateStep3(localParticipants);
@@ -487,7 +494,7 @@ const StepThree = () => {
       try {
         let storedData = "";
         if (typeof window !== "undefined") {
-          storedData = JSON.parse(localStorage.getItem("userInfo") || "");
+          storedData = JSON.parse(getCookies("userInfo") || "{}");
         }
 
         console.log("token", storedData);
@@ -543,7 +550,7 @@ const StepThree = () => {
 
 const StepFour = () => {
   const { ordre_du_jour, updateStep4 } = useMeetingForm();
-  const [localAgenda, /*setLocalAgenda*/] = useState(ordre_du_jour);
+  const [localAgenda /*setLocalAgenda*/] = useState(ordre_du_jour);
 
   useEffect(() => {
     updateStep4(localAgenda);

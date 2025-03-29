@@ -262,7 +262,7 @@ enum MessageType {
   TEXT = "texte",
   IMAGE = "image",
   AUDIO = "audio",
-  FILE = "fichier",
+  FILE = "file",
 }
 
 // Interface for User (sender)

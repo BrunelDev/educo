@@ -1,5 +1,6 @@
 import { getRessources, Ressource, RessourcesResponse } from '@/lib/api/formations'
 import { useEffect, useState } from 'react'
+import { RessourceCard } from './RessourceCards'
 
 export default function ResourceContent() {
   const [ressources, setRessources] = useState<RessourcesResponse>()
@@ -13,7 +14,10 @@ export default function ResourceContent() {
   }, [])
   return (
     <div>
-      {ressources && JSON.stringify(ressources)}
+      <div className='flex flex-wrap gap-3'>{ressources && ressources.results.map((ressource, index) => (
+        <RessourceCard ressource={ressource} key={ressource.id + index} />
+      ))}</div>
+      
     </div>
   )
 }

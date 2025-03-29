@@ -9,6 +9,8 @@ export interface Ressource {
   utilisateur: number;
   date_creation: string;
   date_modification: string;
+  description: string;
+  auteur: string;
 }
 
 export interface Webinaire {
