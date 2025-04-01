@@ -98,8 +98,8 @@ export default function Reunions() {
     const handler = async () => {
       try {
         const data = await getMeetings()
-        setMeetings(data?.results)
-        console.log(data?.results);
+        setMeetings(data)
+        console.log(data);
         
       } catch (error : unknown) {
         console.error("Error fetching meetings:", (error as Error).message);

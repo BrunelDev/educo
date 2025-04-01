@@ -1,5 +1,4 @@
 "use client";
-import { getTeams, Team, User } from "@/lib/api/equipe";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import SearchBar from "../../components/searchBar";
@@ -91,14 +90,6 @@ const TeamGroup = ({ ...props }: TeamGroupProps) => {
   );
 };
 
-interface DiscussionProps {
-  id: string;
-  lastMessage: string;
-  lastMessageHour: string;
-  speakerName: string;
-  speakerImageUrl: string;
-  isLastMessageRead: boolean;
-}
 
 const Discussion = ({ ...props }: Conversation ) => {
   const { 

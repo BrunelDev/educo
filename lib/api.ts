@@ -67,6 +67,9 @@ export const endpoints = {
   
   projets: {
     base : "tasks/projets/",
+  },
+  taches: {
+    base : "tasks/taches/",
   }
   
 };

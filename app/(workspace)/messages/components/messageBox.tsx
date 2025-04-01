@@ -1,14 +1,39 @@
-import { Message } from "@/lib/api/message";
-import { MessageType } from "@/lib/types";
-import { formatDistanceToNow } from "date-fns";
 import { fr } from "date-fns/locale";
 import { Ellipsis } from "lucide-react";
+import { formatDistanceToNow } from "date-fns";
 import Image from "next/image";
-import { cookies } from "next/headers";
+import { MessageType } from "@/lib/types";
+import { getCookies } from "@/lib/utils/cookies";
 
-const MessageBox = async({ message, className }: { message: Message, className: string }) =>{
-  const cookieStorage = await cookies()
-  
+export interface MessageSender {
+  id: number;
+  email: string;
+  first_name: string;
+  last_name: string;
+}
+
+export interface Message {
+  id: number;
+  content: string;
+  type_message: "text" | "file" | "image" | "audio";
+  sender: MessageSender;
+  timestamp: string;
+  is_read: boolean;
+  fichier?: string | null;
+  image?: string | null;
+  audio?: string | null;
+}
+
+interface MessageBoxProps {
+  message: Message;
+  isOwnMessage?: boolean;
+  className?: string;
+}
+
+export default function MessageBox({
+  message,
+  className
+}: MessageBoxProps) {
   const renderContent = () => {
     switch (message.type_message) {
       case MessageType.IMAGE:
@@ -38,12 +63,12 @@ const MessageBox = async({ message, className }: { message: Message, className: 
           </a>
         );
       default:
-        return <p className={`text-gray-800 bg-white-50  p-2 w-fit ${message.sender.id == JSON.parse(cookieStorage.get("userInfo")?.value || "")?.id ? "" : "rounded-b-[8px] rounded-tr-[8px]"}`}>{message.content}</p>;
+      return <p className={`text-gray-800 bg-white-50  p-2 w-fit ${message.sender.id == JSON.parse(getCookies("userInfo") || "")?.id ? "" : "rounded-b-[8px] rounded-tr-[8px]"} min-w-[100px] break-all max-w-[500px]`}>{message.content}</p>;
     }
   };
 
   return (
-    <div className={`flex gap-4 p-4 ${className} my-8`}>
+    <div className={`flex gap-4 p-4 w-fit ${className} my-8 ${message.sender.id == JSON.parse(getCookies("userInfo") || "")?.id ? "ml-auto" : ""}`} >
       <Image
         src={"/userProfile-img.png"}
         alt={message.sender.email}
@@ -53,11 +78,11 @@ const MessageBox = async({ message, className }: { message: Message, className: 
       />
       <div className="flex-1">
         <div className="flex items-center gap-2 mb-1">
-          <span className="font-medium">{message.sender.email}</span>
+          <span className="font-medium">{message.sender.first_name}</span>
           
         </div>
         <div className="relative w-fit">{renderContent()}
-        <span className="text-sm text-gray-500 absolute right-0 -bottom-6">
+        <span className="text-sm text-gray-500 absolute right-0 -bottom-6 text-nowrap">
             {formatDistanceToNow(message.timestamp, { locale: fr, addSuffix: true })}
           </span>
           <Ellipsis size={18}  className="absolute top-1 -right-6"/>
@@ -68,5 +93,3 @@ const MessageBox = async({ message, className }: { message: Message, className: 
     </div>
   );
 }
-
-export default MessageBox;

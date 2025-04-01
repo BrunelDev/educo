@@ -1,103 +1,85 @@
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { MessageType } from "@/lib/types";
-import EmojiPicker, { EmojiClickData } from "emoji-picker-react";
-import { Mic, Paperclip, Smile } from "lucide-react";
-import React, { useRef, useState } from "react";
+import { Paperclip, Send } from "lucide-react";
+import { useRef, useState } from "react";
 
 interface MessageInputProps {
-  onSendMessage: (content: string, type: MessageType, file?: File) => void;
+  onSendMessage: (message: { type: string; message: string }) => void;
+  isConnected: boolean;
+  isLoading?: boolean;
 }
 
-export function MessageInput({ onSendMessage }: MessageInputProps) {
+export function MessageInput({
+  onSendMessage,
+  isConnected,
+  isLoading = false,
+}: MessageInputProps) {
   const [message, setMessage] = useState("");
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (message.trim()) {
-      onSendMessage(message, MessageType.TEXT);
+    if (message.trim() && isConnected) {
+      onSendMessage({
+        type: "message",
+        message: message.trim(),
+      });
       setMessage("");
     }
   };
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file) return;
+    if (!file || !isConnected) return;
 
+    // Convert file to base64 or handle file upload as needed
     const reader = new FileReader();
     reader.onload = () => {
-      const content = reader.result as string;
-      let type: MessageType = MessageType.FILE;
-
-      if (file.type.startsWith("image/")) {
-        type = MessageType.IMAGE;
-      } else if (file.type.startsWith("audio/")) {
-        type = MessageType.AUDIO;
-      }
-
-      onSendMessage(content, type, file);
+      const base64 = reader.result as string;
+      onSendMessage({
+        type: "message",
+        message: base64,
+      });
     };
     reader.readAsDataURL(file);
-  };
 
-  const onEmojiClick = (emojiData: EmojiClickData) => {
-    setMessage((prev) => prev + emojiData.emoji);
-    setShowEmojiPicker(false);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
   };
 
   return (
-    <div>
-      {showEmojiPicker && (
-        <div className="absolute bottom-full right-0">
-          <EmojiPicker onEmojiClick={onEmojiClick} />
-        </div>
-      )}
-
-      <form
-        onSubmit={handleSubmit}
-        className="flex items-center gap-2 p-4 border-t"
+    <form onSubmit={handleSubmit} className="p-4 border-t flex gap-2">
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleFileUpload}
+        className="hidden"
+      />
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
+        onClick={() => fileInputRef.current?.click()}
+        disabled={!isConnected || isLoading}
       >
-        <Input
-          type="file"
-          ref={fileInputRef}
-          onChange={handleFileUpload}
-          className="hidden"
-          accept="image/*,audio/*,.pdf,.doc,.docx"
-        />
+        <Paperclip className="h-5 w-5" />
+      </Button>
 
-        <button
-          type="button"
-          onClick={() => fileInputRef.current?.click()}
-          className="p-2 hover:bg-gray-100 rounded-full"
-        >
-          <Paperclip className="w-5 h-5 text-gray-500" />
-        </button>
+      <Input
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
+        placeholder={!isConnected ? "Déconnecté..." : "Votre message..."}
+        disabled={!isConnected || isLoading}
+        className="flex-1"
+      />
 
-        <button
-          type="button"
-          onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-          className="p-2 hover:bg-gray-100 rounded-full"
-        >
-          <Smile className="w-5 h-5 text-gray-500" />
-        </button>
-
-        <Input
-          type="text"
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          placeholder="Type a message..."
-          className="flex-1 p-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-
-        <button
-          type="submit"
-          disabled={!message.trim()}
-          className="disabled:opacity-50"
-        >
-          <Mic />
-        </button>
-      </form>
-    </div>
+      <Button
+        type="submit"
+        disabled={!message.trim() || !isConnected || isLoading}
+      >
+        <Send className="h-5 w-5" />
+      </Button>
+    </form>
   );
 }
