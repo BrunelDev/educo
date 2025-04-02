@@ -10,6 +10,15 @@ import { StepProgress } from "./stepProgress";
 
 import Editor from "@/app/_components/editor";
 import { handleFileUpload } from "@/app/actions/actions";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { createMeeting } from "@/lib/api/reunion";
 import { getAllusers, User } from "@/lib/api/users";
 import { Error1, Error2, FileInputChangeEvent, MeetingType } from "@/lib/types";
@@ -18,6 +27,7 @@ import { useFileStore } from "@/store/files";
 import { useMeetingForm } from "@/store/meetingForm";
 import Image from "next/image";
 import FileComponent from "./fileComponent";
+import { uploadToS3 } from "@/lib/s3-upload";
 
 export default function CreateMeeting() {
   const [currentStep, setCurrentStep] = useState(1);
@@ -427,17 +437,23 @@ const StepTwo = ({
           <label className="font-medium text-white-800 text-xs">
             Fréquence
           </label>
-          <select
-            value={localFrequency}
-            onChange={(e) => setLocalFrequency(e.target.value)}
-            className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 ${
-              errors.frequency ? "border-red-500" : ""
-            }`}
-          >
-            <option value="Une fois">Une fois</option>
-            <option value="Hebdomadaire">Hebdomadaire</option>
-            <option value="Mensuel">Mensuel</option>
-          </select>
+          <Select value={localFrequency} onValueChange={setLocalFrequency}>
+            <SelectTrigger
+              className={`w-full h-[36px] ${
+                errors.frequency ? "border-red-500" : ""
+              }`}
+            >
+              <SelectValue placeholder="Sélectionner la fréquence" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>Fréquence</SelectLabel>
+                <SelectItem value="Une fois">Une fois</SelectItem>
+                <SelectItem value="Hebdomadaire">Hebdomadaire</SelectItem>
+                <SelectItem value="Mensuel">Mensuel</SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
           {errors.frequency && (
             <p className="text-red-500 text-sm mt-1">{errors.frequency}</p>
           )}
@@ -549,12 +565,6 @@ const StepThree = () => {
 };
 
 const StepFour = () => {
-  const { ordre_du_jour, updateStep4 } = useMeetingForm();
-  const [localAgenda /*setLocalAgenda*/] = useState(ordre_du_jour);
-
-  useEffect(() => {
-    updateStep4(localAgenda);
-  }, [localAgenda, updateStep4]);
 
   return (
     <div className="w-full">

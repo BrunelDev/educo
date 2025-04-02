@@ -58,6 +58,9 @@ export const endpoints = {
   equipes: {
     base: "equipe/equipes/",
   },
+  organisation: {
+    base: "equipe/organisations/",
+  },
   consultations: {
     base: "consultations/",
   },

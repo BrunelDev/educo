@@ -1,120 +1,71 @@
 "use client";
-import { Button } from "@/components/ui/button";
-import { MeetingType } from "@/lib/types";
-import { useEffect, useState } from "react";
-import MeetingCard from "./components/meetingCard";
 import { DialogComponent } from "@/app/_components/dialogComponent";
+import { Button } from "@/components/ui/button";
+import { getMeetings } from "@/lib/api/reunion";
+import { Meeting, MeetingType } from "@/lib/types";
+import { useMeetingStore } from "@/store/meetings";
+import { useEffect, useState } from "react";
 import CreateMeeting from "./components/createMeeting";
-export { DialogComponent } from "@/app/_components/dialogComponent"
-import { useMeetingStore } from "@/store/meetings"
-import {getMeetings} from "@/lib/api/reunion"
+import MeetingCard from "./components/meetingCard";
+export { DialogComponent } from "@/app/_components/dialogComponent";
 
 export default function Reunions() {
   const [filterValue, setFilterValue] = useState<string>("all");
-  /*const meetings: MeetingCardProps[] = [
-    {
-      title: "Réunion CSE Mensuelle",
-      subtitle: "Discussion des points clés du mois",
-      date: "2024-03-15",
-      time: "10:00",
-      attendees: [
-        { name: "Marie Durant", imageUrl: "/avatars/marie.jpg" },
-        { name: "Thomas Bernard", imageUrl: "/avatars/thomas.jpg" },
-        { name: "Sophie Martin", imageUrl: "/avatars/sophie.jpg" },
-      ],
-      remainingAttendees: 2,
-      isOnline: true,
-      isInPerson: false,
-      isFinished: false,
-      meetingType: MeetingType.CSSCT,
-    },
-    {
-      title: "Point Sécurité Trimestriel",
-      subtitle: "Revue des incidents et mesures préventives",
-      date: "2024-03-20",
-      time: "14:30",
-      attendees: [
-        { name: "Pierre Dubois", imageUrl: "/avatars/pierre.jpg" },
-        { name: "Julie Lefebvre", imageUrl: "/avatars/julie.jpg" },
-      ],
-      remainingAttendees: 0,
-      isOnline: false,
-      isInPerson: true,
-      isFinished: true,
-      meetingType: MeetingType.Extraordinal,
-    },
-    {
-      title: "Formation CSSCT",
-      subtitle: "Module avancé sur les risques psychosociaux",
-      date: "2024-03-25",
-      time: "09:00",
-      attendees: [
-        { name: "Lucas Moreau", imageUrl: "/avatars/lucas.jpg" },
-        { name: "Emma Richard", imageUrl: "/avatars/emma.jpg" },
-        { name: "Hugo Martin", imageUrl: "/avatars/hugo.jpg" },
-      ],
-      remainingAttendees: 5,
-      isOnline: true,
-      isInPerson: true,
-      isFinished: false,
-      meetingType: MeetingType.Ordinary,
-    },
-  ];*/
+  const { meetings, setMeetings } = useMeetingStore();
+  const [filteredMeeting, setFilteredMeetings] = useState<Meeting[] | null>(
+    meetings
+  );
+
   type FilterType = "all" | MeetingType;
 
   // Filter function
   const filterMeetings = (filter: FilterType) => {
-    switch (filter) {
-      case "all":
-        return meetings;
-      case MeetingType.Ordinary:
-        return meetings.filter(
-          (meeting) => meeting.type_reunion === MeetingType.Ordinary
-        );
-      case MeetingType.Extraordinal:
-        return meetings.filter(
-          (meeting) => meeting.type_reunion === MeetingType.Extraordinal
-        );
-      case MeetingType.Others:
-        return meetings.filter(
-          (meeting) => meeting.type_reunion === MeetingType.Others
-        );
-      case MeetingType.CSSCT:
-        return meetings.filter(
-          (meeting) => meeting.type_reunion === MeetingType.CSSCT
-        );
-      default:
-        return meetings;
+    if (!meetings || !Array.isArray(meetings)) {
+      return [];
     }
-  };
-  const handleClick = (filterValue: string) => {
-    setFilterValue(filterValue);
-    setFilteredMeetings(filterMeetings(filterValue as FilterType));
+
+    if (!filter || filter === "all") {
+      return meetings;
+    }
+
+    return meetings.filter((meeting) => meeting.type_reunion === filter);
   };
 
-  const {meetings, setMeetings} = useMeetingStore()
-  const [filteredMeeting, setFilteredMeetings] = useState(meetings);
+  const handleClick = (filterValue: string) => {
+    setFilterValue(filterValue);
+    const filtered = filterMeetings(filterValue as FilterType);
+    setFilteredMeetings(filtered);
+  };
+
+  // Update filtered meetings when main meetings change
   useEffect(() => {
-    const handler = async () => {
+    const filtered = filterMeetings(filterValue as FilterType);
+    setFilteredMeetings(filtered);
+  }, [meetings, filterValue]);
+
+  // Fetch meetings on component mount
+  useEffect(() => {
+    const fetchMeetings = async () => {
       try {
-        const data = await getMeetings()
-        setMeetings(data)
-        console.log(data);
-        
-      } catch (error : unknown) {
+        const data = await getMeetings();
+        setMeetings(data.results);
+        console.log("Fetched meetings:", data);
+      } catch (error: unknown) {
         console.error("Error fetching meetings:", (error as Error).message);
-        
       }
-      
-    }
-    handler()
-    
-  }, [setMeetings])
+    };
+    fetchMeetings();
+  }, [setMeetings]);
+
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-5 relative">
       <div className="flex flex-row gap-2">
         <Button
-          className={`cursor-pointer ${filterValue === "all" ? "bg-gradient-to-r from-[#FE6539] to-crimson-400" : "bg-[#FFFFFF99] border border-white-50 text-white-800 hover:bg-coral-50"}`}
+          className={`cursor-pointer ${
+            filterValue === "all"
+              ? "bg-gradient-to-r from-[#FE6539] to-crimson-400"
+              : "bg-[#FFFFFF99] border border-white-50 text-white-800 hover:bg-coral-50"
+          }`}
           variant={"default"}
           onClick={() => {
             handleClick("all");
@@ -123,7 +74,11 @@ export default function Reunions() {
           Toutes
         </Button>
         <Button
-          className={`cursor-pointer ${filterValue === MeetingType.CSSCT ? "bg-gradient-to-r from-[#FE6539] to-crimson-400" : "bg-[#FFFFFF99] border border-white-50 text-white-800 hover:bg-coral-50"}`}
+          className={`cursor-pointer ${
+            filterValue === MeetingType.CSSCT
+              ? "bg-gradient-to-r from-[#FE6539] to-crimson-400"
+              : "bg-[#FFFFFF99] border border-white-50 text-white-800 hover:bg-coral-50"
+          }`}
           variant={"default"}
           onClick={() => {
             handleClick(MeetingType.CSSCT);
@@ -132,7 +87,11 @@ export default function Reunions() {
           CSSCT
         </Button>
         <Button
-          className={`cursor-pointer ${filterValue === MeetingType.Ordinary ? "bg-gradient-to-r from-[#FE6539] to-crimson-400" : "bg-[#FFFFFF99] border border-white-50 text-white-800 hover:bg-coral-50"}`}
+          className={`cursor-pointer ${
+            filterValue === MeetingType.Ordinary
+              ? "bg-gradient-to-r from-[#FE6539] to-crimson-400"
+              : "bg-[#FFFFFF99] border border-white-50 text-white-800 hover:bg-coral-50"
+          }`}
           variant={"default"}
           onClick={() => {
             handleClick(MeetingType.Ordinary);
@@ -141,7 +100,11 @@ export default function Reunions() {
           Ordinaire
         </Button>
         <Button
-          className={`cursor-pointer ${filterValue === MeetingType.Extraordinal ? "bg-gradient-to-r from-[#FE6539] to-crimson-400" : "bg-[#FFFFFF99] border border-white-50 text-white-800 hover:bg-coral-50"}`}
+          className={`cursor-pointer ${
+            filterValue === MeetingType.Extraordinal
+              ? "bg-gradient-to-r from-[#FE6539] to-crimson-400"
+              : "bg-[#FFFFFF99] border border-white-50 text-white-800 hover:bg-coral-50"
+          }`}
           variant={"default"}
           onClick={() => {
             handleClick(MeetingType.Extraordinal);
@@ -150,7 +113,11 @@ export default function Reunions() {
           Extraordinaire
         </Button>
         <Button
-          className={`cursor-pointer ${filterValue === MeetingType.Others ? "bg-gradient-to-r from-[#FE6539] to-crimson-400" : "bg-[#FFFFFF99] border border-white-50 text-white-800 hover:bg-coral-50"}`}
+          className={`cursor-pointer ${
+            filterValue === MeetingType.Others
+              ? "bg-gradient-to-r from-[#FE6539] to-crimson-400"
+              : "bg-[#FFFFFF99] border border-white-50 text-white-800 hover:bg-coral-50"
+          }`}
           variant={"default"}
           onClick={() => {
             handleClick(MeetingType.Others);
@@ -162,22 +129,43 @@ export default function Reunions() {
       <div>
         <h6 className="mb-4">Réunions à venir</h6>
         <div className="w-full flex flex-row flex-wrap gap-5">
-        {filteredMeeting.map((meeting, index) => (
-          <MeetingCard meeting={meeting} key={meeting.titre + index} />
-        ))}
+          {filteredMeeting ?  (
+            filteredMeeting.map((meeting) => (
+              <MeetingCard
+                key={meeting.id} // Use unique ID instead of title + index
+                meeting={meeting}
+              />
+            ))
+          ) : (
+            <p>Aucune réunion à venir</p>
+          )}
         </div>
       </div>
       <div>
         <h6 className="mb-4">Historique des Réunions</h6>
         <div className="w-full flex flex-row flex-wrap gap-5">
-        {meetings.length>0 && meetings?.map((meeting, index) => (
-          <MeetingCard meeting={meeting} key={meeting.titre + index} />
-        ))}
+          {meetings?.length > 0 ? (
+            meetings.map((meeting) => (
+              <MeetingCard key={meeting.id} meeting={meeting} />
+            ))
+          ) : (
+            <p>Aucun historique de réunion</p>
+          )}
         </div>
       </div>
-      <DialogComponent dialogTitle={null}  className={"sm:max-w-[980px] flex items-center justify-center p-0"} dialoTrigger={<Button>Créer une nouvelle réunion</Button>} dialogContent={<CreateMeeting/>}/>
-      
-      
+      <DialogComponent
+        dialogTitle={null}
+        className={"sm:max-w-[980px] flex items-center justify-center p-0"}
+        dialoTrigger={
+          <Button
+            className={`cursor-pointer bg-gradient-to-r from-[#FE6539] to-crimson-400 w-fit absolute -top-10 right-6`}
+            variant={"default"}
+          >
+            Créer une nouvelle réunion
+          </Button>
+        }
+        dialogContent={<CreateMeeting />}
+      />
     </div>
   );
 }

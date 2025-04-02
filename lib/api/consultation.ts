@@ -124,3 +124,26 @@ export const getOneConsultation = async (id: number) : Promise<Consultation> => 
     throw error;
   }
 }
+
+export interface CreateConsultationDto {
+  type_consultation: string;
+  description: string;
+  date_requise: string;
+  statut: string;
+  participants: number[];
+}
+
+export const createConsultation = async (data: CreateConsultationDto): Promise<Consultation> => {
+  try {
+    const response = await api.post<Consultation>(`${endpoints.consultations.base}`, {
+      ...data
+    });
+    return response.data;
+    
+  } catch (error) {
+    console.error("Error creating consultation", error);
+    throw error;
+    
+  }
+  
+}

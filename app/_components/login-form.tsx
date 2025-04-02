@@ -30,7 +30,7 @@ export function LoginForm() {
             setMessage("Connexion réussie");
             
             console.log(getCookies("access_token"))
-            //router.push("/dashboard");
+            router.push("/dashboard");
             return;
           }
           return;

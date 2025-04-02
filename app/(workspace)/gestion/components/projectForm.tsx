@@ -1,36 +1,24 @@
-"use client";
-import { DialogComponent } from "@/app/_components/dialogComponent";
-import { Button } from "@/components/ui/button";
-import { getTeams, TeamApiResponse } from "@/lib/api/equipe";
-import { Plus } from "lucide-react";
-import { useEffect, useState } from "react";
-import SearchBar from "../components/searchBar";
-import AddMemberDialog from "./components/addMemberDialog";
-import AssociateCard from "./components/associateCard";
-import Contact from "./components/contact";
-import AddOrganisation from "./components/addOrganisation";
-import TeamFormHandler from "../components/teamFormHandler";
+import { Input } from '@/components/ui/input'
+import { getTeams, Team } from '@/lib/api/equipe'
+import { useEffect, useState } from 'react'
 
-export default function Equipe() {
-  
-  const [searchValue, setSearchValue] = useState<string>("");
-  const [teams, setTeams] = useState<TeamApiResponse>();
-
-  useEffect(() => {
-    const fetchTeams = async () => {
-      try {
-        const response = await getTeams();
-        console.log(response);
-        setTeams(response);
-        console.log("team", teams)
-      } catch (error: unknown) {
-        console.error("Failed to fetch teams", error);
-      }
-    };
-    fetchTeams();
-  }, [teams]);
+export default function ProjectForm() {
+    const [teamMembers, setTeamMembers] =useState<Team[]>()
+    useEffect(() => {
+        const fetchTeamMembers = async () => {
+            try {
+                const response = await getTeams()
+                setTeamMembers(response.results)
+            } catch (error) {
+                console.error("Error fetching team members", error)
+                throw error
+                
+            }
+        }
+        fetchTeamMembers()
+    }, [])
   return (
-    <div className="flex relative flex-col gap-6">
+    <div className="flex flex-col gap-6">
       <h6>Equipe</h6>
       <Contact />
       <div className="flex justify-between">
@@ -41,8 +29,8 @@ export default function Equipe() {
             handleChange={setSearchValue}
             placeholder={"Recherhcer"}
           />{" "}
-          <div className="absolute right-6 -top-11">
-          <DialogComponent
+          <div className="w-full">
+            <DialogComponent
               className={"sm:max-w-[768px]"}
               dialoTrigger={
                 <Button
@@ -55,9 +43,6 @@ export default function Equipe() {
               dialogContent={<AddOrganisation/>}
               dialogTitle={null}
             />
-          </div>
-          <div className="w-full">
-            
             <DialogComponent
               dialoTrigger={
                 <Button
@@ -67,7 +52,7 @@ export default function Equipe() {
                   <Plus /> Ajouter un membre
                 </Button>
               }
-              dialogContent={<TeamFormHandler/>}
+              dialogContent={teams?.results[0] ? <AddMemberDialog teamId={teams?.results[0].id} /> : <div></div>}
               dialogTitle={null}
             />
           </div>
@@ -90,5 +75,5 @@ export default function Equipe() {
         ))}
       </div>*/}
     </div>
-  );
+  )
 }

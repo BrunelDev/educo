@@ -1,6 +1,8 @@
 import { Button } from "@/components/ui/button";
+import { getOrganization, OrganizationResponse } from "@/lib/api/organisation";
 import { Mail, MapPin, Phone } from "lucide-react";
 import Image from "next/image";
+import { useEffect, useState } from "react";
 export default function Contact() {
   const contact = {
     enterpriseImageUrl: "/enterprise-image.png",
@@ -10,6 +12,14 @@ export default function Contact() {
     email: "contact@acme-solutions.com",
     address: "10 Rue des Startups, 75000 Paris, France",
   };
+  const [organisation, setOrganisation] = useState<OrganizationResponse>()
+  useEffect(() => {
+    const fetchOrganisation = async () => {
+      const response = await getOrganization()
+      setOrganisation(response)
+    }
+      fetchOrganisation()
+  }, [])
   return (
     <div className="w-full bg-[#FFFFFF99] flex flex-col gap-3 rounded-[8px] p-3">
       <div className="flex justify-between">
@@ -22,13 +32,13 @@ export default function Contact() {
             className="rounded-full"
           />
           <div className="flex flex-col justify-around">
-            <h4 className="font-bold text-2[18px]">{contact.enterpriseName}</h4>
+            <h4 className="font-bold text-2[18px]">{organisation?.organisation.nom}</h4>
             <h6 className="font-medium text-[14px]">
               {contact.expertiseDomain}
             </h6>
           </div>
         </div>
-        <Button className="bg-white-100 text-white-800 text-xs">
+        <Button className="bg-white-100 hover:bg-white-200 text-white-800 text-xs">
           Modifier
         </Button>
       </div>

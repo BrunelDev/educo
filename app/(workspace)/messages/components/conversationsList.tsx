@@ -4,6 +4,11 @@ import { useEffect, useState } from "react";
 import SearchBar from "../../components/searchBar";
 import { useMessageStore } from "@/store/message";
 import { Conversation, ConversationResponse, getConversationList } from "@/lib/api/message";
+import { getCookies } from "@/lib/utils/cookies";
+import { User } from "@/lib/api/users";
+
+
+const userInfo : User = JSON.parse(getCookies("userInfo") || "{}")
 
 export default function ConversationsList() {
   const [serachValue, setSearchValue] = useState<string>("");
@@ -103,13 +108,13 @@ const Discussion = ({ ...props }: Conversation ) => {
       <div className="w-full flex justify-between items-center ">
         <div className="flex w-2/3 gap-2 items-center">
           <Image
-            src={props.participants.filter((participant)=>participant._id === 3)[0].avatar || "/userProfile-img.png"}
+            src={props.participants.filter((participant)=>participant._id !== userInfo.id)[0].avatar || "/userProfile-img.png"}
             width={28}
             height={28}
             alt="group icon"
             className="rounded-full"
           />
-          <h6 className="gap-2 truncate">{props.participants.filter((participant)=>participant._id === 3)[0].name || "John Doe"}</h6>
+          <h6 className="gap-2 truncate">{props.participants.filter((participant)=>participant._id !== userInfo.id)[0].name || "John Doe"}</h6>
         </div>
         <h6 className="w-[33px] truncate">{`props.lastMessageHour`}</h6>
       </div>

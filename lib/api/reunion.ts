@@ -3,7 +3,14 @@ import api, { endpoints } from "../api";
 import { Meeting } from "../types";
 const endpoint = endpoints.meetings;
 
-export const getMeetings = async (page: number = 1): Promise<Meeting[]> => {
+
+interface MeetingsApiResponse {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: Meeting[];
+}
+export const getMeetings = async (page: number = 1): Promise<MeetingsApiResponse> => {
   try {
     const response = await api.get(endpoint.list, {
       params: {

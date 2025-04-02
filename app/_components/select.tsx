@@ -12,13 +12,16 @@ export function Select({
   placeholder,
   options,
   label,
+  value,setValue
 }: {
+    value: string;
+    setValue: (value: string) => void;
   placeholder: string;
   options: { value: string }[];
   label: string;
 }) {
   return (
-    <SelectComponent>
+    <SelectComponent value={value} onValueChange={(e)=>setValue(e)}>
       <SelectTrigger className="w-full">
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>

@@ -25,6 +25,9 @@ import {
   parseAllowedFontSize,
 } from "./editorPlugins/styleConfig";
 import ToolbarPlugin from "./editorPlugins/toolbarPlugin";
+import { useEffect, useState } from "react";
+import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import { useMeetingForm } from "@/store/meetingForm";
 
 const placeholder = "Enter some rich text...";
 
@@ -138,6 +141,27 @@ const editorConfig = {
 };
 
 export default function Editor() {
+  function MyOnChangePlugin({ onChange }) {
+    const [editor] = useLexicalComposerContext();
+    useEffect(() => {
+      return editor.registerUpdateListener(({editorState}) => {
+        onChange(editorState);
+      });
+    }, [editor, onChange]);
+    return null;
+  }
+  const [editorState, setEditorState] = useState("");
+  function onChange(editorState : any) {
+    // Call toJSON on the EditorState object, which produces a serialization safe string
+    const editorStateJSON = editorState.toJSON();
+    // However, we still have a JavaScript object, so we need to convert it to an actual string with JSON.stringify
+    setEditorState(JSON.stringify(editorStateJSON));
+  }
+   const { updateStep4 } = useMeetingForm();
+  
+    useEffect(() => {
+      updateStep4([{description :editorState}]);
+    }, [editorState, updateStep4]);
   return (
     <LexicalComposer initialConfig={editorConfig} >
       <div className="editor-container border w-full">
@@ -146,6 +170,7 @@ export default function Editor() {
           <RichTextPlugin
             contentEditable={
               <ContentEditable
+                
                 className="editor-input w-full h-[300px] border rounded-[8px]"
                 aria-placeholder={placeholder}
                 placeholder={
@@ -159,6 +184,7 @@ export default function Editor() {
           <AutoFocusPlugin />
         </div>
       </div>
+      <MyOnChangePlugin onChange={onChange}/>
     </LexicalComposer>
   );
 }

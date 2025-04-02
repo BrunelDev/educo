@@ -1,6 +1,6 @@
 import { AxiosError } from "axios";
 import api, { endpoints } from "../api";
-import { getCookies } from "../utils/cookies";
+import { getCookies, removeCookie, setCookie } from "../utils/cookies";
 const endpoint = endpoints.auth.users;
 
 export interface User {
@@ -100,4 +100,9 @@ export const getUser = async () : Promise<User> => {
     throw error;
     
   }
+}
+export const logout = () => {
+  removeCookie("access_token");
+  removeCookie("refresh_token");
+  removeCookie("userInfo");
 }

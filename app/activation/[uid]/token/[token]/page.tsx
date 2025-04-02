@@ -66,7 +66,7 @@ export default function ActivationPage({
           {status === "loading" && (
             <div className="animate-pulse">
               <h2 className="text-2xl font-bold text-gray-900">
-                Activating your account...
+                Activation du compte...
               </h2>
             </div>
           )}
@@ -74,17 +74,17 @@ export default function ActivationPage({
           {status === "success" && (
             <div className="space-y-4">
               <h2 className="text-2xl font-bold text-green-600">
-                Account Activated!
+                Compte activé!
               </h2>
               <p className="text-gray-600">{message}</p>
               <p className="text-sm text-gray-500">
-                Redirecting to dashboard in 3 seconds...
+                Redirection vers le tableau de bord dans 3 secondes...
               </p>
               <Button
                 onClick={() => router.push("/dashboard")}
                 className="w-full"
               >
-                Go to Dashboard Now
+                Aller au tableau de bord maintenant
               </Button>
             </div>
           )}
@@ -92,11 +92,11 @@ export default function ActivationPage({
           {status === "error" && (
             <div className="space-y-4">
               <h2 className="text-2xl font-bold text-red-600">
-                Activation Failed
+                Activation échouée.
               </h2>
               <p className="text-gray-600">{message}</p>
               <Button onClick={() => router.push("/login")} className="w-full">
-                Go to Login
+                Retourner a la page de connexion
               </Button>
             </div>
           )}

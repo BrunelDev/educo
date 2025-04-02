@@ -109,10 +109,10 @@ export function AppSidebar() {
           <Image width={32} height={32}  src={
             userInfo.image ? userInfo.image : "/userProfile-img.png"
           } alt={"user profile image"} />
-            <h1 className="text-white-800 font-semibold ">
+            <h6 className="text-white-800 font-semibold text-sm">
             {userInfo.first_name ? userInfo.first_name : "John"}{" "}
             {userInfo.last_name ? userInfo.last_name : "Doe"}
-          </h1>
+          </h6>
           </div>
           <ChevronRight/>
           

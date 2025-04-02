@@ -16,7 +16,7 @@ export default function WebinarCard({ webinar }: WebinarCardProps) {
       <Image
           width={380}
           height={380}
-          src={webinar.image ? "/webinarCard-bg.png" : webinar.image}
+          src={webinar.image ?webinar.image :"/webinarCard-bg.png"}
           alt="host profile"
           className="absolute -z-10 rounded-[12px] group-hover:scale-105 duration-300"
         />
@@ -38,7 +38,7 @@ const WebinarCardBotton = ({ webinar }: WebinarCardProps) => {
         <Image
           width={24}
           height={24}
-          src={webinar.image ? "/hostImage.png" : webinar.image}
+          src={webinar.image ? webinar.image: "/hostImage.png"}
           alt="webinar profile"
           className="rounded-full"
         />
