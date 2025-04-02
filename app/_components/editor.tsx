@@ -154,7 +154,7 @@ export default function Editor() {
   function onChange(editorState : any) {
     // Call toJSON on the EditorState object, which produces a serialization safe string
     const editorStateJSON = editorState.toJSON();
-    // However, we still have a JavaScript object, so we need to convert it to an actual string with JSON.stringify
+   
     setEditorState(JSON.stringify(editorStateJSON));
   }
    const { updateStep4 } = useMeetingForm();
