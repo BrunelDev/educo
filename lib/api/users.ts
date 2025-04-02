@@ -1,6 +1,6 @@
 import { AxiosError } from "axios";
 import api, { endpoints } from "../api";
-import { getCookies, removeCookie, setCookie } from "../utils/cookies";
+import { getCookies, removeCookie } from "../utils/cookies";
 const endpoint = endpoints.auth.users;
 
 export interface User {
@@ -76,7 +76,7 @@ export const updatePassword = async (formData: { old_password: string; new_passw
       "confirm_password": formData.confirm_password
     });
     return response.data.message;
-  } catch (error :any) {
+  } catch (error :unknown) {
     console.error("Error updating password", error);
     //check if error is instance of AxiosError
     if (error instanceof AxiosError) {
@@ -91,7 +91,7 @@ export const getUser = async () : Promise<User> => {
     const response = await api.get<User>(`${endpoint}me/`);
     return response.data;
     
-  } catch (error: any) {
+  } catch (error: unknown) {
     if (error instanceof AxiosError) {
       console.error("error fetching users",JSON.stringify(error.response?.data?.error))
     throw error;

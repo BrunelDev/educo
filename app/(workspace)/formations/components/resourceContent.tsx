@@ -1,4 +1,4 @@
-import { getRessources, Ressource, RessourcesResponse } from '@/lib/api/formations'
+import { getRessources, RessourcesResponse } from '@/lib/api/formations'
 import { useEffect, useState } from 'react'
 import { RessourceCard } from './RessourceCards'
 

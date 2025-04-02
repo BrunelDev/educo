@@ -7,7 +7,7 @@ import { useMeetingStore } from "@/store/meetings";
 import { useEffect, useState } from "react";
 import CreateMeeting from "./components/createMeeting";
 import MeetingCard from "./components/meetingCard";
-export { DialogComponent } from "@/app/_components/dialogComponent";
+
 
 export default function Reunions() {
   const [filterValue, setFilterValue] = useState<string>("all");
@@ -41,6 +41,7 @@ export default function Reunions() {
   useEffect(() => {
     const filtered = filterMeetings(filterValue as FilterType);
     setFilteredMeetings(filtered);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [meetings, filterValue]);
 
   // Fetch meetings on component mount

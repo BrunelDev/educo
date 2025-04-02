@@ -43,7 +43,7 @@ interface MeetingParticipant {
 }
 
 // Interface for meeting documents
-interface MeetingDocument {
+export interface MeetingDocument {
   fichier: string;
   nom_fichier: string;
   type_fichier?: MessageType

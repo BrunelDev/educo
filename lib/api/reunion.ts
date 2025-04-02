@@ -24,9 +24,9 @@ export const getMeetings = async (page: number = 1): Promise<MeetingsApiResponse
   }
 };
 
-export const getOneMeting = async (id: number) => {
+export const getOneMeting = async (id: number):Promise<Meeting> => {
   try {
-    const response = await api.get(`${endpoint.list}/${id}`);
+    const response = await api.get(`${endpoint.list}${id}/`);
     return response.data;
   } catch (error: unknown) {
     console.error("Error fetching meeting", error);

@@ -61,3 +61,29 @@ export const getTaskById = async (id: number): Promise<Task> => {
         
     }
 }
+
+export interface CreateTaskDto {
+  project: number;
+  title: string;
+  description: string;
+  task_type: TaskType | null;
+  file_url?: string;
+  assigned_members: number[];
+}
+
+export const createTask = async (data: CreateTaskDto): Promise<Task> => {
+  try {
+    
+
+    const response = await api.post<Task>(
+      endpoints.taches.base,
+      data,
+      
+    );
+    
+    return response.data;
+  } catch (error) {
+    console.error('Error creating task:', error);
+    throw error;
+  }
+};

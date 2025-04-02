@@ -1,5 +1,4 @@
 import api, { endpoints } from "./api";
-import { getCookies } from "./utils/cookies";
 
 export const login = async (email: string, password: string) => {
   try {

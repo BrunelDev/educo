@@ -1,7 +1,6 @@
 import api, { endpoints } from "../api";
 
-
-export type FileType = 'VIDEO' | 'IMAGE' | 'DOCUMENT' | 'AUDIO';
+export type FileType = "VIDEO" | "IMAGE" | "DOCUMENT" | "AUDIO";
 
 export interface Fichier {
   id: number;
@@ -54,9 +53,7 @@ export const getDossiers = async (
   }
 };
 
-
-
-export const getOneDossiers = async (id: string) : Promise<Dossier> => {
+export const getOneDossiers = async (id: string): Promise<Dossier> => {
   try {
     const response = await api.get(`${endpoint}${id}/`);
     return response.data;
@@ -75,31 +72,78 @@ export const getOneDossiers = async (id: string) : Promise<Dossier> => {
   }
 };
 
-export const createDossier = async (nom : string, parent : string | null) => {
-    try {
-      const response = await api.post(endpoint, {
-        nom,
-        parent,
-      });
-      return response.data;
-    } catch (error) {
-      console.error("Error creating dossier", error);
-    }
-}
+export const createFolder = async (nom: string, parent: string | null) => {
+  try {
+    const response = await api.post(endpoint, {
+      nom,
+      parent,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error creating dossier", error);
+  }
+};
 export const deleteDossier = async (id: number) => {
   try {
-      await api.delete(`${endpoint}${id}/`);
-    } catch (error) {
-      console.error("Error deleting dossier", error);
-    }
-}
-export const editDossier = async (id: number, nom? : string) => {
+    await api.delete(`${endpoint}${id}/`);
+  } catch (error) {
+    console.error("Error deleting dossier", error);
+  }
+};
+export const editDossier = async (id: number, nom?: string) => {
   try {
-      const response = await api.patch(`${endpoint}${id}/`, {
-        nom
-      });
-      return response.data;
-    } catch (error) {
-      console.error("Error editing dossier", error);
+    const response = await api.patch(`${endpoint}${id}/`, {
+      nom,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error editing dossier", error);
+  }
+};
+
+export const extractFilenameFromUrl = (url: string): string => {
+  try {
+    // Try to get filename from the last part of the URL
+    const urlParts = url.split("/");
+    let filename = urlParts[urlParts.length - 1];
+
+    // Remove query parameters if present
+    if (filename.includes("?")) {
+      filename = filename.split("?")[0];
     }
+
+    // Remove timestamp prefix pattern (numbers followed by hyphen)
+    filename = filename.replace(/^\d+-/, "");
+
+    // Decode URI components
+    filename = decodeURIComponent(filename);
+
+    return filename || "unknown_file";
+  } catch (error) {
+    console.error("Error extracting filename:", error);
+    return "unknown_file";
+  }
+};
+
+interface CreateFilePayload {
+  nom: string;
+  type_fichier: string | null;
+  url: string;
+  dossier: number;
 }
+
+const fileEndpoint = endpoints.fichiers.fichiers.base
+
+export const createFile = async (fileData: CreateFilePayload) => {
+  try {
+    const response = await api.post(`${fileEndpoint}`, fileData
+      
+    );
+    return response.data
+    
+  } catch (error: unknown) {
+    console.error("Error creating file:", error);
+    throw error;
+    
+  }
+};

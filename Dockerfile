@@ -1,38 +1,37 @@
-# syntax=docker/dockerfile:1
+# Étape 1 : Construction des dépendances
+FROM oven/bun:1.1.29-alpine AS build
+WORKDIR /app
 
-# Comments are provided throughout this file to help you get started.
-# If you need more help, visit the Dockerfile reference guide at
-# https://docs.docker.com/go/dockerfile-reference/
+# Copier le package.json et le bun.lockb pour installer les dépendances
+COPY package.json bun.lock ./
+RUN bun install --frozen-lockfile
 
-# Want to help us make this template better? Share your feedback here: https://forms.gle/ybq9Krt8jtBL3iCk7
-
-ARG NODE_VERSION=23.1.0
-
-FROM node:${NODE_VERSION}-alpine
-
-# Use production node environment by default.
-ENV NODE_ENV production
-
-
-WORKDIR /usr/src/app
-
-# Download dependencies as a separate step to take advantage of Docker's caching.
-# Leverage a cache mount to /root/.npm to speed up subsequent builds.
-# Leverage a bind mounts to package.json and package-lock.json to avoid having to copy them into
-# into this layer.
-RUN --mount=type=bind,source=package.json,target=package.json \
-    --mount=type=bind,source=package-lock.json,target=package-lock.json \
-    --mount=type=cache,target=/root/.npm \
-    npm ci --omit=dev
-
-# Run the application as a non-root user.
-USER node
-
-# Copy the rest of the source files into the image.
+# Copier tout le code source dans l'image de construction
 COPY . .
 
-# Expose the port that the application listens on.
+# Étape 2 : Build de l'application Next.js
+RUN bun run build  # Ajout du build ici, tu peux aussi utiliser `next build` si nécessaire
+
+# Étape 3 : Création de l'image de production
+FROM oven/bun:1.1.29-alpine AS production
+
+# Créer un utilisateur non privilégié
+RUN adduser --system --uid 1001 nextjs
+USER nextjs
+
+# Répertoire de travail pour l'application
+WORKDIR /app
+
+# Copier uniquement les fichiers nécessaires depuis l'étape de build
+COPY --from=build /app ./
+
+# Configuration de l'environnement de production
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
+
 EXPOSE 3000
 
-# Run the application.
-CMD bun run dev
+# Lancer l'application en production
+CMD ["bun", "run", "start"]

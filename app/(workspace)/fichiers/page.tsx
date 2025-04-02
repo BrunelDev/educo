@@ -1,42 +1,16 @@
-"use client"
-import { DocumentProps, FileProps, FileType, FolderProps } from "@/lib/types";
-import DocumentCard, { PopoverContent }  from "./components/document";
-import FolderCard from "./components/folder";
-import FileCard from "./components/file";
+"use client";
+import { Input } from "@/components/ui/input";
+import { createFolder, DossierResponse, getDossiers } from "@/lib/api/fichiers";
+import { DocumentProps } from "@/lib/types";
 import { useEffect, useState } from "react";
-import { DossierResponse, getDossiers } from "@/lib/api/fichiers";
-import { Popover } from "../components/popover";
-import { MoreVertical } from "lucide-react";
+import { DialogComponent } from "@/app/_components/dialogComponent";
+import DocumentCard from "./components/document";
+import FolderCard from "./components/folder";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 export default function FichiersPage() {
-  const files: FileProps[] = [
-    {
-      name: "rapport-cse-2024.pdf",
-      id: 1,
-      type: FileType.other,
-    },
-    {
-      name: "photo-reunion-janvier.jpg",
-      id: 2,
-      type: FileType.img,
-    },
-    {
-      name: "presentation-budget.pdf",
-      id: 3,
-      type: FileType.other,
-    },
-    {
-      name: "photo-formation-sst.jpg",
-      id: 4,
-      type: FileType.img,
-    },
-    {
-      name: "compte-rendu-cssct.pdf",
-      id: 5,
-      type: FileType.other,
-    },
-  ];
+ 
   /*const folders: FolderProps[] = [
     {
       name: "Documents CSE 2024",
@@ -79,7 +53,7 @@ export default function FichiersPage() {
       id: 10,
     },
   ];*/
-  const [folders, setFolders] = useState<DossierResponse>()
+  const [folders, setFolders] = useState<DossierResponse>();
   const documents: DocumentProps[] = [
     {
       name: "Procès-verbal réunion CSE Janvier 2024",
@@ -104,19 +78,22 @@ export default function FichiersPage() {
   ];
   useEffect(() => {
     const fun = async () => {
-      const response = await getDossiers()
-      setFolders(response)
-    }
-    fun()
-  }, [])
+      const response = await getDossiers();
+      setFolders(response);
+    };
+    fun();
+  }, []);
   return (
     <div className="flex flex-col gap-10 bg-[#FFFFFF99] rounded-[12px] py-5 px-4 min-h-[690px] relative">
-      <Popover
-        className="absolute right-6 -top-11"
-        PopoverContent={<PopoverContent content={[]} />}
-        PopoverTrigger={
-          <Button className="bg-gradient-to-r from-[#FE6539] to-crimson-400">Nouveau</Button>
+      <DialogComponent
+        className=""
+        dialogContent={<CreateFolder />}
+        dialoTrigger={
+          <Button className="bg-gradient-to-r from-[#FE6539] to-crimson-400 w-fit absolute right-6 -top-11">
+            Nouveau
+          </Button>
         }
+        dialogTitle={null}
       />
       <div className="flex flex-wrap justify-between gap-y-5">
         {documents.map((document, index) => (
@@ -136,3 +113,24 @@ export default function FichiersPage() {
     </div>
   );
 }
+
+const CreateFolder = () => {
+  const handleSubmit = async(e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const folderName = formData.get("nom");
+    if (folderName) {
+    await createFolder( folderName?.toString(), null)
+      toast.message("Dossier créé avec succès.")
+    }
+    console.log("Creating folder:", folderName);
+  };
+
+  return (
+    <form action="" className="flex flex-col gap-3" onSubmit={handleSubmit}>
+      <label htmlFor="folderName">Nom du dossier</label>
+      <Input type="text" id="folderName" required name="nom" />
+      <Button type="submit">Créer</Button>
+    </form>
+  );
+};

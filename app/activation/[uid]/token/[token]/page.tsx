@@ -4,20 +4,23 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-export default function ActivationPage({
-  params,
-}: {
-  params: { uid: string; token: string };
-}) {
+type PageProps = {
+  params: {
+    uid: string;
+    token: string;
+  };
+};
+
+export default function ActivationPage({ params }: PageProps) {
   const router = useRouter();
   const [status, setStatus] = useState<"loading" | "success" | "error">(
     "loading"
   );
   const [message, setMessage] = useState("");
+  const { uid, token } = params;
 
   useEffect(() => {
     const activateAccount = async () => {
-      const { uid, token } = params;
       if (!uid || !token) {
         setStatus("error");
         setMessage("Invalid activation link");
@@ -57,7 +60,7 @@ export default function ActivationPage({
     };
 
     activateAccount();
-  }, [params, router]);
+  }, [params, router, token, uid]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">

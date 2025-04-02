@@ -1,9 +1,11 @@
-export default async function ActivationPage({
+export default async function ActivationPage(/*{
     params,
   }: {
     params: { uid: string; token: string };
-  }) {
-    const { uid, token } = params;
+  }*/) {
+  //const { uid, token } = params;
+  const uid = "1"
+  const token = "1"
     if (uid && token) {
       try {
         const response = await fetch(process.env.NEXT_PUBLIC_API_URL!, {

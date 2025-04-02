@@ -82,3 +82,14 @@ export const getOrganisationMembers = async (): Promise<OrganizationMember[]> =>
  
   }
 }
+export const addToOrganization = async (orgId : number , membre_ids: number[]): Promise<Organization> => {
+  try {
+    const response = await api.post(endpoints.organisation.base + `${orgId}/membres/`, {membre_ids});
+    console.log(response.data);
+    return response.data;
+    
+  } catch (error) {
+    console.error('Error adding members to organization:', error);
+    throw error;
+  }
+}

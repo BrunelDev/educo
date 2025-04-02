@@ -1,6 +1,7 @@
 import { Meeting } from "@/lib/types";
 import { CalendarDays, Check, Ellipsis } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 interface MeetingCatdProps {
   meeting: Meeting;
@@ -8,7 +9,7 @@ interface MeetingCatdProps {
 
 export default function MeetingCard({meeting} : MeetingCatdProps) {
   return (
-    <div className="bg-[#FFFFFF99] rounded-[8px] py-2 px-3 w-[350px] flex flex-col gap-2">
+    <Link href={`/reunions/details_de_la_reunion/${meeting.id}`} className="bg-[#FFFFFF99] rounded-[8px] py-2 px-3 w-[350px] flex flex-col gap-2">
       <div className="flex justify-between items-start">
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-2">
@@ -69,6 +70,6 @@ export default function MeetingCard({meeting} : MeetingCatdProps) {
         
           <div className={`w-6 h-6 rounded-full bg-white-50 border border-crimson-200 flex justify-center items-center cursor-pointer`}>{meeting.isFinished && <Check color="#FF264F" size={18}/>}</div>
         </div>
-    </div>
+    </Link>
   );
 }

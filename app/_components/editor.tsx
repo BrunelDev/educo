@@ -151,7 +151,7 @@ export default function Editor() {
     return null;
   }
   const [editorState, setEditorState] = useState("");
-  function onChange(editorState : any) {
+  function onChange(editorState : unknown) {
     // Call toJSON on the EditorState object, which produces a serialization safe string
     const editorStateJSON = editorState.toJSON();
    

@@ -33,7 +33,7 @@ export default function DocumentCard({ document }: Document) {
 interface PopoverContent {
   label: string;
   handleClick: () => void;
-  icon: LucideIcon;
+  icon?: LucideIcon;
 }
 interface PopoverContentProps {
   content: PopoverContent[];

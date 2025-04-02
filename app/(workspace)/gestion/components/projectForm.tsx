@@ -1,79 +1,128 @@
-import { Input } from '@/components/ui/input'
-import { getTeams, Team } from '@/lib/api/equipe'
-import { useEffect, useState } from 'react'
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  getOrganisationMembers,
+  OrganizationMember,
+} from "@/lib/api/organisation";
+import { createProject } from "@/lib/api/projets";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
-export default function ProjectForm() {
-    const [teamMembers, setTeamMembers] =useState<Team[]>()
-    useEffect(() => {
-        const fetchTeamMembers = async () => {
-            try {
-                const response = await getTeams()
-                setTeamMembers(response.results)
-            } catch (error) {
-                console.error("Error fetching team members", error)
-                throw error
-                
-            }
-        }
-        fetchTeamMembers()
-    }, [])
+interface CreateProjectParams {
+  title: string;
+  description: string;
+  status: string;
+  participants: number[];
+  team: number;
+}
+
+export default function ProjectForm({ teamId }: { teamId :number}) {
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [members, setMembers] = useState<OrganizationMember[]>([]);
+  const [selectedMembers, setSelectedMembers] = useState<number[]>([]);
+
+  useEffect(() => {
+    const fetchMembers = async () => {
+      try {
+        const response = await getOrganisationMembers();
+        setMembers(response);
+      } catch (error: unknown) {
+        console.error("Error fetching members:", error);
+      }
+    };
+    fetchMembers();
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Validation
+    if (!title.trim()) {
+      toast.error("Le titre du projet est requis");
+      return;
+    }
+
+    if (!description.trim()) {
+      toast.error("La description du projet est requise");
+      return;
+    }
+
+    if (selectedMembers.length === 0) {
+      toast.error("Veuillez sélectionner au moins un participant");
+      return;
+    }
+
+    try {
+      const projectData: CreateProjectParams = {
+        title: title.trim(),
+        description: description.trim(),
+        status: "en_cours", // default status
+        participants: selectedMembers,
+        team: teamId,
+      };
+      console.log(projectData)
+
+      await createProject(projectData);
+      toast.success("Projet créé avec succès");
+
+      // Reset form
+      setTitle("");
+      setDescription("");
+      setSelectedMembers([]);
+    } catch (error) {
+      toast.error("Erreur lors de la création du projet");
+      console.error("Error creating project:", error);
+    }
+  };
+
   return (
-    <div className="flex flex-col gap-6">
-      <h6>Equipe</h6>
-      <Contact />
-      <div className="flex justify-between">
-        <h6>{teams?.results.length} associés</h6>
-        <div className="flex gap-3 items-center ">
-          <SearchBar
-            value={searchValue}
-            handleChange={setSearchValue}
-            placeholder={"Recherhcer"}
-          />{" "}
-          <div className="w-full">
-            <DialogComponent
-              className={"sm:max-w-[768px]"}
-              dialoTrigger={
-                <Button
-                  variant={"default"}
-                  className="cursor-pointer bg-gradient-to-r from-[#FE6539] to-crimson-400"
-                >
-                  <Plus /> Ajouter une organisation
-                </Button>
-              }
-              dialogContent={<AddOrganisation/>}
-              dialogTitle={null}
-            />
-            <DialogComponent
-              dialoTrigger={
-                <Button
-                  variant={"default"}
-                  className="cursor-pointer bg-gradient-to-r from-[#FE6539] to-crimson-400"
-                >
-                  <Plus /> Ajouter un membre
-                </Button>
-              }
-              dialogContent={teams?.results[0] ? <AddMemberDialog teamId={teams?.results[0].id} /> : <div></div>}
-              dialogTitle={null}
-            />
-          </div>
-        </div>
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4 p-3">
+      <div className="flex flex-col gap-4">
+        <Input
+          placeholder="Titre du projet"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
+        <Textarea
+          placeholder="Description du projet"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          className="min-h-[100px]"
+        />
       </div>
       <div>
-        {teams
-          ? teams.results.map((team, index) => (
-              <div key={index + team.id} className="flex flex-wrap gap-6">
-                {team.membres.map((member, index) => (
-                  <AssociateCard key={member.id + index} associate={member} />
-                ))}
-              </div>
-            ))
-          : null}
+        <ScrollArea className="h-[100px] flex flex-col gap-2 mt-3">
+          <h6 className="text-sm text-white-500 mb-3">Assigner à</h6>
+          {members.map((member, index) => (
+            <div key={member.id + index} className="flex justify-between px-4">
+              <h6>
+                {member.first_name ? member.first_name : member.email}{" "}
+                {member.last_name}
+              </h6>{" "}
+              <Checkbox
+                checked={selectedMembers.includes(member.id)}
+                value={member.id}
+                onCheckedChange={(checked) => {
+                  if (checked) {
+                    setSelectedMembers([...selectedMembers, member.id]);
+                  } else {
+                    setSelectedMembers(
+                      selectedMembers.filter((id) => id !== member.id)
+                    );
+                  }
+                }}
+              />
+            </div>
+          ))}
+        </ScrollArea>
       </div>
-      {/*<div className="flex flex-wrap gap-6">
-        {associates.map((associate, index) => (
-          <AssociateCard key={associate.id + index} associate={associate} />
-        ))}
-      </div>*/}
-    </div>
-  )
+      <Button type="submit" className="w-fit ml-auto self-end">
+        Terminé
+      </Button>
+    </form>
+  );
 }

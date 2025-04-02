@@ -1,0 +1,155 @@
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  getOrganisationMembers,
+  OrganizationMember,
+} from "@/lib/api/organisation";
+import { createTask, CreateTaskDto } from "@/lib/api/tache";
+import { useEffect, useState } from "react";
+
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { uploadToS3 } from "@/lib/s3-upload";
+
+export default function TaskForm({projectId} : {projectId: number}) {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<CreateTaskDto>();
+  const [members, setMembers] = useState<OrganizationMember[]>([]);
+  const [selectedMembers, setSelectedMembers] = useState<number[]>([]);
+  useEffect(() => {
+    const fetchMembers = async () => {
+      try {
+        const response = await getOrganisationMembers();
+        setMembers(response);
+      } catch (error: unknown) {
+        console.error("Error fetching members:", error);
+      }
+    };
+    fetchMembers();
+  }, []);
+  const [file, setFile] = useState<File>()
+
+  const onSubmit = async (data: CreateTaskDto) => {
+    try {
+      if (file) {
+        const file_url = await uploadToS3([file])
+        data.file_url = file_url[0]
+      }
+      
+      data.project = projectId
+      console.log(data)
+      const response = await createTask(data);
+      console.log(response);
+      toast("La tâche a été créée", {
+      });
+      setTimeout(() => {
+        window.location.reload()
+      }, 3000);
+    } catch (error: unknown) {
+      toast("La création de la tâche a échoué", )
+      throw error;
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 p-3">
+      <div>
+        <Input
+          {...register("title", { required: "Le titre est requis" })}
+          placeholder="Titre de la tâche"
+        />
+        {errors.title && (
+          <span className="text-red-500 text-sm">{errors.title.message}</span>
+        )}
+      </div>
+
+      <div>
+        <Textarea
+          {...register("description", {
+            required: "La description est requise",
+          })}
+          placeholder="Description de la tâche"
+        />
+        {errors.description && (
+          <span className="text-red-500 text-sm">
+            {errors.description.message}
+          </span>
+        )}
+      </div>
+
+      <div>
+        <Select>
+          <SelectTrigger className="w-fit">
+            <SelectValue placeholder="Choisissez le statut" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectLabel></SelectLabel>
+              <SelectItem value="en_cours">En cours</SelectItem>
+              <SelectItem value="en_attente">En attente</SelectItem>
+              <SelectItem value="termine">Terminée</SelectItem>
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+        {errors.task_type && (
+          <span className="text-red-500 text-sm">
+            {errors.task_type.message}
+          </span>
+        )}
+      </div>
+
+      <div>
+        <Input type="file" onChange={(e) => setFile(e.target.files?.[0])}/>
+      </div>
+
+      <div>
+        <ScrollArea className="h-[100px] flex flex-col gap-2 mt-3">
+        {members.map((member, index) => (
+          <div key={member.id + index} className="flex justify-between px-4">
+          <h6>
+            {member.first_name ? member.first_name : member.email} {member.last_name}
+          </h6>{" "}
+          <Checkbox
+            checked={selectedMembers.includes(member.id)}
+            value={member.id}
+            onCheckedChange={(checked) => {
+              if (checked) {
+                setSelectedMembers([...selectedMembers, member.id]);
+              } else {
+                setSelectedMembers(
+                  selectedMembers.filter((id) => id !== member.id)
+                );
+              }
+            }}
+          />
+        </div>
+        ))}
+        </ScrollArea>
+        
+        {errors.assigned_members && (
+          <span className="text-red-500 text-sm">
+            {errors.assigned_members.message}
+          </span>
+        )}
+      </div>
+
+      <Button className="text-white font-medium bg-linear-to-r from-[#FE6539] to-crimson-400 w-full"
+        variant="default" type="submit">Créer la tâche</Button>
+    </form>
+  );
+}

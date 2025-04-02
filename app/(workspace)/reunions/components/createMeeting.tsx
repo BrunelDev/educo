@@ -19,15 +19,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { extractFilenameFromUrl } from "@/lib/api/fichiers";
 import { createMeeting } from "@/lib/api/reunion";
 import { getAllusers, User } from "@/lib/api/users";
+import { uploadToS3 } from "@/lib/s3-upload";
 import { Error1, Error2, FileInputChangeEvent, MeetingType } from "@/lib/types";
 import { getCookies } from "@/lib/utils/cookies";
 import { useFileStore } from "@/store/files";
 import { useMeetingForm } from "@/store/meetingForm";
 import Image from "next/image";
 import FileComponent from "./fileComponent";
-import { uploadToS3 } from "@/lib/s3-upload";
 
 export default function CreateMeeting() {
   const [currentStep, setCurrentStep] = useState(1);
@@ -124,6 +125,18 @@ export default function CreateMeeting() {
               try {
                 const filesToUpload = filesList.map((item) => item.file);
                 await handleFileUpload(filesToUpload);
+                const res = await uploadToS3(
+                  filesList.map((item) => item.file)
+                );
+                console.log(formData);
+                formData.documents = res.map((item) => {
+                  return {
+                    fichier: item,
+                    nom_fichier: extractFilenameFromUrl(item),
+                    type_document: "DOCUMENT",
+                  };
+                });
+
                 await createMeeting(formData);
                 // Optionally reset form or redirect after success
                 console.log("Meeting created successfully");
@@ -389,7 +402,7 @@ const StepTwo = ({
         documents: filesList.map((f) => ({
           nom_fichier: "le nom",
           fichier: f.fileUrl,
-          type_document: "fichier",
+          type_document: "DOCUMENT",
         })),
       });
     }
@@ -498,7 +511,13 @@ const StepTwo = ({
 
 const StepThree = () => {
   const { participants, updateStep3 } = useMeetingForm();
-  const [localParticipants /*setLocalParticipants*/] = useState(participants);
+  const [localParticipants, setLocalParticipants] = useState<
+    {
+      utilisateur: number;
+      est_hote: boolean;
+      statut_invitation: "EN_ATTENTE" | "ACCEPTE" | "REFUSE" | null;
+    }[]
+  >(participants);
 
   useEffect(() => {
     updateStep3(localParticipants);
@@ -522,6 +541,27 @@ const StepThree = () => {
     };
     fun();
   }, []);
+
+  const handleParticipantToggle = (userId: number) => {
+    setLocalParticipants((prev) => {
+      const existingParticipant = prev.find((p) => p.utilisateur === userId);
+      if (existingParticipant) {
+        // Remove participant if already selected
+        return prev.filter((p) => p.utilisateur !== userId);
+      } else {
+        // Add new participant
+        return [
+          ...prev,
+          {
+            utilisateur: userId,
+            est_hote: false,
+            statut_invitation: "EN_ATTENTE",
+          },
+        ];
+      }
+    });
+  };
+
   return (
     <div className="flex flex-col gap-4 rounded-[12px] py-10 px-20 w-full">
       <div className=" flex gap-2 items-center">
@@ -554,7 +594,13 @@ const StepThree = () => {
                 {user.email}
               </div>
               <div className="h-5 w-5 rounded-sm flex justify-center items-center hover:bg-coral-50 cursor-pointer">
-                <Input type="checkbox" />
+                <Input
+                  type="checkbox"
+                  checked={localParticipants.some(
+                    (p) => p.utilisateur === user.id
+                  )}
+                  onChange={() => handleParticipantToggle(user.id)}
+                />
               </div>
             </div>
           ))}
@@ -565,7 +611,6 @@ const StepThree = () => {
 };
 
 const StepFour = () => {
-
   return (
     <div className="w-full">
       <Editor />

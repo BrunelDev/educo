@@ -3,7 +3,9 @@ import Formations from "./components/formations";
 import Reunions from "./components/reunions";
 import Suggestions from "./components/suggestions";
 
+
 export default function DashboardPage() {
+  
   return (
     <div className="flex flex-col gap-4">
       <h1 className="text-2xl font-bold">Dashboard</h1>

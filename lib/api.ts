@@ -1,14 +1,7 @@
 import axios from "axios";
 import { getCookies } from "./utils/cookies";
 
-interface User {
-  token: string;
-  id: number;
-  email: string;
-  profile_image: string | null;
-  first_name: string;
-  last_name: string;
-}
+
 
 
 const access_token = getCookies("access_token") ;
@@ -43,6 +36,9 @@ export const endpoints = {
       update: (id: string) => `/dossiers/${id}`,
       delete: (id: string) => `/dossiers/${id}`,
     },
+    fichiers: {
+      base : "fichiers/fichiers/"
+    }
   },
   formations: {
     webinaires: {

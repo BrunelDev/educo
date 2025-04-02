@@ -53,7 +53,7 @@ interface createProjectParams {
   description: string;
   status: string;
   participants: number[];
-    team: 0
+    team: number
   
 }
 export const createProject = async (project: createProjectParams): Promise<Project> => {
