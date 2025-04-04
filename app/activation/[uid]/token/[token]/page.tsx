@@ -2,28 +2,25 @@
 
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 
-type PageProps = {
-  params: {
-    uid: string;
-    token: string;
-  };
-};
-
-export default function ActivationPage({ params }: PageProps) {
+export default function ActivationPage({
+  params,
+}: {
+  params: Promise<{ uid: string; token: string }>;
+}) {
   const router = useRouter();
   const [status, setStatus] = useState<"loading" | "success" | "error">(
     "loading"
   );
   const [message, setMessage] = useState("");
-  const { uid, token } = params;
+  const { uid, token } = use(params);
 
   useEffect(() => {
     const activateAccount = async () => {
       if (!uid || !token) {
         setStatus("error");
-        setMessage("Invalid activation link");
+        setMessage("Lien d'activation invalide");
         return;
       }
 
@@ -50,12 +47,12 @@ export default function ActivationPage({ params }: PageProps) {
           }, 3000);
         } else {
           setStatus("error");
-          setMessage(data.message || "Activation failed");
+          setMessage(data.message || "Échec de l'activation");
         }
       } catch (error) {
         setStatus("error");
-        setMessage("An error occurred during activation");
-        console.error("Activation error:", error);
+        setMessage("Une erreur s'est produite lors de l'activation");
+        console.error("Erreur d'activation:", error);
       }
     };
 
@@ -69,7 +66,7 @@ export default function ActivationPage({ params }: PageProps) {
           {status === "loading" && (
             <div className="animate-pulse">
               <h2 className="text-2xl font-bold text-gray-900">
-                Activation du compte...
+                Activation du compte en cours...
               </h2>
             </div>
           )}
@@ -77,17 +74,17 @@ export default function ActivationPage({ params }: PageProps) {
           {status === "success" && (
             <div className="space-y-4">
               <h2 className="text-2xl font-bold text-green-600">
-                Compte activé!
+                Compte activé avec succès !
               </h2>
               <p className="text-gray-600">{message}</p>
               <p className="text-sm text-gray-500">
-                Redirection vers le tableau de bord dans 3 secondes...
+                Redirection vers la page de connexion dans 3 secondes...
               </p>
               <Button
                 onClick={() => router.push("/dashboard")}
                 className="w-full"
               >
-                Aller au tableau de bord maintenant
+                Aller à la page de connexion maintenant
               </Button>
             </div>
           )}
@@ -95,11 +92,11 @@ export default function ActivationPage({ params }: PageProps) {
           {status === "error" && (
             <div className="space-y-4">
               <h2 className="text-2xl font-bold text-red-600">
-                Activation échouée.
+                Échec de l&apos;activation
               </h2>
               <p className="text-gray-600">{message}</p>
               <Button onClick={() => router.push("/login")} className="w-full">
-                Retourner a la page de connexion
+                Retourner à la page de connexion
               </Button>
             </div>
           )}

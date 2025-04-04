@@ -1,16 +1,22 @@
-"use client"
+"use client";
 
+import { CodeHighlightNode, CodeNode } from "@lexical/code";
+import { LinkNode } from "@lexical/link";
+import { ListItemNode, ListNode } from "@lexical/list";
 import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
+import { HeadingNode, QuoteNode } from "@lexical/rich-text";
+import { TableCellNode, TableNode, TableRowNode } from "@lexical/table";
 import {
   $isTextNode,
   DOMConversionMap,
   DOMExportOutput,
   DOMExportOutputMap,
+  EditorState,
   isHTMLElement,
   Klass,
   LexicalEditor,
@@ -19,17 +25,17 @@ import {
   TextNode,
 } from "lexical";
 
+import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import { useEffect, useState, useCallback } from "react";
 import ExampleTheme from "./editorPlugins/ExampleTheme";
 import {
   parseAllowedColor,
   parseAllowedFontSize,
 } from "./editorPlugins/styleConfig";
 import ToolbarPlugin from "./editorPlugins/toolbarPlugin";
-import { useEffect, useState } from "react";
-import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { useMeetingForm } from "@/store/meetingForm";
 
-const placeholder = "Enter some rich text...";
+const placeholder = "Entre du texte";
 
 const removeStylesExportDOM = (
   editor: LexicalEditor,
@@ -37,9 +43,7 @@ const removeStylesExportDOM = (
 ): DOMExportOutput => {
   const output = target.exportDOM(editor);
   if (output && isHTMLElement(output.element)) {
-    // Remove all inline styles and classes if the element is an HTMLElement
-    // Children are checked as well since TextNode can be nested
-    // in i, b, and strong tags.
+    
     for (const el of [
       output.element,
       ...output.element.querySelectorAll('[style],[class],[dir="ltr"]'),
@@ -133,7 +137,20 @@ const editorConfig = {
     import: constructImportMap(),
   },
   namespace: "React.js Demo",
-  nodes: [ParagraphNode, TextNode],
+  nodes: [
+    TextNode,
+    HeadingNode,
+    QuoteNode,
+    ListNode,
+    ListItemNode,
+    CodeNode,
+    CodeHighlightNode,
+    TableNode,
+    TableCellNode,
+    TableRowNode,
+    LinkNode,
+    ParagraphNode,
+  ],
   onError(error: Error) {
     throw error;
   },
@@ -141,36 +158,43 @@ const editorConfig = {
 };
 
 export default function Editor() {
-  function MyOnChangePlugin({ onChange }) {
+  const { updateStep4 } = useMeetingForm();
+  const [editorStateJSON, setEditorStateJSON] = useState("");
+  
+  // Utilisez useCallback pour éviter la recréation de cette fonction à chaque rendu
+  const onChange = useCallback((editorState: EditorState) => {
+    const json = JSON.stringify(editorState.toJSON());
+    setEditorStateJSON(json);
+    console.log(json)
+  }, []);
+
+  // Utilisez une dépendance stable pour le useEffect
+  useEffect(() => {
+    if (editorStateJSON) {
+      updateStep4([{ description: editorStateJSON }]);
+    }
+  }, [editorStateJSON, updateStep4]);
+
+  function MyOnChangePlugin({ onChange }: { onChange: (editorState: EditorState) => void }) {
     const [editor] = useLexicalComposerContext();
+    
     useEffect(() => {
-      return editor.registerUpdateListener(({editorState}) => {
+      return editor.registerUpdateListener(({ editorState }) => {
         onChange(editorState);
       });
     }, [editor, onChange]);
+    
     return null;
   }
-  const [editorState, setEditorState] = useState("");
-  function onChange(editorState : unknown) {
-    // Call toJSON on the EditorState object, which produces a serialization safe string
-    const editorStateJSON = editorState.toJSON();
-   
-    setEditorState(JSON.stringify(editorStateJSON));
-  }
-   const { updateStep4 } = useMeetingForm();
-  
-    useEffect(() => {
-      updateStep4([{description :editorState}]);
-    }, [editorState, updateStep4]);
+
   return (
-    <LexicalComposer initialConfig={editorConfig} >
+    <LexicalComposer initialConfig={editorConfig}>
       <div className="editor-container border w-full">
         <ToolbarPlugin />
         <div className="editor-inner">
           <RichTextPlugin
             contentEditable={
               <ContentEditable
-                
                 className="editor-input w-full h-[300px] border rounded-[8px]"
                 aria-placeholder={placeholder}
                 placeholder={
@@ -184,7 +208,7 @@ export default function Editor() {
           <AutoFocusPlugin />
         </div>
       </div>
-      <MyOnChangePlugin onChange={onChange}/>
+      <MyOnChangePlugin onChange={onChange} />
     </LexicalComposer>
   );
 }

@@ -10,6 +10,7 @@ import AddOrganisation from "./components/addOrganisation";
 import TeamFormHandler from "../components/teamFormHandler";
 import { getCookies } from "@/lib/utils/cookies";
 import {  getOrganization, OrganizationResponse } from "@/lib/api/organisation";
+import EmptyState from "@/app/_components/EmptyState";
 
 export default function Equipe() {
   
@@ -32,20 +33,19 @@ export default function Equipe() {
           };
           fun();
        }, []);
-  if (users)
-  {
+
     return (
       <div className="flex relative flex-col gap-6">
         <h6>Equipe</h6>
         <Contact />
         <div className="flex justify-between">
-          <h6>{users.membres?.length} associés</h6>
+          {users?.membres ? <h6>{users.membres?.length} associés</h6> : <h6>Aucune équipe liée.</h6>}
           <div className="flex gap-3 items-center ">
-            <SearchBar
+            {users?.membres ? <SearchBar
               value={searchValue}
               handleChange={setSearchValue}
               placeholder={"Recherhcer"}
-            />{" "}
+            /> : null}
             <div className="absolute right-6 -top-11">
             <DialogComponent
                 className={"sm:max-w-[768px]"}
@@ -62,19 +62,20 @@ export default function Equipe() {
               />
             </div>
             <div className="w-full">
-              
+              {users?.organisation?.id ?
               <DialogComponent
-                dialoTrigger={
-                  <Button
-                    variant={"default"}
-                    className="cursor-pointer bg-gradient-to-r from-[#FE6539] to-crimson-400"
-                  >
-                    <Plus /> Ajouter un membre
-                  </Button>
-                }
-                dialogContent={<TeamFormHandler orgId={users?.organisation?.id}/>}
-                dialogTitle={null}
-              />
+              dialoTrigger={
+                <Button
+                  variant={"default"}
+                  className="cursor-pointer bg-gradient-to-r from-[#FE6539] to-crimson-400"
+                >
+                  <Plus /> Ajouter un membre
+                </Button>
+              }
+              dialogContent={<TeamFormHandler orgId={users?.organisation?.id}/>}
+              dialogTitle={null}
+            /> : null}
+              
             </div>
           </div>
         </div>
@@ -84,7 +85,8 @@ export default function Equipe() {
                 
                     <AssociateCard key={user.id + index} associate={user} />
               ))
-            : null}
+            : <div className="w-full flex justify-center items-center">
+            <EmptyState title={"Vous n'appartenez à aucune organisation"} description={"Veuillez créer une organisation pour commencer."}/></div>}
         </div>
         {/*<div className="flex flex-wrap gap-6">
           {associates.map((associate, index) => (
@@ -93,6 +95,5 @@ export default function Equipe() {
         </div>*/}
       </div>
     );
-  }
   
 }

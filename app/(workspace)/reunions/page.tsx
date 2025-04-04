@@ -1,13 +1,17 @@
 "use client";
 import { DialogComponent } from "@/app/_components/dialogComponent";
 import { Button } from "@/components/ui/button";
+import { getOrganization } from "@/lib/api/organisation";
 import { getMeetings } from "@/lib/api/reunion";
 import { Meeting, MeetingType } from "@/lib/types";
 import { useMeetingStore } from "@/store/meetings";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import CreateMeeting from "./components/createMeeting";
 import MeetingCard from "./components/meetingCard";
-
+import { AxiosError } from "axios";
+import EmptyState from "@/app/_components/EmptyState";
 
 export default function Reunions() {
   const [filterValue, setFilterValue] = useState<string>("all");
@@ -41,7 +45,7 @@ export default function Reunions() {
   useEffect(() => {
     const filtered = filterMeetings(filterValue as FilterType);
     setFilteredMeetings(filtered);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [meetings, filterValue]);
 
   // Fetch meetings on component mount
@@ -57,6 +61,27 @@ export default function Reunions() {
     };
     fetchMeetings();
   }, [setMeetings]);
+
+  const router = useRouter();
+
+  useEffect(() => {
+
+    const getOrg = async () => {
+      try {
+        await getOrganization();
+        
+      } catch (error : unknown) {
+      if (error instanceof AxiosError) {
+        toast.error("Vous devez d'abord créer une organisation");
+        router.push("/equipe");
+      }
+        
+      }
+      
+      
+    };
+    getOrg();
+  }, [router]);
 
   return (
     <div className="flex flex-col gap-5 relative">
@@ -130,7 +155,7 @@ export default function Reunions() {
       <div>
         <h6 className="mb-4">Réunions à venir</h6>
         <div className="w-full flex flex-row flex-wrap gap-5">
-          {filteredMeeting ?  (
+          {filteredMeeting && filteredMeeting?.length > 0 ? (
             filteredMeeting.map((meeting) => (
               <MeetingCard
                 key={meeting.id} // Use unique ID instead of title + index
@@ -138,7 +163,10 @@ export default function Reunions() {
               />
             ))
           ) : (
-            <p>Aucune réunion à venir</p>
+              <div className="w-full flex justify-center items-center">
+                <EmptyState title={"Aucune réunion à venir"} description={"Veuillez patienter"}/>
+              </div>
+            
           )}
         </div>
       </div>
@@ -150,7 +178,11 @@ export default function Reunions() {
               <MeetingCard key={meeting.id} meeting={meeting} />
             ))
           ) : (
-            <p>Aucun historique de réunion</p>
+            <div className="w-full flex justify-center items-center">
+              
+                <EmptyState title={"Aucun historique de réunion"} description={"Veuillez patienter"} />
+        </div>
+                
           )}
         </div>
       </div>

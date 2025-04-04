@@ -69,6 +69,9 @@ export const endpoints = {
   },
   taches: {
     base : "tasks/taches/",
+  }, 
+  notifications: {
+    base :"notifications/"
   }
   
 };

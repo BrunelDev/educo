@@ -4,32 +4,51 @@ import { Label } from "@/components/ui/label";
 import { register } from "@/lib/functions";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { toast } from "sonner";
 
 export function RegisterForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("error");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
   return (
     <form
       className="flex flex-col gap-6 w-full"
       onSubmit={async (e) => {
-        e.preventDefault(); // Prevent form default submission
+        e.preventDefault();
+        setIsLoading(true);
 
         try {
-          // Validate passwords match
-          if (password !== confirmPassword) {
-            setError("Les mots de passe ne correspondent pas");
+          // Email validation
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          if (!emailRegex.test(email)) {
+            toast.error("Veuillez entrer une adresse email valide");
             return;
           }
 
-          // Validate password strength if needed
+          // Password validation
           if (password.length < 8) {
-            setError("Le mot de passe doit contenir au moins 8 caractères");
+            toast.error("Le mot de passe doit contenir au moins 8 caractères");
+            return;
+          }
+
+          // Password strength validation
+          const passwordRegex =
+            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$_!%*?&])[A-Za-z\d@$!%*?&]/;
+          if (!passwordRegex.test(password)) {
+            toast.error(
+              "Le mot de passe doit contenir au moins une majuscule, une minuscule, un chiffre et un caractère spécial"
+            );
+            return;
+          }
+
+          // Confirm password validation
+          if (password !== confirmPassword) {
+            toast.error("Les mots de passe ne correspondent pas");
             return;
           }
 
@@ -37,20 +56,20 @@ export function RegisterForm() {
           const response = await register(email, password);
 
           if (response?.message) {
-            setError(response.message);
-            console.log(response.message);
-            router.push("/login")
+            toast.success(
+              "Inscription réussie ! Un e-mail de confirmation a été envoyé. Veuillez vérifier votre boîte de réception pour activer votre compte."
+            );
+            router.push("/login");
             return;
           }
-          return
-        } catch (err : unknown) {
-          // Handle specific error cases
+        } catch (err) {
           if (err instanceof Error) {
-            setError(err.message);
-            console.log(err.message + '---');
+            toast.error(err.message);
           } else {
-            setError("Une erreur est survenue lors de l'inscription");
+            toast.error("Une erreur est survenue lors de l'inscription");
           }
+        } finally {
+          setIsLoading(false);
         }
       }}
     >
@@ -102,13 +121,18 @@ export function RegisterForm() {
         </div>
         <Button
           type="submit"
+          disabled={isLoading}
           className="w-full h-11 bg-coral-500 hover:bg-coral-700"
         >
-          S’inscrire
+          {isLoading ? (
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              Inscription en cours...
+            </div>
+          ) : (
+            "S'inscrire"
+          )}
         </Button>
-        {error && <div className="p-2 bg-red-500 rounded-lg">
-          <p className="text-white text-sm">{error}</p>
-        </div>}
         <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
           <span className="relative z-10 bg-background px-2 text-white-800">
             Ou s’inscrire avec
@@ -117,6 +141,7 @@ export function RegisterForm() {
         <div className="flex justify-center items-center gap-5">
           <Link href={"#"}>
             <Image
+              unoptimized
               src={"/icon_google.svg"}
               width={28}
               height={28}
@@ -125,6 +150,7 @@ export function RegisterForm() {
           </Link>
           <Link href={"#"}>
             <Image
+              unoptimized
               src={"/icon_apple.svg"}
               width={22}
               height={22}

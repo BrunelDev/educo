@@ -1,7 +1,10 @@
 "use client";
+import EmptyState from "@/app/_components/EmptyState";
+import LexicalView from "@/app/_components/LexicalView";
 import { getMeetings } from "@/lib/api/reunion";
 import { Meeting, MeetingComponentProps } from "@/lib/types";
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 export default function Reunions() {
@@ -14,20 +17,27 @@ export default function Reunions() {
     fetchMeetings();
   }, []);
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 overflow-hidden">
       <div className="flex justify-between items-center">
-        <h3 className="font-semibold text-[14px]">Réunins à venir</h3>
-        <h6 className="underline text-xs text-coral-500">Tout Voir</h6>
+        <h3 className="font-semibold text-[14px]">Réunions à venir</h3>
+        <Link href={"/reunions"} className="underline text-xs text-coral-500">
+          Tout Voir
+        </Link>
       </div>
 
       <div className="flex flex-col gap-4">
-        {meetings
-          ? meetings
-              .slice(0, 3)
-              .map((meeting, index) => (
-                <ReunionComponent key={meeting.id + index} meeting={meeting} />
-              ))
-          : null}
+        {meetings && meetings.length > 0 ? (
+          meetings
+            .slice(0, 3)
+            .map((meeting, index) => (
+              <ReunionComponent key={meeting.id + index} meeting={meeting} />
+            ))
+        ) : (
+          <EmptyState
+            title="Aucune réunion à venir"
+            description="Il n'y a pas de réunions planifiées pour le moment."
+          />
+        )}
       </div>
     </div>
   );
@@ -44,6 +54,7 @@ const ReunionComponent = ({ meeting }: MeetingComponentProps) => {
         </div>
         <div className="flex gap-2 font-medium text-xs items-center">
           <Image
+            unoptimized
             src={"/calendar-icon.svg"}
             width={12}
             height={12}
@@ -57,6 +68,7 @@ const ReunionComponent = ({ meeting }: MeetingComponentProps) => {
         <h6 className="font-extrabold text-[14px]">{meeting.titre}</h6>
         <div className="cursor-pointer">
           <Image
+            unoptimized
             src={"/dots-icon.svg"}
             width={13.5}
             height={1.5}
@@ -66,12 +78,12 @@ const ReunionComponent = ({ meeting }: MeetingComponentProps) => {
       </div>
       <p className="text-sm break-all">{meeting.objet}</p>
       <div className="flex gap-2">
-        {meeting.ordre_du_jour.map((tag, index) => (
+        {meeting.ordre_du_jour.map((ordre, index) => (
           <div
-            className="bg-white-50 flex justify-center items-center p-1 break-all"
-            key={tag.description + index}
+            className="bg-white-50 flex justify-center items-center p-1 "
+            key={ordre.description.length + index}
           >
-            <h6 className="text-sm">{tag.description}</h6>
+            <LexicalView editorStateJSON={ordre.description} />
           </div>
         ))}
       </div>

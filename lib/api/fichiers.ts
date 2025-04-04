@@ -81,6 +81,7 @@ export const createFolder = async (nom: string, parent: string | null) => {
     return response.data;
   } catch (error) {
     console.error("Error creating dossier", error);
+    throw error;
   }
 };
 export const deleteDossier = async (id: number) => {

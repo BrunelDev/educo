@@ -7,12 +7,38 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
 
 export function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [message, setMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+
+  const validateForm = () => {
+    if (!email) {
+      toast.error("L'adresse e-mail est requise");
+      return false;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      toast.error("L'adresse e-mail n'est pas valide");
+      return false;
+    }
+
+    if (!password) {
+      toast.error("Le mot de passe est requis");
+      return false;
+    }
+
+    if (password.length < 8) {
+      toast.error("Le mot de passe doit contenir au moins 8 caractères");
+      return false;
+    }
+
+    return true;
+  };
+
   return (
     <form
       className="flex flex-col gap-6 w-full"
@@ -20,28 +46,26 @@ export function LoginForm() {
       onSubmit={async (e) => {
         e.preventDefault();
 
+        if (!validateForm()) return;
+
+        setIsLoading(true);
         try {
-          if (password.length < 8) {
-            setMessage("Le mot de passe doit contenir au moins 8 caractères");
-            return;
-          }
           const response = await login(email, password);
           if (response) {
-            setMessage("Connexion réussie");
-            
-            console.log(getCookies("access_token"))
+            toast.success("Connexion réussie");
+            console.log(getCookies("access_token"));
             router.push("/dashboard");
             return;
           }
-          return;
         } catch (err: unknown) {
-          // Handle specific message cases
           if (err instanceof Error) {
-            setMessage(err.message);
-            console.log(err.message + "--");
+            toast.error("Mot de passe ou email incorrect");
+            console.log(err.message);
           } else {
-            setMessage("Une erreur est survenue lors de l'inscription");
+            toast.error("Une erreur est survenue lors de la connexion");
           }
+        } finally {
+          setIsLoading(false);
         }
       }}
     >
@@ -81,15 +105,18 @@ export function LoginForm() {
         </div>
         <Button
           type="submit"
+          disabled={isLoading}
           className="w-full h-11 bg-coral-500 hover:bg-coral-700"
         >
-          Se connecter
+          {isLoading ? (
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              Connexion en cours...
+            </div>
+          ) : (
+            "Se connecter"
+          )}
         </Button>
-        {message && (
-          <div className="p-2 bg-red-500 rounded-lg">
-            <p className="text-white text-sm">{message}</p>
-          </div>
-        )}
         <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
           <span className="relative z-10 bg-background px-2 text-white-800">
             Ou se connecter avec

@@ -3,6 +3,8 @@ import { getWebinaires, Webinaire } from "@/lib/api/formations";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import EmptyState from "@/app/_components/EmptyState";
 
 export default function Formations() {
   const [formations, setFormations] = useState<Webinaire[]>();
@@ -17,9 +19,9 @@ export default function Formations() {
     <div className="w-full flex flex-col gap-4">
       <div className="flex justify-between items-center">
         <h3 className="font-semibold text-[14px]">Nouvelles formations</h3>
-        <h6 className="underline text-xs text-coral-500">Tout Voir</h6>
+        <Link href={"/formations"} className="underline text-xs text-coral-500">Tout Voir</Link>
       </div>
-      {formations ? formations.slice(0, 3).map((formation, index) => {
+      {formations && formations?.length > 0 ? formations.slice(0, 3).map((formation, index) => {
         return (
           <FormationComponent
             key={formation.id + index}
@@ -27,7 +29,12 @@ export default function Formations() {
             title={formation.titre}
           />
         );
-      }) : null}
+      }) :  (
+                <EmptyState
+                  title="Aucune formation pour le moment"
+                  description="Il n'y a pas de formations disponibles pour le moment."
+                />
+              )}
     </div>
   );
 }

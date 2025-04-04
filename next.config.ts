@@ -17,6 +17,13 @@ module.exports = {
         pathname: "/**",
         search: "",
       },
+      {
+        protocol: "https",
+        hostname: "cse-impact.s3.eu-north-1.amazonaws.com",
+        port: "",
+        pathname: "/**",
+        search: "",
+      },
     ],
   },
   experimental: {

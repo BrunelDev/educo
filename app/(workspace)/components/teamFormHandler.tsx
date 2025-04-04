@@ -2,9 +2,8 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   addToOrganization,
-  getOrganisationMembers,
-  OrganizationMember,
 } from "@/lib/api/organisation";
+import { getAllusers, User } from "@/lib/api/users";
 import { getCookies } from "@/lib/utils/cookies";
 import { AxiosError } from "axios";
 import Image from "next/image";
@@ -12,7 +11,7 @@ import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 export default function TeamFormHandler({ orgId }: { orgId: number }) {
-  const [users, setUsers] = useState<OrganizationMember[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [selectedMembers, setSelectedMembers] = useState<number[]>([]);
 
   useEffect(() => {
@@ -24,8 +23,8 @@ export default function TeamFormHandler({ orgId }: { orgId: number }) {
         }
 
         console.log("token", storedData);
-        const response = await getOrganisationMembers();
-        setUsers(response);
+        const response = await getAllusers();
+        setUsers(response.results);
       } catch (error) {
         console.error(error);
       }
@@ -73,6 +72,7 @@ export default function TeamFormHandler({ orgId }: { orgId: number }) {
           <div className="flex gap-3 items-center">
             <div className="h-[28px] w-[28px] flex items-center justify-center border border-dashed rounded-full">
               <Image
+                unoptimized
                 src={"user-icon.svg"}
                 width={16}
                 height={19}

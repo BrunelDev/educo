@@ -8,6 +8,8 @@ import DocumentCard from "./components/document";
 import FolderCard from "./components/folder";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { AxiosError } from "axios";
+import EmptyState from "@/app/_components/EmptyState";
 
 export default function FichiersPage() {
  
@@ -76,6 +78,11 @@ export default function FichiersPage() {
       id: 5,
     },
   ];
+  const fetchDossiers = async () => {
+    const response = await getDossiers();
+      setFolders(response);
+    
+  }
   useEffect(() => {
     const fun = async () => {
       const response = await getDossiers();
@@ -101,9 +108,10 @@ export default function FichiersPage() {
         ))}
       </div>
       <div className="flex flex-wrap gap-5">
-        {folders?.results.map((folder, index) => (
-          <FolderCard key={folder.id + index} folder={folder} />
-        ))}
+        {folders && folders.results?.length > 0 ? folders?.results.map((folder, index) => (
+          <FolderCard key={folder.id + index} folder={folder} fetchDossiers={fetchDossiers} />
+        )) : <div className="w-full flex justify-center items-center">
+        <EmptyState title={"Aucun dossier pour le moment."} description={"Veuillez créez un dossier."}/></div>}
       </div>
       {/*<div className="flex flex-wrap justify-between gap-y-5">
         {files.map((file, index) => (
@@ -115,16 +123,28 @@ export default function FichiersPage() {
 }
 
 const CreateFolder = () => {
-  const handleSubmit = async(e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const folderName = formData.get("nom");
-    if (folderName) {
-    await createFolder( folderName?.toString(), null)
-      toast.message("Dossier créé avec succès.")
+    try {
+      if (folderName) {
+        await createFolder(folderName?.toString(), null)
+        toast.message("Dossier créé avec succès.")
+      }
+      window.location.reload();
+      console.log("Creating folder:", folderName);
+      
+      
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        toast.error(error.response?.data?.detail);
+        throw error
+      }
+      
     }
-    console.log("Creating folder:", folderName);
-  };
+  }
+    
 
   return (
     <form action="" className="flex flex-col gap-3" onSubmit={handleSubmit}>
@@ -132,5 +152,5 @@ const CreateFolder = () => {
       <Input type="text" id="folderName" required name="nom" />
       <Button type="submit">Créer</Button>
     </form>
-  );
-};
+  )
+}

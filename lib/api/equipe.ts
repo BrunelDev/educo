@@ -31,7 +31,7 @@ export const getTeams = async () : Promise<TeamApiResponse> => {
         
     } catch (error: unknown) {
         console.error("Error getting item",(error as Error).message)
-        throw new Error(error)
+        throw error
         
     }
 }

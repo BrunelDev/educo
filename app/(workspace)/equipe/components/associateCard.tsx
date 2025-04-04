@@ -26,6 +26,7 @@ export default function AssociateCard({ associate }: AssociateCardProps) {
           }}
         >
           <Image
+            unoptimized
             src={"/dash-icon.svg"}
             width={9.3}
             height={1}

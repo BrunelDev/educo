@@ -5,6 +5,7 @@ import { createConsultation } from "@/lib/api/consultation";
 import { ConsultationDialog, ConsultationType } from "@/lib/types";
 import { format } from "date-fns";
 import { useState } from "react";
+import { toast } from "sonner";
 
 export default function ConsultationDialogContent({
   consultation,
@@ -25,22 +26,23 @@ export default function ConsultationDialogContent({
   const handleCreateConsultation = async () => {
     try {
       setIsLoading(true);
+      toast.loading("Création de la consultation en cours...");
       const formattedDate = format(new Date(), "yyyy-MM-dd");
 
       const data = {
         type_consultation: value,
-        statut : "En attente",
+        statut: "En attente",
         description: "Une consultation test",
         date_requise: formattedDate,
         participants: [],
       };
 
-      const res = await createConsultation(data);
-      console.log(res);
-      // TODO: Add success toast notification
+      await createConsultation(data);
+      toast.success("La consultation a été créée avec succès!");
+      window.location.reload();
     } catch (error) {
       console.error("Error creating consultation:", error);
-      // TODO: Add error toast notification
+      toast.error("Erreur lors de la création de la consultation");
     } finally {
       setIsLoading(false);
     }

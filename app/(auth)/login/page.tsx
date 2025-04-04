@@ -14,7 +14,7 @@ export default function LoginPage() {
           Retrouvez votre espace dédié aux élus : réunions, formations,
           documents et assistance en un seul endroit.
         </p>
-        <Image width={366} height={366} src="/ellipse 16.svg" alt="ellipse" className="self-center"/>
+        <Image width={366} height={366} src="./ellipse 16.svg" alt="ellipse" className="self-center" unoptimized/>
       </div>
       <div className="flex items-center w-full bg-white p-6 md:p-24 rounded-tl-[28px] rounded-bl-[28px]">
         <div className="w-full">

@@ -15,6 +15,7 @@ import { use, useEffect, useState } from "react";
 import { toast } from "sonner";
 import FileCard from "../../components/file";
 import Folder from "../../components/folder";
+import EmptyState from "@/app/_components/EmptyState";
 
 export default function DossierPage({
   params,
@@ -57,11 +58,13 @@ export default function DossierPage({
           />
         </div>
         <ul className="flex gap-5 flex-wrap">
-          {folderContent?.fichiers.map((file) => (
+          {folderContent && folderContent?.fichiers.length > 0 ? folderContent?.fichiers.map((file) => (
             <li key={file.id}>
               <FileCard file={file} />
             </li>
-          ))}
+          )) : <div className="w-full flex justify-center items-center">
+                  <EmptyState title={"Aucun fichier pour le moment."} description={"Veuillez créez un fihier."}/></div>}
+                
         </ul>
       </div>
       <div>
@@ -79,11 +82,14 @@ export default function DossierPage({
       </div>
 
         <ul className="flex gap-5 flex-wrap">
-          {folderContent?.sous_dossiers.map((folder) => (
+          {folderContent && folderContent?.sous_dossiers.length> 0 ? folderContent?.sous_dossiers.map((folder) => (
             <li key={folder.id}>
-              <Folder folder={folder} />
+              <Folder folder={folder} fetchDossiers={function (): Promise<void> {
+                throw new Error("Function not implemented.");
+              } } />
             </li>
-          ))}
+          )) :<div className="w-full flex justify-center items-center">
+                  <EmptyState title={"Aucun dossier pour le moment."} description={"Veuillez créez un dossier."}/></div>}
         </ul>
       </div>
     </div>

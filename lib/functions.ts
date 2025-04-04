@@ -1,9 +1,9 @@
 import api, { endpoints } from "./api";
-
+const baseUrl = process.env.NEXT_PUBLIC_API_URL
 export const login = async (email: string, password: string) => {
   try {
     const response = await fetch(
-      "http://localhost:8000/api/auth/utilisateurs/connexion/",
+      `${baseUrl}auth/utilisateurs/connexion/`,
       {
         method: "POST",
         headers: {
@@ -38,7 +38,7 @@ export const login = async (email: string, password: string) => {
 export const register = async (email: string, password: string) => {
   try {
     const response = await fetch(
-      "http://localhost:8000/api/auth/utilisateurs/inscriptions/",
+      `${baseUrl}auth/utilisateurs/inscriptions/`,
       {
         method: "POST",
         headers: {
@@ -78,4 +78,14 @@ export const logout = async (): Promise<void> => {
     }
     throw new Error("An unknown error occurred during logout");
   }
+};
+
+export const formatDateToFrench = (dateString: string) => {
+  return new Intl.DateTimeFormat("fr-FR", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+  }).format(new Date(dateString));
 };

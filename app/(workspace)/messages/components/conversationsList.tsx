@@ -116,9 +116,9 @@ const Discussion = ({ ...props }: Conversation ) => {
           />
           <h6 className="gap-2 truncate">{props.participants.filter((participant)=>participant._id !== userInfo.id)[0].name || "John Doe"}</h6>
         </div>
-        <h6 className="w-[33px] truncate">{`props.lastMessageHour`}</h6>
+        <h6 className="w-[33px] truncate"></h6>
       </div>
-      <p className="w-full truncate">{`props.lastMessage`}</p>
+      <p className="w-full truncate"></p>
     </div>
   );
 };

@@ -9,7 +9,8 @@ import Image from "next/image";
 const MessageHeader = ({ ...props }: MessageHeaderProps) => {
   const { activeConversation } = useMessageStore();
   const userInfo: User = JSON.parse(getCookies("userInfo") || "{}");
-  return (
+  if(activeConversation)
+  {return (
     <div className="flex justify-between items-center mx-6 py-6 border-b">
       <div className="flex items-center gap-3">
         <Image
@@ -43,7 +44,7 @@ const MessageHeader = ({ ...props }: MessageHeaderProps) => {
       </div>
       <Ellipsis size={18} />
     </div>
-  );
+  );}
 };
 
 export default MessageHeader;

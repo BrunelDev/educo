@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { createOrganization } from "@/lib/api/organisation";
+import { updateOrganisation } from "@/lib/api/organisation";
 import { uploadToS3 } from "@/lib/s3-upload";
 import { FileInputChangeEvent } from "@/lib/types";
 import { AxiosError } from "axios";
@@ -19,20 +19,27 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 
-export default function AddOrganisation() {
+export default function UpdateOrganisationForm({ orgId }: { orgId: number }) {
   const [, setLogo] = useState<File>();
   const [logoUrl, setLogoUrl] = useState<string>("");
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const organisationSchema = z.object({
-    nom_entreprise: z.string().min(1, "Le nom de l'entreprise est requis"),
-    secteur_activite: z.string().min(1, "Le secteur d'activité est requis"),
-    taille: z.string().min(1, "La taille est requise"),
-    adresse_siege: z.string().min(1, "L'adresse est requise"),
+    nom_entreprise: z
+      .string()
+      .min(1, "Le nom de l'entreprise est requis")
+      .optional(),
+    secteur_activite: z
+      .string()
+      .min(1, "Le secteur d'activité est requis")
+      .optional(),
+    taille: z.string().min(1, "La taille est requise").optional(),
+    adresse_siege: z.string().min(1, "L'adresse est requise").optional(),
     code_postal: z
       .string()
-      .length(5, "Le code postal doit contenir 5 chiffres"),
-    ville: z.string().min(1, "La ville est requise"),
+      .length(5, "Le code postal doit contenir 5 chiffres")
+      .optional(),
+    ville: z.string().min(1, "La ville est requise").optional(),
   });
 
   const handleFileInputChange = async (
@@ -61,40 +68,56 @@ export default function AddOrganisation() {
 
         try {
           organisationSchema.parse({
-            nom_entreprise: formData.get("nom"),
-            secteur_activite: formData.get("secteur_activite"),
-            taille: formData.get("taille"),
-            adresse_siege: formData.get("adresse_siege"),
-            code_postal: formData.get("code_postal"),
-            ville: formData.get("ville"),
+            nom_entreprise: formData.get("nom") || undefined,
+            secteur_activite: formData.get("secteur_activite") || undefined,
+            taille: formData.get("taille") || undefined,
+            adresse_siege: formData.get("adresse_siege") || undefined,
+            code_postal: formData.get("code_postal") || undefined,
+            ville: formData.get("ville") || undefined,
           });
 
-          if (!logoUrl) {
-            toast.error("Erreur", {
-              description: "Veuillez ajouter un logo d'entreprise",
-            });
-            return;
-          }
+          const organizationData: Partial<{
+            nom: string;
+            nom_entreprise: string;
+            secteur_activite: string;
+            taille: string;
+            adresse_siege: string;
+            code_postal: string;
+            ville: string;
+            logo: string;
+            description: string;
+          }> = {};
 
-          const organizationData = {
-            nom: formData.get("nom") as string,
-            nom_entreprise: formData.get("nom") as string,
-            secteur_activite: formData.get("secteur_activite") as string,
-            taille: formData.get("taille") as string,
-            adresse_siege: formData.get("adresse_siege") as string,
-            code_postal: formData.get("code_postal") as string,
-            ville: formData.get("ville") as string,
-            logo: logoUrl, // Use the S3 URL instead of the File object
-            membre_ids: [1],
-            description: "",
-          };
-          console.log("there", organizationData);
-          const res = await createOrganization(organizationData);
+          const nom = formData.get("nom") as string;
+          if (nom) organizationData.nom = nom;
+          if (nom) organizationData.nom_entreprise = nom;
 
-          toast.success("Organisation créée", {
-            description: `L'organisation ${res.organisation.nom_entreprise} a été créée avec succès`,
+          const secteur = formData.get("secteur_activite") as string;
+          if (secteur) organizationData.secteur_activite = secteur;
+
+          const taille = formData.get("taille") as string;
+          if (taille) organizationData.taille = taille;
+
+          const adresse = formData.get("adresse_siege") as string;
+          if (adresse) organizationData.adresse_siege = adresse;
+
+          const codePostal = formData.get("code_postal") as string;
+          if (codePostal) organizationData.code_postal = codePostal;
+
+          const ville = formData.get("ville") as string;
+          if (ville) organizationData.ville = ville;
+
+          if (logoUrl) organizationData.logo = logoUrl;
+
+          // Add required fields
+          organizationData.description = "";
+
+          console.log("Submitting:", organizationData);
+          const res = await updateOrganisation(orgId, organizationData);
+
+          toast.success("Organisation modifiée", {
+            description: `L'organisation ${res.organisation.nom_entreprise} a été modifiée avec succès`,
           });
-          window.location.reload();
         } catch (error) {
           if (error instanceof z.ZodError) {
             const newErrors: Record<string, string> = {};
@@ -109,7 +132,7 @@ export default function AddOrganisation() {
             });
           }
           if (error instanceof AxiosError) {
-            toast.error("Erreur lors de la création de l'organisation", {
+            toast.error("Erreur lors de la modification de l'organisation", {
               description: error?.response?.data.detail,
             });
             throw error;

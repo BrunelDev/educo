@@ -5,7 +5,7 @@ import Link from "next/link";
 export default function Navbar() {
   return (
     <div className="w-full h-[72px] rounded-full bg-white-50 py-5 px-3 flex items-center justify-between backdrop-blur-2xl">
-      <Image src={"/logo.svg"} width={167} height={48} alt="The logo" />
+      <Image src={"/logo.svg"} width={167} height={48} alt="The logo" unoptimized/>
       <ul className="flex gap-4 font-semibold">
         <li>
           <Link href={"#home"}>Accueil</Link>

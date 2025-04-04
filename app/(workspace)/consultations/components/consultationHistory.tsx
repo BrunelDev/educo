@@ -15,9 +15,9 @@ import {
 } from "@/lib/api/consultation";
 import { Ellipsis } from "lucide-react";
 
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Popover } from "../../components/popover";
-import { useRouter } from "next/navigation";
 /*const consultations: ConsultationProps[] = [
   {
     consultationType: ConsultationType.Orientation,
@@ -56,13 +56,17 @@ import { useRouter } from "next/navigation";
 export default function History() {
   const router = useRouter();
   const [consultations, setConsultations] = useState<Consultation[]>([]);
+  const updateConsultations = async () => {
+    const response = await getConsultations();
+    setConsultations(response);
+  };
   useEffect(() => {
     const fetchConsultations = async () => {
       const response = await getConsultations();
       setConsultations(response);
     };
     fetchConsultations();
-  }, []);
+  }, [consultations]);
   return (
     <Table>
       <TableHeader>
@@ -78,21 +82,47 @@ export default function History() {
       <TableBody>
         {consultations && consultations?.length >= 1
           ? consultations?.map((consultation) => (
-            
-              <TableRow className="hover:bg-white cursor-pointer" onClick={() => {
-                router.push(`/consultations/details/${consultation.id}`)
-            }} key={consultation.id + consultation.date_creation}>
-                <TableCell className="font-medium">
+              <TableRow
+                className="hover:bg-white cursor-pointer"
+                key={consultation.id + consultation.date_creation}
+              >
+                <TableCell
+                  className="font-medium"
+                  onClick={() => {
+                    router.push(`/consultations/details/${consultation.id}`);
+                  }}
+                >
                   {consultation.type_consultation}
                 </TableCell>
-                <TableCell>{consultation.date_modification}</TableCell>
-                <TableCell className="text-left">
+                <TableCell
+                  onClick={() => {
+                    router.push(`/consultations/details/${consultation.id}`);
+                  }}
+                >
+                  {consultation.date_modification}
+                </TableCell>
+                <TableCell
+                  className="text-left"
+                  onClick={() => {
+                    router.push(`/consultations/details/${consultation.id}`);
+                  }}
+                >
                   {`${consultation.documents.length}/3`}
                 </TableCell>
-                <TableCell className="text-right">
+                <TableCell
+                  className="text-right"
+                  onClick={() => {
+                    router.push(`/consultations/details/${consultation.id}`);
+                  }}
+                >
                   {consultation.date_requise}
                 </TableCell>
-                <TableCell className="w-full flex justify-end">
+                <TableCell
+                  className="w-full flex justify-end"
+                  onClick={() => {
+                    router.push(`/consultations/details/${consultation.id}`);
+                  }}
+                >
                   <div
                     className={`${
                       consultation.statut === "En attente"
@@ -112,7 +142,12 @@ export default function History() {
                 <TableCell className="text-left"></TableCell>
                 <Popover
                   PopoverTrigger={<Ellipsis />}
-                  PopoverContent={<PopoverContent id={consultation.id} />}
+                  PopoverContent={
+                    <PopoverContent
+                      id={consultation.id}
+                      updateConsultations={updateConsultations}
+                    />
+                  }
                 />
               </TableRow>
             ))
@@ -122,31 +157,35 @@ export default function History() {
   );
 }
 
-const PopoverContent = ({ id }: { id: number }) => {
+const PopoverContent = ({
+  id,
+  updateConsultations,
+}: {
+  id: number;
+  updateConsultations: () => Promise<void>;
+}) => {
   return (
     <div className="p-2 flex flex-col gap-2 text-sm">
       <button
-        onClick={() => {
+        onClick={async () => {
           updateConsultationStatus(id, "En cours");
-          window.location.reload();
-
+          await updateConsultations();
         }}
       >
         En cours
       </button>{" "}
       <button
-        onClick={() => {
+        onClick={async () => {
           updateConsultationStatus(id, "En attente");
-          window.location.reload();
+          await updateConsultations();
         }}
       >
         En attente
       </button>{" "}
       <button
-        onClick={() => {
+        onClick={async () => {
           updateConsultationStatus(id, "Terminé");
-          window.location.reload();
-
+          await updateConsultations();
         }}
       >
         Terminé

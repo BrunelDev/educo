@@ -38,7 +38,7 @@ export const useWebSocket = (conversationId: string) => {
     const token = getCookies("access_token");
     console.log("Token", token);
     const ws = new WebSocket(
-      `ws://localhost:8000/ws/chat/${conversationId}/?token=${token}`
+      `wss://impact-cse-backend-0-5.onrender.com/ws/chat/${conversationId}/?token=${token}`
     );
 
     ws.onopen = () => {

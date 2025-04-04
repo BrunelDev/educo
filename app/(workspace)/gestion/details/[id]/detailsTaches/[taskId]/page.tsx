@@ -55,7 +55,12 @@ export default function DetailTache({
         {task?.assigned_members ? task.assigned_members.map((participant, index) => (
           <ParticipantComponent
             key={participant.id + index}
-            participant={participant}
+            participant={{
+              id: participant.id,
+              email: participant.email,
+              nom_complet: participant.first_name + " " + participant.last_name,
+              photo: participant.email
+          }}
           />
         )) : null}
       </div>

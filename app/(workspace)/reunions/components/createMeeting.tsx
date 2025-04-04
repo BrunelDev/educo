@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { CirclePlus } from "lucide-react";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import "../../../_components/editorPlugins/style.css";
 import { StepProgress } from "./stepProgress";
 
@@ -20,13 +21,17 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { extractFilenameFromUrl } from "@/lib/api/fichiers";
+import {
+  getOrganisationMembers,
+  OrganizationMember,
+} from "@/lib/api/organisation";
 import { createMeeting } from "@/lib/api/reunion";
-import { getAllusers, User } from "@/lib/api/users";
 import { uploadToS3 } from "@/lib/s3-upload";
 import { Error1, Error2, FileInputChangeEvent, MeetingType } from "@/lib/types";
 import { getCookies } from "@/lib/utils/cookies";
 import { useFileStore } from "@/store/files";
 import { useMeetingForm } from "@/store/meetingForm";
+import { Checkbox } from "@/components/ui/checkbox";
 import Image from "next/image";
 import FileComponent from "./fileComponent";
 
@@ -79,7 +84,7 @@ export default function CreateMeeting() {
     setForm2Error(errors);
     return Object.keys(errors).length === 0;
   };
-  const {} = useMeetingForm();
+
   return (
     <div className="flex flex-col gap-6 py-10 px-20 w-[900px]">
       <StepProgress steps={steps} />
@@ -112,36 +117,53 @@ export default function CreateMeeting() {
             if (currentStep === 1) {
               const isValid = validateStep1(form1Error);
               if (!isValid) {
+                toast.error(
+                  "Veuillez remplir tous les champs obligatoires de l'étape 1"
+                );
                 return;
               }
             } else if (currentStep === 2) {
               const isValid = validateStep2(form2Error);
               if (!isValid) {
+                toast.error(
+                  "Veuillez remplir tous les champs obligatoires de l'étape 2"
+                );
                 return;
               }
+            } else if (currentStep === 3) {
+              if (
+                !formData.participants ||
+                formData.participants.length === 0
+              ) {
+                toast.error(
+                  "Veuillez sélectionner au moins un participant à la réunion"
+                );
+                return;
+              }
+              
             }
 
             if (currentStep === 4) {
               try {
+                toast.loading("Création de la réunion en cours...");
                 const filesToUpload = filesList.map((item) => item.file);
                 await handleFileUpload(filesToUpload);
                 const res = await uploadToS3(
                   filesList.map((item) => item.file)
                 );
-                console.log(formData);
-                formData.documents = res.map((item) => {
-                  return {
-                    fichier: item,
-                    nom_fichier: extractFilenameFromUrl(item),
-                    type_document: "DOCUMENT",
-                  };
-                });
+                formData.documents = res.map((item) => ({
+                  fichier: item,
+                  nom_fichier: extractFilenameFromUrl(item),
+                  type_document: "DOCUMENT",
+                }));
 
                 await createMeeting(formData);
-                // Optionally reset form or redirect after success
-                console.log("Meeting created successfully");
+                toast.success("La réunion a été créée avec succès!");
+                window.location.reload();
               } catch (error) {
+                toast.error("Erreur lors de la création de la réunion");
                 console.error("Error creating meeting:", error);
+                return;
               }
               return;
             }
@@ -380,11 +402,12 @@ const StepOne = ({
 
 const StepTwo = ({
   errors,
+  setErrors,
 }: {
   errors: Error2;
   setErrors: (error: Error2) => void;
 }) => {
-  const { /*date_heure,*/ frequence, updateStep2 } = useMeetingForm();
+  const { frequence, updateStep2 } = useMeetingForm();
   const { filesList, addFileWithUrl, removeFileWithUrl } = useFileStore();
 
   const [localDate, setLocalDate] = useState<string>("");
@@ -392,6 +415,25 @@ const StepTwo = ({
   const [localFrequency, setLocalFrequency] = useState<string>(frequence);
 
   useEffect(() => {
+    const newErrors: Error2 = {};
+
+    // Date validation
+    if (!localDate) {
+      newErrors.date = "La date est requise";
+    }
+
+    // Time validation
+    if (!localTime) {
+      newErrors.time = "L'heure est requise";
+    }
+
+    // Frequency validation
+    if (!localFrequency) {
+      newErrors.frequency = "La fréquence est requise";
+    }
+
+    setErrors(newErrors);
+
     if (localDate && localTime) {
       const combinedDateTime = new Date(
         `${localDate}T${localTime}`
@@ -406,19 +448,17 @@ const StepTwo = ({
         })),
       });
     }
-  }, [localDate, localTime, localFrequency, filesList, updateStep2]);
+  }, [localDate, localTime, localFrequency, filesList, updateStep2, setErrors]);
 
   const handleFileInputChange = (e: FileInputChangeEvent): void => {
     const newFile = e.target.files[0];
-    /*if (fileUrl && filesList.length > 0 && .includes(fileUrl)) {
-      URL.revokeObjectURL(fileUrl);
-    }*/
     if (newFile) {
       const url = URL.createObjectURL(newFile);
       addFileWithUrl(newFile, url);
       console.log(url);
     }
   };
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex w-full gap-4 justify-between">
@@ -519,11 +559,33 @@ const StepThree = () => {
     }[]
   >(participants);
 
+  const handleParticipantChange = (userId: number, checked: boolean) => {
+    setLocalParticipants((prev) => {
+      if (checked) {
+        // Add participant if not already in the list
+        if (!prev.some((p) => p.utilisateur === userId)) {
+          return [
+            ...prev,
+            {
+              utilisateur: userId,
+              est_hote: false,
+              statut_invitation: "EN_ATTENTE",
+            },
+          ];
+        }
+      } else {
+        // Remove participant if unchecked
+        return prev.filter((p) => p.utilisateur !== userId);
+      }
+      return prev;
+    });
+  };
+
   useEffect(() => {
     updateStep3(localParticipants);
   }, [localParticipants, updateStep3]);
 
-  const [users, setUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState<OrganizationMember[]>([]);
   useEffect(() => {
     const fun = async () => {
       try {
@@ -533,34 +595,14 @@ const StepThree = () => {
         }
 
         console.log("token", storedData);
-        const response = await getAllusers();
-        setUsers(response.results);
+        const response = await getOrganisationMembers();
+        setUsers(response);
       } catch (error) {
         console.error(error);
       }
     };
     fun();
   }, []);
-
-  const handleParticipantToggle = (userId: number) => {
-    setLocalParticipants((prev) => {
-      const existingParticipant = prev.find((p) => p.utilisateur === userId);
-      if (existingParticipant) {
-        // Remove participant if already selected
-        return prev.filter((p) => p.utilisateur !== userId);
-      } else {
-        // Add new participant
-        return [
-          ...prev,
-          {
-            utilisateur: userId,
-            est_hote: false,
-            statut_invitation: "EN_ATTENTE",
-          },
-        ];
-      }
-    });
-  };
 
   return (
     <div className="flex flex-col gap-4 rounded-[12px] py-10 px-20 w-full">
@@ -594,12 +636,13 @@ const StepThree = () => {
                 {user.email}
               </div>
               <div className="h-5 w-5 rounded-sm flex justify-center items-center hover:bg-coral-50 cursor-pointer">
-                <Input
-                  type="checkbox"
+                <Checkbox
                   checked={localParticipants.some(
                     (p) => p.utilisateur === user.id
                   )}
-                  onChange={() => handleParticipantToggle(user.id)}
+                  onCheckedChange={(checked) =>
+                    handleParticipantChange(user.id, checked as boolean)
+                  }
                 />
               </div>
             </div>
