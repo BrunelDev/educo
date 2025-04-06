@@ -26,10 +26,10 @@ export default function TaskCard({
       <p>{description}</p>
       <div className="w-full border-b"></div>
       <div className="flex justify-between">
-        <h6>numbre de participant</h6>
+        <h6>Nombre de participant</h6>
         <div className="flex gap-1">
           <Paperclip width={15} />
-          <h6>3</h6>
+          <h6>2</h6>
         </div>
       </div>
     </div>

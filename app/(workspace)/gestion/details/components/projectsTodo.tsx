@@ -2,6 +2,7 @@ import { Project } from "@/lib/api/projets";
 import TaskCard from "./project";
 
 import ProjectGroup from "./projectGroup";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface ProjectTodoProps {
   tasks: Project;
@@ -11,7 +12,8 @@ interface ProjectTodoProps {
 export default function ProjectsTodo({ tasks, filterBy = "a_faire" }: ProjectTodoProps) {
   const categoryLabel = filterBy === "a_faire" ? "A faire" : filterBy === "en_cours" ? "En cours" : "Terminée"
   return (
-    <div className="flex flex-col gap-4 w-1/3 px-4">
+    <ScrollArea className=" w-1/3 px-4 sm:h-[70vh]">
+      <div className="flex flex-col gap-4">
       <ProjectGroup categoryLabel={categoryLabel} ProjectId={tasks.id} />
       {tasks.taches ? tasks.taches.filter((task)=>task.task_type === filterBy).map((task, index) => (
         <TaskCard
@@ -21,6 +23,8 @@ export default function ProjectsTodo({ tasks, filterBy = "a_faire" }: ProjectTod
           description={task.description}
         />
       )) : null}
-    </div>
+      </div>
+      
+    </ScrollArea>
   );
 }

@@ -66,7 +66,7 @@ export default function History() {
       setConsultations(response);
     };
     fetchConsultations();
-  }, [consultations]);
+  }, []);
   return (
     <Table>
       <TableHeader>

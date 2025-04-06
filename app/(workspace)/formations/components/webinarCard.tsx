@@ -27,7 +27,7 @@ export default function WebinarCard({ webinar }: WebinarCardProps) {
 
 const WebinarCardBotton = ({ webinar }: WebinarCardProps) => {
   return (
-      <div className="bg-gradient-to-b from-[#FFFFFFCC] to-white p-2 rounded-[12px] flex flex-col gap-3 h-fit absolute bottom-0 text-[10px]">
+      <div className="bg-gradient-to-b from-[#FFFFFFCC] to-white p-2 rounded-[12px] flex flex-col gap-3 h-fit absolute bottom-0 text-[10px] w-full">
           <div className="bg-[#FFFFFF99] flex items-center justify-center py-1 px-2 w-fit rounded-[8px]">
           <h6 className="text-xs font-semibold text-wrap truncate">{webinar.titre}</h6>
           </div>

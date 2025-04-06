@@ -1,8 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  addToOrganization,
-} from "@/lib/api/organisation";
+import { addToOrganization } from "@/lib/api/organisation";
 import { getAllusers, User } from "@/lib/api/users";
 import { getCookies } from "@/lib/utils/cookies";
 import { AxiosError } from "axios";
@@ -50,15 +48,15 @@ export default function TeamFormHandler({ orgId }: { orgId: number }) {
       await addToOrganization(orgId, selectedMembers);
       toast.success("Membres ajoutés avec succès à l'organisation");
       setSelectedMembers([]); // Reset selection
+      window.location.reload();
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
-      toast.error(error.response?.data?.detail);
-        return
-        
+        toast.error(error.response?.data?.detail);
+        return;
       }
       toast.error("Erreur lors de l'ajout des membres à l'organisation");
       console.error(error);
-      return
+      return;
     }
   };
 

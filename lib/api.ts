@@ -59,6 +59,9 @@ export const endpoints = {
   },
   consultations: {
     base: "consultations/",
+    comment: {
+      base : "consultations/commentaires/",
+    }
   },
   messagerie: {
     base: "messagerie/",
@@ -72,7 +75,8 @@ export const endpoints = {
   }, 
   notifications: {
     base :"notifications/"
-  }
+  },
+  
   
 };
 

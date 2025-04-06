@@ -113,11 +113,10 @@ export default function UpdateOrganisationForm({ orgId }: { orgId: number }) {
           organizationData.description = "";
 
           console.log("Submitting:", organizationData);
-          const res = await updateOrganisation(orgId, organizationData);
+          await updateOrganisation(orgId, organizationData);
 
-          toast.success("Organisation modifiée", {
-            description: `L'organisation ${res.organisation.nom_entreprise} a été modifiée avec succès`,
-          });
+          toast.success(`L'organisation a été modifiée avec succès`);
+          window.location.reload();
         } catch (error) {
           if (error instanceof z.ZodError) {
             const newErrors: Record<string, string> = {};

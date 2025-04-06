@@ -75,7 +75,7 @@ export function AppSidebar() {
         <SidebarGroup>
           <div className="flex justify-center">
             <Image
-              src={"logo.svg"}
+              src={"/logo.svg"}
               width={169}
               height={59.3}
               alt="The logo"
@@ -109,9 +109,9 @@ export function AppSidebar() {
           <Image width={32} height={32}  src={
             userInfo.image ? userInfo.image : "/userProfile-img.png"
           } alt={"user profile image"} />
-            <h6 className="text-white-800 font-semibold text-sm">
-            {userInfo.first_name ? userInfo.first_name : "John"}{" "}
-            {userInfo.last_name ? userInfo.last_name : "Doe"}
+            <h6 className={`text-white-800 font-semibold text-sm ${userInfo.first_name ? "" :"truncate w-3/4"}`}>
+            {userInfo.first_name ? userInfo.first_name : userInfo.email}{" "}
+            {userInfo.last_name ? userInfo.last_name : ""}
           </h6>
           </div>
           <ChevronRight/>

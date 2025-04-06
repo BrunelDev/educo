@@ -34,16 +34,14 @@ export function PasswordForm() {
     async function onSubmit(values: z.infer<typeof formSchema>) {
       // Validate password match before updating password
         if (values.new_password !== values.confirm_password) {
-            alert("Les mots de passe ne correspondent pas");
+            toast.error("Les mots de passe ne correspondent pas");
             return;
     }
     console.log(values);
    const res = await updatePassword(values);
    // setCookie("userInfo", JSON.stringify(res.user));
     //console.log(res.message);
-    toast("", {
-        description: JSON.stringify(res)
-      })
+    toast( JSON.stringify(res))
     //console.log(res);
     // Handle form submission here
   }

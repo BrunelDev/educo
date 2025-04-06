@@ -1,8 +1,8 @@
+"use client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { login } from "@/lib/functions";
-import { getCookies } from "@/lib/utils/cookies";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -53,7 +53,7 @@ export function LoginForm() {
           const response = await login(email, password);
           if (response) {
             toast.success("Connexion réussie");
-            console.log(getCookies("access_token"));
+            router.refresh();
             router.push("/dashboard");
             return;
           }

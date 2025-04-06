@@ -18,7 +18,7 @@ export default function ProjectGroup({
             <Plus size={18} />
           </div>
         }
-        dialogContent={<TaskForm projectId={ProjectId} />}
+        dialogContent={<TaskForm projectId={ProjectId} categoryLabel={categoryLabel} />}
         dialogTitle={null}
       />
     </div>

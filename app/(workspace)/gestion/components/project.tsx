@@ -1,6 +1,6 @@
 "use client"
 import { Project } from "@/lib/api/projets";
-import { Download, Ellipsis, FilePenLine, LucideIcon, Trash2 } from "lucide-react";
+import { Ellipsis, FilePenLine, LucideIcon, Trash2 } from "lucide-react";
 import { Popover } from "../../components/popover";
 import Link from "next/link";
 interface ProjectCardProps {
@@ -9,7 +9,7 @@ interface ProjectCardProps {
 export default function ProjectCard({ project }: ProjectCardProps) {
   return (
     <div className= "relative bg-[#ffffff] w-[300px] h-[120px] rounded-[12px] py-4 px-3">
-      <Link href={`/gestion/details/${project.id}`} className= "flex flex-col justify-between text-sm cursor-pointer" >
+      <Link href={`/gestion/details/${project.id}`} className= "flex flex-col gap-3 justify-between text-sm cursor-pointer" >
       <div className="flex justify-between">
         <h6 className="truncate font-bold">{project.title}</h6>
         
@@ -46,20 +46,13 @@ interface PopoverContent {
 const deleteItem = () => {
   console.log("delete");
 };
-const download = () => {
-  console.log("delete");
-};
+
 const rename = () => {
   console.log("delete");
 };
 
 const PopoverContent = () => {
   const content = [
-    {
-      label: "Télécharger",
-      icon: Download,
-      handleClick: download,
-    },
     {
       label: "Renommer",
       icon: FilePenLine,

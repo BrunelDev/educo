@@ -8,6 +8,7 @@ import {
   OrganizationMember,
 } from "@/lib/api/organisation";
 import { createProject } from "@/lib/api/projets";
+import { AxiosError } from "axios";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -73,8 +74,11 @@ export default function ProjectForm({ teamId }: { teamId :number}) {
       setTitle("");
       setDescription("");
       setSelectedMembers([]);
-    } catch (error) {
-      toast.error("Erreur lors de la création du projet");
+    } catch (error : unknown) {
+      if (error instanceof AxiosError) {
+        toast.error(error.response?.data.detail);
+      }
+      
       console.error("Error creating project:", error);
     }
   };
@@ -120,7 +124,7 @@ export default function ProjectForm({ teamId }: { teamId :number}) {
           ))}
         </ScrollArea>
       </div>
-      <Button type="submit" className="w-fit ml-auto self-end">
+      <Button type="submit" className="w-fit ml-auto self-end bg-linear-to-r from-coral-400 to-crimson-400">
         Terminé
       </Button>
     </form>

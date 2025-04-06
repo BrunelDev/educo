@@ -66,7 +66,7 @@ export interface CreateTaskDto {
   project: number;
   title: string;
   description: string;
-  task_type: TaskType | null;
+  task_type: TaskType;
   file_url?: string;
   assigned_members: number[];
 }

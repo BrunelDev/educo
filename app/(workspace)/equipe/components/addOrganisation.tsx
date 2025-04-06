@@ -44,9 +44,11 @@ export default function AddOrganisation() {
       try {
         const urls = await uploadToS3([files[0]]);
         setLogoUrl(urls[0]);
-        toast.success("Logo uploaded successfully");
+        toast.success("Logo chargé avec succès");
       } catch (error) {
-        toast.error("Failed to upload logo");
+        toast.error(
+          "Nous n'avons pas réussi à charger votre logo. Veuillez réessayer."
+        );
         console.error(error);
       }
     }
@@ -89,11 +91,9 @@ export default function AddOrganisation() {
             description: "",
           };
           console.log("there", organizationData);
-          const res = await createOrganization(organizationData);
+          await createOrganization(organizationData);
 
-          toast.success("Organisation créée", {
-            description: `L'organisation ${res.organisation.nom_entreprise} a été créée avec succès`,
-          });
+          toast.success(`L'organisation a été créée avec succès` );
           window.location.reload();
         } catch (error) {
           if (error instanceof z.ZodError) {

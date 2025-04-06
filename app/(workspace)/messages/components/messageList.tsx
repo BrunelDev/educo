@@ -132,7 +132,7 @@ export default function MessageList() {
                 />
               ))
             ) : (
-              <div className="text-center text-gray-500">No messages yet</div>
+              <div className="text-center text-gray-500">Aucun message pour le moment</div>
             )}
           </div>
 

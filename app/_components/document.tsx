@@ -9,7 +9,7 @@ export default function DocumentComponent({
 }) {
   return (
     <div className="bg-[#FFFFFF99] flex gap-3 rounded-[8px] p-3 w-[450px]">
-      <Link href={document.fichier}>
+      <Link href={document.fichier} target="blank">
         <div className="flex gap-5 items-center">
           <div className="p-2 rounded-lg bg-coral-100 ">
             <File className="text-coral-400" size={20} />

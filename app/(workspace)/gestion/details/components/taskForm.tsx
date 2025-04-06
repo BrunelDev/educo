@@ -16,17 +16,30 @@ import {
   getOrganisationMembers,
   OrganizationMember,
 } from "@/lib/api/organisation";
-import { createTask, CreateTaskDto } from "@/lib/api/tache";
+import { createTask, CreateTaskDto, TaskType } from "@/lib/api/tache";
 import { useEffect, useState } from "react";
 
+import { uploadToS3 } from "@/lib/s3-upload";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { uploadToS3 } from "@/lib/s3-upload";
 
-export default function TaskForm({projectId} : {projectId: number}) {
+export default function TaskForm({
+  projectId,
+  categoryLabel,
+}: {
+  projectId: number;
+  categoryLabel: string;
+}) {
+  const defaultCategory =
+    categoryLabel == "En cours"
+      ? "en_cours"
+      : categoryLabel == "Terminée"
+      ? "termine"
+      : "a_faire";
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<CreateTaskDto>();
   const [members, setMembers] = useState<OrganizationMember[]>([]);
@@ -42,26 +55,22 @@ export default function TaskForm({projectId} : {projectId: number}) {
     };
     fetchMembers();
   }, []);
-  const [file, setFile] = useState<File>()
+  const [file, setFile] = useState<File>();
 
   const onSubmit = async (data: CreateTaskDto) => {
     try {
       if (file) {
-        const file_url = await uploadToS3([file])
-        data.file_url = file_url[0]
+        const file_url = await uploadToS3([file]);
+        data.file_url = file_url[0];
       }
-      
-      data.project = projectId
-      console.log(data)
-      const response = await createTask(data);
-      console.log(response);
-      toast("La tâche a été créée", {
-      });
-      setTimeout(() => {
-        window.location.reload()
-      }, 3000);
+
+      data.project = projectId;
+      console.log(data);
+      await createTask(data);
+      toast("La tâche a été créée");
+      window.location.reload();
     } catch (error: unknown) {
-      toast("La création de la tâche a échoué", )
+      toast("La création de la tâche a échoué");
       throw error;
     }
   };
@@ -93,7 +102,10 @@ export default function TaskForm({projectId} : {projectId: number}) {
       </div>
 
       <div>
-        <Select>
+        <Select
+          onValueChange={(value) => setValue("task_type", value as TaskType)}
+          defaultValue={defaultCategory}
+        >
           <SelectTrigger className="w-fit">
             <SelectValue placeholder="Choisissez le statut" />
           </SelectTrigger>
@@ -101,7 +113,7 @@ export default function TaskForm({projectId} : {projectId: number}) {
             <SelectGroup>
               <SelectLabel></SelectLabel>
               <SelectItem value="en_cours">En cours</SelectItem>
-              <SelectItem value="en_attente">En attente</SelectItem>
+              <SelectItem value="a_faire">A faire</SelectItem>
               <SelectItem value="termine">Terminée</SelectItem>
             </SelectGroup>
           </SelectContent>
@@ -114,33 +126,34 @@ export default function TaskForm({projectId} : {projectId: number}) {
       </div>
 
       <div>
-        <Input type="file" onChange={(e) => setFile(e.target.files?.[0])}/>
+        <Input type="file" onChange={(e) => setFile(e.target.files?.[0])} />
       </div>
 
       <div>
         <ScrollArea className="h-[100px] flex flex-col gap-2 mt-3">
-        {members.map((member, index) => (
-          <div key={member.id + index} className="flex justify-between px-4">
-          <h6>
-            {member.first_name ? member.first_name : member.email} {member.last_name}
-          </h6>{" "}
-          <Checkbox
-            checked={selectedMembers.includes(member.id)}
-            value={member.id}
-            onCheckedChange={(checked) => {
-              if (checked) {
-                setSelectedMembers([...selectedMembers, member.id]);
-              } else {
-                setSelectedMembers(
-                  selectedMembers.filter((id) => id !== member.id)
-                );
-              }
-            }}
-          />
-        </div>
-        ))}
+          {members.map((member, index) => (
+            <div key={member.id + index} className="flex justify-between px-4">
+              <h6>
+                {member.first_name ? member.first_name : member.email}{" "}
+                {member.last_name}
+              </h6>{" "}
+              <Checkbox
+                checked={selectedMembers.includes(member.id)}
+                value={member.id}
+                onCheckedChange={(checked) => {
+                  if (checked) {
+                    setSelectedMembers([...selectedMembers, member.id]);
+                  } else {
+                    setSelectedMembers(
+                      selectedMembers.filter((id) => id !== member.id)
+                    );
+                  }
+                }}
+              />
+            </div>
+          ))}
         </ScrollArea>
-        
+
         {errors.assigned_members && (
           <span className="text-red-500 text-sm">
             {errors.assigned_members.message}
@@ -148,8 +161,13 @@ export default function TaskForm({projectId} : {projectId: number}) {
         )}
       </div>
 
-      <Button className="text-white font-medium bg-linear-to-r from-[#FE6539] to-crimson-400 w-full"
-        variant="default" type="submit">Créer la tâche</Button>
+      <Button
+        className="text-white font-medium bg-linear-to-r from-[#FE6539] to-crimson-400 w-full"
+        variant="default"
+        type="submit"
+      >
+        Créer la tâche
+      </Button>
     </form>
   );
 }
