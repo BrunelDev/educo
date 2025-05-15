@@ -24,6 +24,13 @@ module.exports = {
         pathname: "/**",
         search: "",
       },
+      {
+        protocol: "https",
+        hostname: "example-bucket.s3.amazonaws.com",
+        port: "",
+        pathname: "/**",
+        search: "",
+      },
     ],
   },
   experimental: {
@@ -32,7 +39,6 @@ module.exports = {
     },
   },
 };
-const nextConfig: NextConfig = {
-};
+const nextConfig: NextConfig = {};
 
 export default nextConfig;

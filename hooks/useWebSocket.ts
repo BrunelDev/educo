@@ -25,6 +25,7 @@ export interface WebSocketMessage {
 interface WebSocketSendMessage {
   type: string;
   message: string;
+  messageType?: string;
 }
 
 export const useWebSocket = (conversationId: string) => {
@@ -52,10 +53,36 @@ export const useWebSocket = (conversationId: string) => {
         console.log("Received message:", data);
 
         if (data.type === "message") {
+          // Determine message type and content
+          let type_message: "text" | "file" | "image" | "audio" = "text";
+          let fichier: string | null = null;
+          let image: string | null = null;
+          let audio: string | null = null;
+
+          // If messageType is provided, use it to set the correct type and content
+          if (data.message.messageType) {
+            switch (data.message.messageType) {
+              case "image":
+                type_message = "image";
+                image = data.message.content;
+                break;
+              case "audio":
+                type_message = "audio";
+                audio = data.message.content;
+                break;
+              case "file":
+                type_message = "file";
+                fichier = data.message.content;
+                break;
+              default:
+                type_message = "text";
+            }
+          }
+
           const receivedMessage: WebSocketMessage = {
             id: data.message.id,
             content: data.message.content,
-            type_message: "text", // default to text for now
+            type_message: type_message,
             sender: {
               id: data.message.sender.id,
               email: data.message.sender.email,
@@ -64,9 +91,9 @@ export const useWebSocket = (conversationId: string) => {
             },
             timestamp: data.message.timestamp,
             is_read: data.message.is_read,
-            fichier: null,
-            image: null,
-            audio: null,
+            fichier: fichier,
+            image: image,
+            audio: audio,
           };
 
           setMessages((prevMessages) => {
@@ -102,6 +129,7 @@ export const useWebSocket = (conversationId: string) => {
         const formattedMessage = {
           type: messageData.type,
           message: messageData.message,
+          messageType: messageData.messageType || "text", // Include messageType if provided
         };
 
         console.log("Sending message:", formattedMessage);

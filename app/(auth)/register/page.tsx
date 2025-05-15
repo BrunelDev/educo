@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { RegisterForm } from "@/app/_components/register-form";
 import TempLogo from "@/app/_components/temLogo";
 import Image from "next/image";
@@ -21,8 +21,8 @@ export default function RegisterPage() {
         <Image
           width={1429.123515884542}
           height={870.1743657071188}
-          src="/Macbook.svg"
-          alt="ellipse"
+          src="/macBook.svg"
+          alt="macbook image"
         />
       </div>
       <div className="flex items-center w-full bg-white p-6 md:p-24 rounded-tl-[28px] rounded-bl-[28px] h-screen overflow-hidden">

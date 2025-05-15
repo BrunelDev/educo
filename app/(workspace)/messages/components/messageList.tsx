@@ -125,14 +125,14 @@ export default function MessageList() {
                   key={message.id}
                   message={message}
                   className={
-                    message.sender.id === activeConversation?.id
-                      ? "ml-auto"
-                      : ""
+                    message.sender.id === activeConversation?.id ? "" : ""
                   }
                 />
               ))
             ) : (
-              <div className="text-center text-gray-500">Aucun message pour le moment</div>
+              <div className="text-center text-gray-500">
+                Aucun message pour le moment
+              </div>
             )}
           </div>
 

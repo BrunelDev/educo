@@ -1,7 +1,19 @@
 "use client";
-import { Users, LayoutGrid, Sparkles, NotepadText, CircleCheck, GraduationCap, MessageSquareMore, FolderClosed, UsersRound, ChevronRight } from "lucide-react";
+import {
+  ChevronRight,
+  CircleCheck,
+  FolderClosed,
+  GraduationCap,
+  LayoutGrid,
+  MessageSquareMore,
+  NotepadText,
+  Sparkles,
+  Users,
+  UsersRound,
+} from "lucide-react";
 import Image from "next/image";
 
+import { User } from "@/app/types/auth";
 import {
   Sidebar,
   SidebarContent,
@@ -12,63 +24,60 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import {User } from "@/app/types/auth";
+import { getCookies } from "@/lib/utils/cookies";
 import Link from "next/link";
-import { getCookies } from "@/lib/utils/cookies"
 
 // Menu items.
 const items = [
   {
     title: "Tableau de bord",
     url: "/dashboard",
-    icon: LayoutGrid ,
+    icon: LayoutGrid,
   },
   {
     title: "Assistance IA",
     url: "/assistance",
-    icon: Sparkles ,
+    icon: Sparkles,
   },
   {
     title: "Réunions",
     url: "/reunions",
-    icon: Users ,
+    icon: Users,
   },
   {
     title: "Consultations CSE",
     url: "/consultations",
-    icon: NotepadText ,
+    icon: NotepadText,
   },
   {
     title: "Messages",
     url: "/messages",
-    icon: MessageSquareMore  ,
+    icon: MessageSquareMore,
   },
   {
     title: "Gestion des tâches",
     url: "/gestion",
-    icon: CircleCheck ,
+    icon: CircleCheck,
   },
   {
     title: "Formations",
     url: "/formations",
-    icon: GraduationCap ,
+    icon: GraduationCap,
   },
   {
     title: "Fichiers",
     url: "/fichiers",
-    icon: FolderClosed ,
+    icon: FolderClosed,
   },
   {
     title: "Equipe",
     url: "/equipe",
-    icon: UsersRound ,
+    icon: UsersRound,
   },
 ];
 
 export function AppSidebar() {
-  const userInfo: User = JSON.parse(
-    getCookies("userInfo") || "{}"
-  );
+  const userInfo: User = JSON.parse(getCookies("userInfo") || "{}");
   return (
     <Sidebar className="w-[210px]">
       <SidebarContent>
@@ -104,18 +113,27 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
-        <Link href={"/profile"} className="flex justify-between items-center px-2 py-1 hover:pl-4 hover:bg-white-100 duration-200 rounded-[8px]">
+        <Link
+          href={"/profile"}
+          className="flex justify-between items-center px-2 py-1 hover:pl-4 hover:bg-white-100 duration-200 rounded-[8px]"
+        >
           <div className="flex items-center gap-5 ">
-          <Image width={32} height={32}  src={
-            userInfo.image ? userInfo.image : "/userProfile-img.png"
-          } alt={"user profile image"} />
-            <h6 className={`text-white-800 font-semibold text-sm ${userInfo.first_name ? "" :"truncate w-3/4"}`}>
-            {userInfo.first_name ? userInfo.first_name : userInfo.email}{" "}
-            {userInfo.last_name ? userInfo.last_name : ""}
-          </h6>
+            <Image
+              width={32}
+              height={32}
+              src={userInfo.image ? userInfo.image : "/userProfile-img.png"}
+              alt={"user profile image"}
+            />
+            <h6
+              className={`text-white-800 font-semibold text-sm ${
+                userInfo.first_name ? "" : "truncate w-3/4"
+              }`}
+            >
+              {userInfo.first_name ? userInfo.first_name : userInfo.email}{" "}
+              {userInfo.last_name ? userInfo.last_name : ""}
+            </h6>
           </div>
-          <ChevronRight/>
-          
+          <ChevronRight />
         </Link>
       </SidebarFooter>
     </Sidebar>
