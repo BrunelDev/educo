@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import SearchBar from "../../components/searchBar";
+//import SearchBar from "../../components/searchBar";
 import { useMessageStore } from "@/store/message";
 import { Conversation, ConversationResponse, getConversationList } from "@/lib/api/message";
 import { getCookies } from "@/lib/utils/cookies";
@@ -11,7 +11,7 @@ import { User } from "@/lib/api/users";
 const userInfo : User = JSON.parse(getCookies("userInfo") || "{}")
 
 export default function ConversationsList() {
-  const [serachValue, setSearchValue] = useState<string>("");
+  //const [serachValue, setSearchValue] = useState<string>("");
   const [conversations, setConversations] = useState<ConversationResponse>();
   useEffect(() => {
     const fetchData = async () => {
@@ -23,13 +23,13 @@ export default function ConversationsList() {
   return (
     <div className="h-[calc(100vh-93px)] w-[280px] flex flex-col gap-3 pt-4 px-2 text-xs">
       <h6 className="text-lg font-semibold">Messages</h6>
-      <SearchBar
+      {/*<SearchBar
         value={serachValue}
         handleChange={setSearchValue}
         placeholder={"Rechercher"}
         className="w-full"
-      />
-      <div className="flex flex-col gap-3">
+      />*/}
+      {/*<div className="flex flex-col gap-3">
         <h6 className="font-semibold">Equipe</h6>
         <TeamGroup
           groupName={"ACME Solutions"}
@@ -41,7 +41,7 @@ export default function ConversationsList() {
           lastMessageHour={"10:45"}
           lastSpeakerName={"John"}
         />
-      </div>
+      </div>*/}
       <div className="flex flex-col gap-3">
         <h6 className="font-semibold">Discussion</h6>
         <div className="flex flex-col gap-3">
@@ -56,15 +56,15 @@ export default function ConversationsList() {
   );
 }
 
-interface TeamGroupProps {
+/*interface TeamGroupProps {
   groupName: string;
   groupImageUrl: string;
   lastSpeakerImageUrl: string;
   lastMessage: string;
   lastMessageHour: string;
   lastSpeakerName: string;
-}
-const TeamGroup = ({ ...props }: TeamGroupProps) => {
+}*/
+{/*const TeamGroup = ({ ...props }: TeamGroupProps) => {
   return (
     <div className="w-full bg-[#FFFFFF80] border border-white-50 p-2 flex flex-col gap-[6px] items-center rounded-[8px] h-fit">
       <div className="w-full flex justify-between items-center">
@@ -93,7 +93,7 @@ const TeamGroup = ({ ...props }: TeamGroupProps) => {
       </div>
     </div>
   );
-};
+};*/}
 
 
 const Discussion = ({ ...props }: Conversation ) => {

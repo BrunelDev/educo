@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { register } from "@/lib/functions";
-import Image from "next/image";
+import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -12,6 +12,8 @@ export function RegisterForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
@@ -36,15 +38,7 @@ export function RegisterForm() {
             return;
           }
 
-          // Password strength validation
-          const passwordRegex =
-            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$_!%*?&])[A-Za-z\d@$!%*?&]/;
-          if (!passwordRegex.test(password)) {
-            toast.error(
-              "Le mot de passe doit contenir au moins une majuscule, une minuscule, un chiffre et un caractère spécial"
-            );
-            return;
-          }
+          
 
           // Confirm password validation
           if (password !== confirmPassword) {
@@ -95,29 +89,49 @@ export function RegisterForm() {
           <div className="flex items-center">
             <Label htmlFor="password">Mot de passe</Label>
           </div>
-          <Input
-            value={password}
-            onChange={(e) => {
-              setPassword(e.target.value);
-            }}
-            id="password"
-            type="password"
-            required
-          />
+          <div className="relative">
+            <Input
+              value={password}
+              onChange={(e) => {
+                setPassword(e.target.value);
+              }}
+              id="password"
+              type={showPassword ? "text" : "password"}
+              required
+              className="pr-10"
+            />
+            <button
+              type="button"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
         </div>
         <div className="grid gap-2">
           <div className="flex items-center">
             <Label htmlFor="confirmPassword">Confirmez le mot de passe</Label>
           </div>
-          <Input
-            value={confirmPassword}
-            onChange={(e) => {
-              setConfirmPassword(e.target.value);
-            }}
-            id="confirmPassword"
-            type="password"
-            required
-          />
+          <div className="relative">
+            <Input
+              value={confirmPassword}
+              onChange={(e) => {
+                setConfirmPassword(e.target.value);
+              }}
+              id="confirmPassword"
+              type={showConfirmPassword ? "text" : "password"}
+              required
+              className="pr-10"
+            />
+            <button
+              type="button"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+            >
+              {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
         </div>
         <Button
           type="submit"
@@ -133,7 +147,7 @@ export function RegisterForm() {
             "S'inscrire"
           )}
         </Button>
-        <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
+        {/*<div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
           <span className="relative z-10 bg-background px-2 text-white-800">
             Ou s’inscrire avec
           </span>
@@ -157,7 +171,7 @@ export function RegisterForm() {
               alt="apple icon"
             />
           </Link>
-        </div>
+        </div>*/}
       </div>
       <div className="text-center text-sm">
         Vous avez un compte ?{" "}

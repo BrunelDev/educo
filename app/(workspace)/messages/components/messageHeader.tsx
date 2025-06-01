@@ -1,50 +1,125 @@
 "use client";
+import { Button } from "@/components/ui/button";
 import { User } from "@/lib/api/users";
 import { MessageHeaderProps } from "@/lib/types";
 import { getCookies } from "@/lib/utils/cookies";
 import { useMessageStore } from "@/store/message";
-import { Ellipsis } from "lucide-react";
+import { ChevronDown, Info } from "lucide-react";
 import Image from "next/image";
+import { useState } from "react";
 
 const MessageHeader = ({ ...props }: MessageHeaderProps) => {
   const { activeConversation } = useMessageStore();
   const userInfo: User = JSON.parse(getCookies("userInfo") || "{}");
-  if(activeConversation)
-  {return (
-    <div className="flex justify-between items-center mx-6 py-6 border-b">
-      <div className="flex items-center gap-3">
-        <Image
-          src={props.conversationImageUrl}
-          alt={"conversation image"}
-          height={40}
-          width={40}
-          className="rounded-full"
-        />
-        <div className="flex flex-col justify-self-start">
-          <h6 className="text-sm font-semibold text-start">
-            {activeConversation
-              ? activeConversation?.participants.filter(
-                  (participant) => participant._id === userInfo.id
-                )[0]?.name
-              : "John Doe"}
-          </h6>
-          {Array.isArray(props.speakers) ? (
-            <div className="flex gap-1">
-              {activeConversation?.participants.map((speaker, index) => (
-                <h6 key={speaker._id + index} className="text-xs">
-                  {(speaker && speaker.name) || "John Does"}
-                  {index < activeConversation?.participants.length - 1
-                    ? ","
-                    : ""}
-                </h6>
-              ))}
-            </div>
-          ) : null}
+  const [showAllParticipants, setShowAllParticipants] = useState(false);
+
+  if (!activeConversation) {
+    return (
+      <div className="flex justify-between items-center mx-6 py-4 border-b">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
+            <Info className="w-5 h-5 text-gray-400" />
+          </div>
+          <div className="flex flex-col">
+            <h6 className="text-sm font-semibold">
+              Sélectionnez une conversation
+            </h6>
+            <p className="text-xs text-gray-500">
+              Choisissez une conversation pour commencer
+            </p>
+          </div>
         </div>
       </div>
-      <Ellipsis size={18} />
+    );
+  }
+
+  // Get other participants (excluding current user)
+  const otherParticipants = activeConversation.participants.filter(
+    (participant) => participant._id !== userInfo.id
+  );
+
+  // Get conversation name - use the other participant's name for 1:1 chats
+  const conversationName =
+    activeConversation.title ||
+    (otherParticipants.length === 1
+      ? otherParticipants[0].name
+      : `Groupe (${otherParticipants.length + 1} participants)`);
+
+  // Determine if this is a group conversation
+  const isGroupConversation = otherParticipants.length > 1;
+
+  return (
+    <div className="flex justify-between items-center mx-2 sm:mx-6 py-4 border-b">
+      <div className="flex items-center gap-3">
+        {/* Avatar/Image */}
+        <div className="relative">
+          <Image
+            src={props.conversationImageUrl || "/placeholder-avatar.png"}
+            alt={conversationName}
+            height={40}
+            width={40}
+            className="rounded-full object-cover"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.src = "/placeholder-avatar.png";
+            }}
+          />
+        </div>
+
+        {/* Conversation info */}
+        <div className="flex flex-col">
+          <h6 className="text-sm font-semibold">{conversationName}</h6>
+
+          {/* Participants list */}
+          {isGroupConversation && (
+            <div className="flex items-center">
+              <div className="flex flex-wrap gap-1 text-xs text-gray-500 max-w-[150px] xs:max-w-[200px] sm:max-w-[300px] md:max-w-none">
+                {(showAllParticipants
+                  ? otherParticipants
+                  : otherParticipants.slice(0, 2)
+                ).map((participant, index) => (
+                  <span
+                    key={participant._id + index}
+                    className="whitespace-nowrap"
+                  >
+                    {participant.name}
+                    {index <
+                      (showAllParticipants
+                        ? otherParticipants.length - 1
+                        : Math.min(otherParticipants.length - 1, 1)) && ", "}
+                  </span>
+                ))}
+                {!showAllParticipants && otherParticipants.length > 2 && (
+                  <button
+                    onClick={() => setShowAllParticipants(true)}
+                    className="text-xs text-blue-500 hover:underline flex items-center"
+                  >
+                    +{otherParticipants.length - 2} autres
+                    <ChevronDown className="w-3 h-3 ml-1" />
+                  </button>
+                )}
+                {showAllParticipants && (
+                  <button
+                    onClick={() => setShowAllParticipants(false)}
+                    className="text-xs text-blue-500 hover:underline"
+                  >
+                    Voir moins
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Online status for 1:1 conversations */}
+        </div>
+      </div>
+
+      {/* Action buttons */}
+      <div className="flex items-center gap-2">
+        <Button variant="ghost" size="icon" className="rounded-full"></Button>
+      </div>
     </div>
-  );}
+  );
 };
 
 export default MessageHeader;

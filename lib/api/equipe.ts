@@ -66,7 +66,7 @@ export const addMembersToTeam = async ( membres_ids : number[], teamId? : number
 
 export const removeFromTeam = async (id : number) => {
     try {
-        const response = await api.delete(endpoints.equipes.base + `${id}/`)
+        const response = await api.delete(endpoints.equipes.base + `${id}/membres/`)
         return response.data
         
     } catch (error: unknown) {

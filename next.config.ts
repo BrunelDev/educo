@@ -31,6 +31,18 @@ module.exports = {
         pathname: "/**",
         search: "",
       },
+      {
+        protocol: "https",
+        hostname: "**", // Allows any hostname over HTTPS. WARNING: Use with caution due to security risks.
+        port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: "http",
+        hostname: "**", // Allows any hostname over HTTP. WARNING: Use with caution due to security risks.
+        port: "",
+        pathname: "/**",
+      },
     ],
   },
   experimental: {

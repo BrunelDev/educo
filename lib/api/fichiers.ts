@@ -21,6 +21,7 @@ export interface Dossier {
   fichiers: Fichier[];
   date_creation: string;
   date_modification: string;
+  type_dossier: string
 }
 
 export interface DossierResponse {
@@ -59,16 +60,7 @@ export const getOneDossiers = async (id: string): Promise<Dossier> => {
     return response.data;
   } catch (error) {
     console.error("Error fetching dossier", error);
-    return {
-      id: 4,
-      nom: "Marketing & Communication",
-      parent: null,
-      utilisateur: 3,
-      sous_dossiers: [],
-      fichiers: [],
-      date_creation: "2025-03-21T10:29:46.834618Z",
-      date_modification: "2025-03-21T10:29:46.834655Z",
-    };
+    throw error;
   }
 };
 
@@ -133,18 +125,70 @@ interface CreateFilePayload {
   dossier: number;
 }
 
-const fileEndpoint = endpoints.fichiers.fichiers.base
+const fileEndpoint = endpoints.fichiers.fichiers.base;
+
+/**
+ * Gets a file by its ID
+ * @param id - The ID of the file to retrieve
+ * @returns The file data
+ */
+export const getFile = async (id: number): Promise<Fichier> => {
+  try {
+    const response = await api.get(`${fileEndpoint}${id}/`);
+    return response.data;
+  } catch (error: unknown) {
+    console.error("Error fetching file:", error);
+    throw error;
+  }
+};
 
 export const createFile = async (fileData: CreateFilePayload) => {
   try {
-    const response = await api.post(`${fileEndpoint}`, fileData
-      
-    );
-    return response.data
-    
+    const response = await api.post(`${fileEndpoint}`, fileData);
+    return response.data;
   } catch (error: unknown) {
     console.error("Error creating file:", error);
     throw error;
-    
+  }
+};
+
+/**
+ * Interface for updating a file
+ * All fields are optional to allow partial updates
+ */
+export interface UpdateFilePayload {
+  nom?: string;
+  type_fichier?: string | null;
+  url?: string;
+  dossier?: number;
+}
+
+/**
+ * Updates an existing file with the provided data
+ * @param id - The ID of the file to update
+ * @param fileData - The data to update the file with
+ * @returns The updated file data
+ */
+export const updateFile = async (id: number, fileData: UpdateFilePayload) => {
+  try {
+    const response = await api.patch(`${fileEndpoint}${id}/`, fileData);
+    return response.data;
+  } catch (error: unknown) {
+    console.error("Error updating file:", error);
+    throw error;
+  }
+};
+
+/**
+ * Deletes a file by its ID
+ * @param id - The ID of the file to delete
+ * @returns A promise that resolves when the file is deleted
+ */
+export const deleteFile = async (id: number): Promise<void> => {
+  try {
+    await api.delete(`${fileEndpoint}${id}/`);
+  } catch (error: unknown) {
+    console.error("Error deleting file:", error);
+    throw error;
   }
 };

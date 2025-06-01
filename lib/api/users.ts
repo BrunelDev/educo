@@ -1,7 +1,7 @@
 import { AxiosError } from "axios";
 import api, { endpoints } from "../api";
 import { getCookies, removeCookie } from "../utils/cookies";
-const endpoint = endpoints.auth.users;
+const endpoint = endpoints.auth.allUsers;
 
 export interface User {
   id: number;

@@ -59,12 +59,45 @@ export const getWebinaires = async (
   }
 };
 
-export const getRessources = async () : Promise<RessourcesResponse> => {
+export const getRessources = async (): Promise<RessourcesResponse> => {
   try {
     const response = await api.get(endpoints.formations.ressources.base);
     return response.data;
   } catch (error) {
-    console.error("Failed to get Ressources", (error as Error).message)
-    throw error
+    console.error("Failed to get Ressources", (error as Error).message);
+    throw error;
   }
+};
+
+/**
+ * Interface for the data that can be updated in a resource
+ */
+export interface UpdateRessourceDto {
+  titre?: string;
+  description?: string;
+  type_ressource?: string;
+  url?: string;
+  auteur?: string;
 }
+
+/**
+ * Update an existing resource with partial data
+ * @param id The ID of the resource to update
+ * @param updateData The partial data to update the resource with
+ * @returns The updated resource data
+ */
+export const updateRessource = async (
+  id: number,
+  updateData: UpdateRessourceDto
+): Promise<Ressource> => {
+  try {
+    const response = await api.patch<Ressource>(
+      `${endpoints.formations.ressources.base}${id}/`,
+      updateData
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error updating resource:", error);
+    throw error;
+  }
+};

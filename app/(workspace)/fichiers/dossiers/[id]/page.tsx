@@ -1,6 +1,7 @@
 "use client";
 
 import { DialogComponent } from "@/app/_components/dialogComponent";
+import EmptyState from "@/app/_components/EmptyState";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -15,7 +16,6 @@ import { use, useEffect, useState } from "react";
 import { toast } from "sonner";
 import FileCard from "../../components/file";
 import Folder from "../../components/folder";
-import EmptyState from "@/app/_components/EmptyState";
 
 export default function DossierPage({
   params,
@@ -42,11 +42,9 @@ export default function DossierPage({
 
   return (
     <div className="p-4 flex flex-col gap-10">
-      
-        <div className="">
-
-      <div className="flex justify-between items-center mb-6">
-        <h6>Les fichiers</h6>
+      <div className="">
+        <div className="flex justify-between items-center mb-6">
+          <h6>Les fichiers</h6>
           <DialogComponent
             dialogContent={<CreateFile folderId={id} />}
             dialoTrigger={
@@ -58,19 +56,26 @@ export default function DossierPage({
           />
         </div>
         <ul className="flex gap-5 flex-wrap">
-          {folderContent && folderContent?.fichiers.length > 0 ? folderContent?.fichiers.map((file) => (
-            <li key={file.id}>
-              <FileCard file={file} />
-            </li>
-          )) : <div className="w-full flex justify-center items-center">
-                  <EmptyState title={"Aucun fichier pour le moment."} description={"Veuillez créez un fihier."}/></div>}
-                
+          {folderContent && folderContent?.fichiers.length > 0 ? (
+            folderContent?.fichiers.map((file) => (
+              <li key={file.id}>
+                <FileCard file={file} />
+              </li>
+            ))
+          ) : (
+            <div className="w-full flex justify-center items-center">
+              <EmptyState
+                title={"Aucun fichier pour le moment."}
+                description={"Veuillez créez un fihier."}
+              />
+            </div>
+          )}
         </ul>
       </div>
       <div>
-      <div className="w-full flex justify-between mb-6">
-        <h6>Les Sous dossiers</h6>
-        <DialogComponent
+        <div className="w-full flex justify-between mb-6">
+          <h6>Les Sous dossiers</h6>
+          <DialogComponent
             dialogContent={<CreateFolder folderId={id} />}
             dialoTrigger={
               <Button className="bg-gradient-to-r from-[#FE6539] to-crimson-400 w-fit">
@@ -79,17 +84,28 @@ export default function DossierPage({
             }
             dialogTitle={null}
           />
-      </div>
+        </div>
 
         <ul className="flex gap-5 flex-wrap">
-          {folderContent && folderContent?.sous_dossiers.length> 0 ? folderContent?.sous_dossiers.map((folder) => (
-            <li key={folder.id}>
-              <Folder folder={folder} fetchDossiers={function (): Promise<void> {
-                throw new Error("Function not implemented.");
-              } } />
-            </li>
-          )) :<div className="w-full flex justify-center items-center">
-                  <EmptyState title={"Aucun dossier pour le moment."} description={"Veuillez créez un dossier."}/></div>}
+          {folderContent && folderContent?.sous_dossiers.length > 0 ? (
+            folderContent?.sous_dossiers.map((folder) => (
+              <li key={folder.id}>
+                <Folder
+                  folder={folder}
+                  fetchDossiers={function (): Promise<void> {
+                    throw new Error("Function not implemented.");
+                  }}
+                />
+              </li>
+            ))
+          ) : (
+            <div className="w-full flex justify-center items-center">
+              <EmptyState
+                title={"Aucun dossier pour le moment."}
+                description={"Veuillez créez un dossier."}
+              />
+            </div>
+          )}
         </ul>
       </div>
     </div>
@@ -105,6 +121,7 @@ const CreateFolder = ({ folderId }: { folderId: string }) => {
       const res = createFolder(folderName?.toString(), folderId);
       console.log(res);
       toast.message("Dossier créé avec succès.");
+      window.location.reload();
     }
     console.log("Creating folder:", folderName);
   };
@@ -139,6 +156,7 @@ const CreateFile = ({ folderId }: { folderId: string }) => {
         };
         await createFile(fileData);
         toast.success("Fichier créé avec succès");
+        window.location.reload();
       } catch (error: unknown) {
         console.error("Error creating file", error);
         toast.error("Erreur lors de la création du fichier");

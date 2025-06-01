@@ -51,7 +51,7 @@ const NotificationIcon = ({ handleClick }: { handleClick: () => void }) => (
     }}
   >
     <div className="relative">
-      <Image unoptimized src={"/bell.svg"} width={16.6} height={18} alt="bell icon"/>
+      <Image src={"/bell.svg"} width={16.6} height={18} alt="bell icon"/>
       <div className="absolute bg-crimson-500 w-2 h-2 rounded-full top-0 right-0"></div>
     </div>
   </div>

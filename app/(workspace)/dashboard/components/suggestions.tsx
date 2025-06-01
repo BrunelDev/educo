@@ -15,7 +15,7 @@ export default function Suggestions() {
           <li key={index} className="list-disc w-fit">{suggestion}</li>
         ))}
       </ul>
-      <Image unoptimized src={"/sparkles.svg"} width={100} height={100} alt="sparkle icon" className="absolute top-1/2 right-1 -translate-y-1/2"/>
+      <Image unoptimized src={"/sparkles.svg"} width={100} height={100} alt="sparkle icon" className="hidden sm:block absolute top-1/2 right-1 -translate-y-1/2"/>
     </div>
   );
 }

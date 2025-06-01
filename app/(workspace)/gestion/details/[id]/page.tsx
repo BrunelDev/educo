@@ -3,37 +3,42 @@ import { getProjectById, Project } from "@/lib/api/projets";
 import { use, useEffect, useState } from "react";
 import ProjectsTodo from "../components/projectsTodo";
 
-export default function Detail({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default function Detail({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const [tasks, SetTasks] = useState<Project>();
+  const [projectDetails, setProjectDetails] = useState<Project>(); // Renamed for clarity
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await getProjectById(parseInt(id));
-        SetTasks(response);
-        console.log("Tasks:", response);
+        setProjectDetails(response);
+        console.log("Project Details:", response);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
-    fetchData();
-  }, [id]);
+    if (id) { // Ensure id is available before fetching
+      fetchData();
+    }
+  }, [id]); // Removed tasks from dependency array as it causes re-fetch on tasks update by child
 
   return (
-    <div className="flex flex-col gap-5">
-      <h6 className="text-lg font-bold">{tasks ? tasks.title : null}</h6>
-      <h6 className="font-medium text-[16px]">{tasks ? tasks.description : null}</h6>
-      {tasks ? (
-        <div className="flex gap-5">
-          <ProjectsTodo tasks={{ ...tasks }} filterBy="a_faire"/>
-          <ProjectsTodo tasks={tasks} filterBy="termine"/>
-          <ProjectsTodo tasks={tasks} filterBy="en_cours"/>
+    <div className="flex flex-col gap-5 p-4 md:p-6"> {/* Added padding */}
+      <h6 className="text-xl font-bold mb-2"> {/* Adjusted size and margin */}
+        {projectDetails ? projectDetails.title : "Chargement du titre..."}
+      </h6>
+      <h6 className="font-medium text-base mb-6"> {/* Adjusted size and margin */}
+        {projectDetails ? projectDetails.description : "Chargement de la description..."}
+      </h6>
+      {projectDetails ? (
+        <div className="flex flex-col lg:flex-row gap-6"> {/* Responsive flex and adjusted gap */}
+          <ProjectsTodo tasks={projectDetails} filterBy="a_faire" />
+          <ProjectsTodo tasks={projectDetails} filterBy="termine" />
+          <ProjectsTodo tasks={projectDetails} filterBy="en_cours" />
         </div>
-      ) : null}
+      ) : (
+        <div className="text-center py-10">Chargement des tâches...</div> // Loading state for tasks
+      )}
     </div>
   );
 }

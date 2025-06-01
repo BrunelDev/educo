@@ -5,9 +5,26 @@ import { FilePenLine, FolderClosed, MoreVertical, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { Popover } from "../../components/popover";
+import Image from "next/image";
 
 
 export default function FolderCard({ folder, fetchDossiers }: {folder :Dossier, fetchDossiers : ()=>Promise<void>}) {
+  if(folder.type_dossier === "DEFAULT") return (
+      <Link href={`/fichiers/dossiers/${folder.id}`}>
+    <div className="w-[186px] flex flex-col gap-2 justify-center items-center group hover:bg-[#ffffffb7] duration-200 rounded-[8px] relative">
+
+      <Image
+        src={"/folder-icon.svg"}
+        width={100}
+        height={100}
+        alt="document icon"
+      />
+       <h6 className="text-center">{folder.nom}</h6>
+      
+      </div></Link>
+      
+     
+  );
   return (
     <div className="flex items-center justify-between p-3 bg-white rounded-lg hover:bg-gray-50 w-[237px] h-12">
       <Link

@@ -2,6 +2,7 @@
 import EmptyState from "@/app/_components/EmptyState";
 import LexicalView from "@/app/_components/LexicalView";
 import { getMeetings } from "@/lib/api/reunion";
+import { formatDateToFrench } from "@/lib/functions";
 import { Meeting, MeetingComponentProps } from "@/lib/types";
 import Image from "next/image";
 import Link from "next/link";
@@ -15,7 +16,7 @@ export default function Reunions() {
       setMeetings(response.results);
     };
     fetchMeetings();
-  }, []);
+  }, [meetings]);
   return (
     <div className="flex flex-col gap-4 overflow-hidden">
       <div className="flex justify-between items-center">
@@ -46,7 +47,7 @@ export default function Reunions() {
 const ReunionComponent = ({ meeting }: MeetingComponentProps) => {
   return (
     <div className="bg-[#FFFFFF99] flex flex-col gap-3 h-[142px] w-full rounded-[12px] p-3 text-white-800 truncate">
-      <div className="flex justify-between ">
+      <div className="flex flex-col sm:flex-row sm:justify-between">
         <div className="flex gap-2 items-center">
           <div className="bg-crimson-100 w-2 h-2 rounded-full"></div>
 
@@ -60,11 +61,11 @@ const ReunionComponent = ({ meeting }: MeetingComponentProps) => {
             height={12}
             alt="calendar icon"
           />
-          <h6>{meeting.date_heure.toLocaleString()} :</h6>
-          <h6>{meeting.date_heure.toLocaleString()}</h6>
+          <h6>{formatDateToFrench(meeting.date_heure.toLocaleString())} :</h6>
+          
         </div>
       </div>
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center gap-1 sm:gap-0">
         <h6 className="font-extrabold text-[14px]">{meeting.titre}</h6>
         <div className="cursor-pointer">
           <Image
@@ -77,7 +78,7 @@ const ReunionComponent = ({ meeting }: MeetingComponentProps) => {
         </div>
       </div>
       <p className="text-sm break-all">{meeting.objet}</p>
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
         {meeting.ordre_du_jour.map((ordre, index) => (
           <div
             className="bg-white-50 flex justify-center items-center p-1 "

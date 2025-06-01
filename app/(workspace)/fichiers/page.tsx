@@ -1,10 +1,8 @@
 "use client";
 import { Input } from "@/components/ui/input";
 import { createFolder, DossierResponse, getDossiers } from "@/lib/api/fichiers";
-import { DocumentProps } from "@/lib/types";
 import { useEffect, useState } from "react";
 import { DialogComponent } from "@/app/_components/dialogComponent";
-import DocumentCard from "./components/document";
 import FolderCard from "./components/folder";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -56,28 +54,7 @@ export default function FichiersPage() {
     },
   ];*/
   const [folders, setFolders] = useState<DossierResponse>();
-  const documents: DocumentProps[] = [
-    {
-      name: "Procès-verbal réunion CSE Janvier 2024",
-      id: 1,
-    },
-    {
-      name: "Rapport annuel CSSCT 2023",
-      id: 2,
-    },
-    {
-      name: "Convention collective mise à jour",
-      id: 3,
-    },
-    {
-      name: "Plan de formation 2024",
-      id: 4,
-    },
-    {
-      name: "Bilan social 2023",
-      id: 5,
-    },
-  ];
+ 
   const fetchDossiers = async () => {
     const response = await getDossiers();
       setFolders(response);
@@ -91,26 +68,23 @@ export default function FichiersPage() {
     fun();
   }, []);
   return (
-    <div className="flex flex-col gap-10 bg-[#FFFFFF99] rounded-[12px] py-5 px-4 min-h-[690px] relative">
+    <div className="flex flex-col gap-10 bg-[#FFFFFF99] rounded-[12px] py-5 px-3 sm:px-6 min-h-[690px] relative w-full">
       <DialogComponent
         className=""
         dialogContent={<CreateFolder />}
         dialoTrigger={
-          <Button className="bg-gradient-to-r from-[#FE6539] to-crimson-400 w-fit absolute right-6 -top-11">
+          <Button className="bg-gradient-to-r from-[#FE6539] to-crimson-400 w-full sm:w-fit absolute right-3 sm:right-6 -top-11 sm:-top-11 text-sm sm:text-base">
             Nouveau
           </Button>
         }
         dialogTitle={null}
       />
-      <div className="flex flex-wrap justify-between gap-y-5">
-        {documents.map((document, index) => (
-          <DocumentCard key={document.id + index} document={document} />
-        ))}
-      </div>
-      <div className="flex flex-wrap gap-5">
+     
+      {/* Folders grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {folders && folders.results?.length > 0 ? folders?.results.map((folder, index) => (
           <FolderCard key={folder.id + index} folder={folder} fetchDossiers={fetchDossiers} />
-        )) : <div className="w-full flex justify-center items-center">
+        )) : <div className="col-span-full flex justify-center items-center py-8">
         <EmptyState title={"Aucun dossier pour le moment."} description={"Veuillez créez un dossier."}/></div>}
       </div>
       {/*<div className="flex flex-wrap justify-between gap-y-5">

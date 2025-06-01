@@ -22,9 +22,10 @@ export default function TeamFormHandler({ orgId }: { orgId: number }) {
 
         console.log("token", storedData);
         const response = await getAllusers();
+        console.log("res", response)
         setUsers(response.results);
       } catch (error) {
-        console.error(error);
+        console.error("error geting users", error);
       }
     };
     fun();
@@ -62,7 +63,7 @@ export default function TeamFormHandler({ orgId }: { orgId: number }) {
 
   return (
     <form onSubmit={handleSubmit} className="mt-3 flex flex-col gap-3 p-3">
-      {users.map((user, index) => (
+      {users ? users.map((user, index) => (
         <div
           key={index}
           className="flex items-center justify-between space-x-2"
@@ -92,7 +93,7 @@ export default function TeamFormHandler({ orgId }: { orgId: number }) {
             }
           />
         </div>
-      ))}
+      )) : null }
       <Button
         type="submit"
         className="mt-4 px-4 py-2 bg-gradient-to-r from-coral-400 to-crimson-400 text-white rounded"

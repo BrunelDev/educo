@@ -16,37 +16,52 @@ import EmptyState from "@/app/_components/EmptyState";
 export default function Reunions() {
   const [filterValue, setFilterValue] = useState<string>("all");
   const { meetings, setMeetings } = useMeetingStore();
-  const [filteredMeeting, setFilteredMeetings] = useState<Meeting[] | null>(
-    meetings
-  );
+  const [upcomingMeetings, setUpcomingMeetings] = useState<Meeting[] | null>(null);
+  const [pastMeetings, setPastMeetings] = useState<Meeting[] | null>(null);
 
   type FilterType = "all" | MeetingType;
 
   // Filter function
-  const filterMeetings = (filter: FilterType) => {
+  const processMeetings = (filter: FilterType) => {
     if (!meetings || !Array.isArray(meetings)) {
-      return [];
+      return { upcoming: [], past: [] };
     }
 
-    if (!filter || filter === "all") {
-      return meetings;
-    }
+    const now = new Date();
 
-    return meetings.filter((meeting) => meeting.type_reunion === filter);
+    const typeFilteredMeetings = 
+      !filter || filter === "all"
+        ? meetings
+        : meetings.filter((meeting) => meeting.type_reunion === filter);
+
+    const upcoming = typeFilteredMeetings.filter(meeting => {
+      const meetingDate = new Date(meeting.date_heure);
+      return meetingDate > now;
+    });
+
+    const past = typeFilteredMeetings.filter(meeting => {
+      const meetingDate = new Date(meeting.date_heure);
+      return meetingDate <= now;
+    });
+
+    return { upcoming, past };
   };
 
-  const handleClick = (filterValue: string) => {
-    setFilterValue(filterValue);
-    const filtered = filterMeetings(filterValue as FilterType);
-    setFilteredMeetings(filtered);
+  const handleClick = (newFilterValue: string) => {
+    setFilterValue(newFilterValue);
+    const { upcoming, past } = processMeetings(newFilterValue as FilterType);
+    setUpcomingMeetings(upcoming);
+    setPastMeetings(past);
   };
 
-  // Update filtered meetings when main meetings change
+  // Update upcoming and past meetings when main meetings or filterValue change
   useEffect(() => {
-    const filtered = filterMeetings(filterValue as FilterType);
-    setFilteredMeetings(filtered);
+    const { upcoming, past } = processMeetings(filterValue as FilterType);
+    setUpcomingMeetings(upcoming);
+    setPastMeetings(past);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [meetings, filterValue]);
+  }, [meetings, filterValue]); // Note: processMeetings is stable if meetings/filterValue are its only deps indirectly
+
 
   // Fetch meetings on component mount
   useEffect(() => {
@@ -85,7 +100,7 @@ export default function Reunions() {
 
   return (
     <div className="flex flex-col gap-5 relative">
-      <div className="flex flex-row gap-2">
+      <div className="flex flex-row flex-wrap gap-2">
         <Button
           className={`cursor-pointer ${
             filterValue === "all"
@@ -155,8 +170,8 @@ export default function Reunions() {
       <div>
         <h6 className="mb-4">Réunions à venir</h6>
         <div className="w-full flex flex-row flex-wrap gap-5">
-          {filteredMeeting && filteredMeeting?.length > 0 ? (
-            filteredMeeting.map((meeting) => (
+          {upcomingMeetings && upcomingMeetings?.length > 0 ? (
+            upcomingMeetings.map((meeting) => (
               <MeetingCard
                 key={meeting.id} // Use unique ID instead of title + index
                 meeting={meeting}
@@ -173,8 +188,8 @@ export default function Reunions() {
       <div>
         <h6 className="mb-4">Historique des Réunions</h6>
         <div className="w-full flex flex-row flex-wrap gap-5">
-          {meetings?.length > 0 ? (
-            meetings.map((meeting) => (
+          {pastMeetings && pastMeetings?.length > 0 ? (
+            pastMeetings.map((meeting) => (
               <MeetingCard key={meeting.id} meeting={meeting} />
             ))
           ) : (
@@ -191,7 +206,7 @@ export default function Reunions() {
         className={"sm:max-w-[980px] flex items-center justify-center p-0"}
         dialoTrigger={
           <Button
-            className={`cursor-pointer bg-gradient-to-r from-[#FE6539] to-crimson-400 w-fit absolute -top-10 right-6`}
+            className={`cursor-pointer bg-gradient-to-r from-[#FE6539] to-crimson-400 w-full mt-4 md:w-fit md:absolute md:-top-10 md:right-6 md:mt-0`}
             variant={"default"}
           >
             Créer une nouvelle réunion

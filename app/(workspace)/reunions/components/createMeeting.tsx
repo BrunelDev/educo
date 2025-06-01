@@ -158,9 +158,12 @@ export default function CreateMeeting() {
                 }));
 
                 await createMeeting(formData);
+                toast.dismiss();
                 toast.success("La réunion a été créée avec succès!");
                 window.location.reload();
               } catch (error) {
+                //hide loading toast
+                toast.dismiss();
                 toast.error("Erreur lors de la création de la réunion");
                 console.error("Error creating meeting:", error);
                 return;
@@ -172,7 +175,7 @@ export default function CreateMeeting() {
           }}
           className="px-4 py-2 bg-rose-500 text-white rounded-md hover:bg-rose-600 transition-colors"
         >
-          {currentStep === 4 ? "Submit" : "Suivant"}
+          {currentStep === 4 ? "Soumettre" : "Suivant"}
         </Button>
       </div>
     </div>

@@ -34,7 +34,7 @@ export default function AddDocument({
       try {
         const urls = await uploadToS3([file]);
         setFileUrl(urls[0]);
-        toast.success("Document téléchargé avec succès");
+        // Don't show success message here, wait until the document is added to the task
       } catch (error) {
         toast.error("Échec du téléchargement du document");
         console.error(error);
@@ -52,11 +52,11 @@ export default function AddDocument({
     setIsSubmitting(true);
     try {
       await handleFileSubmit(fileUrl);
-      toast.success("Document enregistré avec succès");
+      toast.success("Document téléchargé et ajouté avec succès");
       setFileUrl("");
       setFileName("");
     } catch (error) {
-      toast.error("Échec de l'enregistrement du document");
+      toast.error("Échec de l'ajout du document");
       console.error(error);
     } finally {
       setIsSubmitting(false);

@@ -1,3 +1,4 @@
+import { formatDateToFrench } from "@/lib/functions";
 import Image from "next/image";
 
 const actualities = [
@@ -68,7 +69,7 @@ export default function Actuality() {
           title={actuality.title}
           source={actuality.source}
           imageUrl={actuality.imageUrl}
-          date={actuality.date}
+          date={formatDateToFrench(actuality.date)}
         />
       ))}
     </div>
@@ -93,7 +94,7 @@ const ActualityComponent = ({
       <Image src={imageUrl} width={60} height={60} alt="actuality image" className="h-[60px] w-[60px]" />
       <div className="flex flex-col text-white-800">
         <h6 className="font-semibold text-sm">{title}</h6>
-        <div className="flex justify-between">
+        <div className="flex flex-col sm:flex-row sm:justify-between">
           <h6 className="font-medium text-[12px]">
             Source : <span className="text-coral-400">{source}</span>
           </h6>

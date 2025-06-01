@@ -18,6 +18,7 @@ export const login = async (email: string, password: string) => {
     if (response.ok) {
       const res = await response.json();
       document.cookie = `access_token=${res.token};path=/`;
+      console.log("res", res);
       document.cookie = `refresh_token=${res.refresh};path=/`;
       document.cookie = `userInfo=${JSON.stringify(res.user)};path=/`;
       

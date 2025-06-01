@@ -1,83 +1,86 @@
 import WebinarCard from "./webinarCard";
 import { useEffect, useState } from "react";
-import { getWebinaires, WebinairesResponse } from "@/lib/api/formations";
+import { getWebinaires, Webinaire } from "@/lib/api/formations";
 
 export default function WebinarContent() {
-  /*const webinars: WebinarCardProps[] = [
-    {
-      tag: "Comptabilité",
-      title: "Maîtriser la Comptabilité du CSE en 3 Étapes",
-      description:
-        "Apprenez à gérer les budgets du CSE, à suivre les comptes et à préparer un bilan financier annuel clair et conforme.",
-      hostName: "William Anderson",
-      hostProfileImageUrl: "/hostImage.png",
-      hostProfession: "Expert-Comptable spécialisé dans les CSE",
-      backgroundImageUrl: "/webinarCard-bg.png",
-      id: "1248",
-    },
-    {
-      tag: "Formation",
-      title: "Créer une entreprise de confiance avec un CSE",
-      description:
-        "Découvrez comment vous pouvez utiliser votre CSE pour améliorer votre comptabilité, augmenter votre productivité et réduire vos co��ts.",
-      hostName: "Micheline Muller",
-      hostProfileImageUrl: "/hostImage.png",
-      hostProfession: "Ingénieur en Comptabilité spécialisé dans les CSE",
-      backgroundImageUrl: "/webinarCard-bg.png",
-      id: "1249",
-    },
-    {
-      tag: "Formation",
-      title: "Créer une entreprise de confiance avec un CSE",
-      description:
-        "Découvrez comment vous pouvez utiliser votre CSE pour améliorer votre comptabilité, augmenter votre productivité et réduire vos co��ts.",
-      hostName: "Micheline Muller",
-      hostProfileImageUrl: "/hostImage.png",
-      hostProfession: "Ingénieur en Comptabilité spécialisé dans les CSE",
-      backgroundImageUrl: "/webinarCard-bg.png",
-      id: "1249",
-    },
-  ];*/
-  const [webinars, setWebinars] = useState<WebinairesResponse>() 
+  const [allWebinars, setAllWebinars] = useState<Webinaire[]>([]);
+  const [upcomingWebinars, setUpcomingWebinars] = useState<Webinaire[]>([]);
+  const [pastWebinars, setPastWebinars] = useState<Webinaire[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
   useEffect(() => {
-    const fun = async () => {
+    const fetchAndSetWebinars = async () => {
+      setLoading(true);
+      setError(null);
       try {
         const response = await getWebinaires();
-        setWebinars(response);
-        console.log(response);
-        
-      } catch (error: unknown) {
-        console.error("Error fetching webinars", error);
-        
+        setAllWebinars(response.results || []);
+      } catch (err: unknown) {
+        console.error("Error fetching webinars:", err);
+        setError("Impossible de charger les webinaires. Veuillez réessayer plus tard.");
+      } finally {
+        setLoading(false);
       }
+    };
+    fetchAndSetWebinars();
+  }, []);
+
+  useEffect(() => {
+    if (allWebinars.length > 0) {
+      const now = new Date();
+      const upcoming: Webinaire[] = [];
+      const past: Webinaire[] = [];
+
+      allWebinars.forEach((webinar) => {
+        const webinarDate = new Date(webinar.date);
+        if (webinarDate >= now) {
+          upcoming.push(webinar);
+        } else {
+          past.push(webinar);
+        }
+      });
+
+      setUpcomingWebinars(upcoming);
+      setPastWebinars(past);
     }
-    fun()
-  }, [])
+  }, [allWebinars]);
+
+  if (loading) {
+    return <p className="text-center py-10">Chargement des webinaires...</p>;
+  }
+
+  if (error) {
+    return <p className="text-center py-10 text-red-500">{error}</p>;
+  }
+
   return (
-      <div className="flex flex-col gap-3">
-          <h4 className="font-bold text-[18px]">Regardez nos sessions d&apos;experts à la demande</h4>
-      <h6 className="font-medium">
-        Vous avez manqué l&apos;un de nos webinaires en direct ? Ne vous
-        inquiétez pas, vous pouvez trouver une liste de sessions à la demande
-        ici !
-      </h6>
-      <div>
-        <h6 className="mb-3 text-sm font-semibold">À venir</h6>
-        <div className="flex flex-wrap gap-5">  {webinars?.results.map((webinar, index) => (
-            <WebinarCard webinar={webinar} key={webinar.id + index} />
-          ))}
-        </div>
-      </div><div>
-        
-              <h6 className="mb-3 text-sm font-semibold">
-              Recommandés pour vous
-        </h6>
-        <div className="flex flex-wrap gap-5">
-          {webinars?.results.map((webinar, index) => (
-            <WebinarCard webinar={webinar} key={webinar.id + index} />
-          ))}
-        </div>
-      </div>
+    <div className="flex flex-col gap-10">
+      <section>
+        <h2 className="text-2xl font-semibold mb-6">Prochains Webinaires</h2>
+        {upcomingWebinars.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {upcomingWebinars.map((webinar) => (
+              <WebinarCard key={webinar.id} webinar={webinar} />
+            ))}
+          </div>
+        ) : (
+          <p>Aucun webinaire à venir pour le moment.</p>
+        )}
+      </section>
+
+      <section>
+        <h2 className="text-2xl font-semibold mb-6">Webinaires Passés</h2>
+        {pastWebinars.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {pastWebinars.map((webinar) => (
+              <WebinarCard key={webinar.id} webinar={webinar} />
+            ))}
+          </div>
+        ) : (
+          <p>Aucun webinaire passé trouvé.</p>
+        )}
+      </section>
     </div>
   );
 }

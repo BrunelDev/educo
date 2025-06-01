@@ -16,8 +16,8 @@ export interface Creator {
 
 export interface Document {
   id: number;
-  fichier: string;
-  nom_fichier: string;
+  url: string;
+  nom: string;
 }
 
 export interface Comment {
@@ -38,12 +38,14 @@ export interface Consultation {
   statut: ConsultationStatus;
   statut_display: string;
   createur: Creator;
-  participants: {
-    id: number;
-    email: string;
-    nom_complet: string;
-    photo: string;
-}[];
+  participants_details: {
+    utilisateur_details: {
+      id: number;
+      email: string;
+      nom_complet: string;
+      photo: string;
+    };
+  }[];
   documents: Document[];
   commentaires: Comment[];
 }
@@ -65,17 +67,154 @@ export const getConsultations = async (): Promise<Consultation[]> => {
   }
 };
 
-export const updateConsultationStatus = async (
+/**
+ * Interface for document data when adding to a consultation
+ */
+export interface AddDocumentDto {
+  fichier: string;
+  nom_fichier: string;
+}
+
+/**
+ * Interface for updating a consultation
+ * All fields are optional to allow partial updates
+ */
+export interface UpdateConsultationDto {
+  type_consultation?: ConsultationType;
+  description?: string;
+  date_requise?: string;
+  statut?: ConsultationStatus;
+  participants?: number[];
+  documents?: AddDocumentDto[]; // Add documents to the consultation
+}
+
+/**
+ * Updates a consultation with the provided data
+ * @param id - The ID of the consultation to update
+ * @param data - The data to update the consultation with
+ * @returns The updated consultation data
+ */
+export const updateConsultation = async (
   id: number,
-  statut: ConsultationStatus
-) => {
+  data: UpdateConsultationDto
+): Promise<Consultation> => {
   try {
-    const response = await api.patch(`${endpoints.consultations.base}${id}/`, {
-      statut,
-    });
+    const response = await api.patch<Consultation>(
+      `${endpoints.consultations.base}${id}/`,
+      data
+    );
+    console.log("res", response.data);
     return response.data;
   } catch (error: unknown) {
     console.error("Error updating consultation", (error as Error).message);
+    throw error;
+  }
+};
+
+/**
+ * @deprecated Use updateConsultation instead
+ * Updates only the status of a consultation
+ */
+export const updateConsultationStatus = async (
+  id: number,
+  statut: ConsultationStatus
+): Promise<Consultation> => {
+  console.warn(
+    "updateConsultationStatus is deprecated. Use updateConsultation instead."
+  );
+  return updateConsultation(id, { statut });
+};
+
+/**
+ * Adds multiple documents to a consultation
+ * @param id - The ID of the consultation to update
+ * @param documents - Array of documents to add
+ * @returns The updated consultation data
+ */
+export const addDocumentsToConsultation = async (
+  id: number,
+  documents: AddDocumentDto[]
+): Promise<Consultation> => {
+  return updateConsultation(id, { documents });
+};
+
+/**
+ * Interface for document data when adding to a consultation using the new POST endpoint
+ */
+export interface DocumentPostDto {
+  nom: string;
+  url: string;
+  consultation: number;
+}
+
+/**
+ * Adds a single document to a consultation using the new POST endpoint
+ * @param document - Document data containing name, url, and consultation ID
+ * @returns The created document data
+ */
+export const addDocument = async (
+  document: DocumentPostDto
+): Promise<Document> => {
+  try {
+    const response = await api.post<Document>(
+      `${endpoints.consultations.base}documents/`,
+      document
+    );
+    return response.data;
+  } catch (error: unknown) {
+    console.error(
+      "Error adding document to consultation",
+      (error as Error).message
+    );
+    throw error;
+  }
+};
+
+/**
+ * Adds a single document to a consultation
+ * @param id - The ID of the consultation to update
+ * @param document - Document to add
+ * @returns The updated consultation data
+ * @deprecated Use addDocument instead with the new POST endpoint format
+ */
+export const addDocumentToConsultation = async (
+  id: number,
+  document: AddDocumentDto
+): Promise<Consultation> => {
+  console.warn(
+    "addDocumentToConsultation is deprecated. Use addDocument instead."
+  );
+  return addDocumentsToConsultation(id, [document]);
+};
+
+/**
+ * Removes a document from a consultation by its ID
+ * @param consultationId - The ID of the consultation
+ * @param documentId - The ID of the document to remove
+ * @returns The updated consultation data
+ */
+export const removeDocumentFromConsultation = async (
+  consultationId: number,
+  documentId: number
+): Promise<Consultation> => {
+  try {
+    // First, get the current consultation to access its documents
+    const consultation = await getOneConsultation(consultationId);
+
+    // Filter out the document to remove
+    const updatedDocuments = consultation.documents.filter(
+      (doc) => doc.id !== documentId
+    );
+
+    // Update the consultation with the filtered documents
+    return updateConsultation(consultationId, {
+      documents: updatedDocuments,
+    });
+  } catch (error: unknown) {
+    console.error(
+      "Error removing document from consultation",
+      (error as Error).message
+    );
     throw error;
   }
 };
@@ -99,8 +238,6 @@ export interface Comment {
   date_creation: string;
   utilisateur: Creator;
 }
-
-
 
 export const getOneConsultation = async (id: number): Promise<Consultation> => {
   try {
@@ -134,5 +271,17 @@ export const createConsultation = async (
   } catch (error) {
     console.error("Error creating consultation", error);
     throw error;
+  }
+};
+
+export const deleteConsultation = async (id: number): Promise<void> => {
+  try {
+    await api.delete(`${endpoints.consultations.base}${id}/`);
+    // Successful deletion (e.g., 204 No Content) will not return data.
+    // Axios delete method typically resolves for 2xx status codes and rejects for others.
+  } catch (error) {
+    // Log the error with context for easier debugging
+    console.error(`Error deleting consultation with ID ${id}:`, error);
+    throw error; // Re-throw the error so it can be caught and handled by the calling component (e.g., to show a toast notification)
   }
 };

@@ -21,7 +21,7 @@ export default function RegisterPage() {
         <Image
           width={1429.123515884542}
           height={870.1743657071188}
-          src="/macBook.svg"
+          src="/macBook.png"
           alt="macbook image"
         />
       </div>

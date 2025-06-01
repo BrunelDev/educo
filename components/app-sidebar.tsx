@@ -126,7 +126,7 @@ export function AppSidebar() {
             />
             <h6
               className={`text-white-800 font-semibold text-sm ${
-                userInfo.first_name ? "" : "truncate w-3/4"
+                userInfo.first_name ? "" : "truncate w-[100px]"
               }`}
             >
               {userInfo.first_name ? userInfo.first_name : userInfo.email}{" "}

@@ -81,6 +81,7 @@ interface TabsProps {
 enum TabsState {
   Webinaires = "Webinaires",
   Ressources = "Ressources",
+  Historique = "Historique",
 }
 interface SearchBarProps {
   value: string;
@@ -206,11 +207,15 @@ enum ConsultationType {
   Orientation = "Orientations stratégiques de l’entreprise",
   Situation = "Situation économique et financière",
   Politique = "Politique sociale, conditions de travail et emploi",
-  Gestion = "Gestion de la qualité et des processus",
   Accord = "Accords et plans de sauvegarde de l’emploi (PSE)",
   Introduction = "Introduction de nouvelles technologies",
   Modification = "Modifications importantes des conditions de travail",
   Fusion = "Fusion, acquisition, cession d’entreprise",
+  ReglementInterieur = "Règlement intérieur",
+  ActivitePartielle = "Activité partielle (chômage partiel)",
+  DemenagementReorganisationSite = "Déménagement ou réorganisation de site",
+  RisquesProfessionnels = "Risques professionnels / santé / sécurité",
+  AccordsCollectif = "Accords collectifs",
 }
 
 interface ConsultationProps {

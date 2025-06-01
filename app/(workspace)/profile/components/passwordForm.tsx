@@ -18,32 +18,34 @@ import * as z from "zod";
 const formSchema = z.object({
   old_password: z.string().min(8, "Mot de passe trop court"),
   new_password: z.string().min(8, "Mot de passe trop court"),
-  confirm_password: z.string().min(8,"Mot de passe trop court"),
+  confirm_password: z.string().min(8, "Mot de passe trop court"),
 });
 
 export function PasswordForm() {
-
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       old_password: "",
       new_password: "",
-      confirm_password: ""
+      confirm_password: "",
     },
   });
-    async function onSubmit(values: z.infer<typeof formSchema>) {
-      // Validate password match before updating password
-        if (values.new_password !== values.confirm_password) {
-            toast.error("Les mots de passe ne correspondent pas");
-            return;
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    // Validate password match before updating password
+    if (values.new_password !== values.confirm_password) {
+      toast.error("Les mots de passe ne correspondent pas");
+      return;
     }
     console.log(values);
-   const res = await updatePassword(values);
-   // setCookie("userInfo", JSON.stringify(res.user));
-    //console.log(res.message);
-    toast( JSON.stringify(res))
-    //console.log(res);
-    // Handle form submission here
+    try {
+    await updatePassword(values);
+      toast.success("Mot de passe mis à jour avec succès");
+      // Reload the page to ensure all data is up-to-date
+      window.location.reload();
+    } catch (error) {
+      toast.error("Échec de la mise à jour du mot de passe");
+      console.error(error);
+    }
   }
 
   return (
@@ -56,7 +58,7 @@ export function PasswordForm() {
             <FormItem>
               <FormLabel>Ancien mot de passe</FormLabel>
               <FormControl>
-                <Input  {...field} type="password"/>
+                <Input {...field} type="password" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -70,7 +72,7 @@ export function PasswordForm() {
             <FormItem>
               <FormLabel>Nouveau mot de passe</FormLabel>
               <FormControl>
-                <Input {...field} type="password"/>
+                <Input {...field} type="password" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -84,18 +86,12 @@ export function PasswordForm() {
             <FormItem>
               <FormLabel>Confirmez votre mot de passe</FormLabel>
               <FormControl>
-                <Input
-                  type="password"
-                  {...field}
-                />
+                <Input type="password" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-
-
-        
 
         <Button
           type="submit"

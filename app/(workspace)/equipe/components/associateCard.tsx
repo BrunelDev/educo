@@ -16,6 +16,7 @@ export default function AssociateCard({ associate }: AssociateCardProps) {
           alt="user image"
         />
         <button
+          className="p-3 h-1 overflow-hidden hover:bg-gray-100 rounded-lg"
           onClick={async () => {
             try {
               const res = await removeFromTeam(associate.id);
@@ -26,7 +27,6 @@ export default function AssociateCard({ associate }: AssociateCardProps) {
           }}
         >
           <Image
-            unoptimized
             src={"/dash-icon.svg"}
             width={9.3}
             height={1}

@@ -42,6 +42,7 @@ export default function TaskForm({
     setValue,
     formState: { errors },
   } = useForm<CreateTaskDto>();
+  setValue("task_type", defaultCategory)
   const [members, setMembers] = useState<OrganizationMember[]>([]);
   const [selectedMembers, setSelectedMembers] = useState<number[]>([]);
   useEffect(() => {
@@ -65,10 +66,13 @@ export default function TaskForm({
       }
 
       data.project = projectId;
+      // Set the selected members to assigned_member_ids
+      data.assigned_member_ids = selectedMembers;
+      
       console.log(data);
       await createTask(data);
       toast("La tâche a été créée");
-      window.location.reload();
+      //window.location.reload();
     } catch (error: unknown) {
       toast("La création de la tâche a échoué");
       throw error;
@@ -154,9 +158,9 @@ export default function TaskForm({
           ))}
         </ScrollArea>
 
-        {errors.assigned_members && (
+        {errors.assigned_member_ids && (
           <span className="text-red-500 text-sm">
-            {errors.assigned_members.message}
+            {errors.assigned_member_ids.message}
           </span>
         )}
       </div>

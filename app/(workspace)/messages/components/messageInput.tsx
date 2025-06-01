@@ -171,19 +171,25 @@ export function MessageInput({
           {fileError}
         </div>
       )}
-
+<div className="relative h-fit">
       {imagePreview && (
-        <div className="relative mx-4 mb-2">
+        <div className="mx-4 mb-2 absolute top-0 -translate-y-[100%]">
           <div className="flex items-start gap-2 p-2 border rounded-md">
             {fileToSend?.type.startsWith("image/") ? (
-              <div className="relative w-32 h-32">
+              <div className="relative w-24 h-24 sm:w-32 sm:h-32 overflow-hidden">
                 <Image
-                  src={imagePreview}
+                  src={imagePreview || "/placeholder-image.png"}
                   alt="Preview"
-                  fill
-                  className={`object-cover rounded-md ${
+                  width={128}
+                  height={128}
+                  className={`object-contain w-full h-full rounded-md ${
                     isUploading ? "opacity-50" : ""
                   }`}
+                  onError={(e) => {
+                    // If image fails to load, show a placeholder or fallback
+                    const target = e.target as HTMLImageElement;
+                    target.src = "/placeholder-image.png";
+                  }}
                 />
                 {isUploading && (
                   <div className="absolute inset-0 flex items-center justify-center">
@@ -193,7 +199,7 @@ export function MessageInput({
               </div>
             ) : (
               <div
-                className={`p-2 bg-gray-100 rounded-md ${
+                className={`p-2 bg-gray-100 rounded-md max-w-[80%] break-words ${
                   isUploading ? "opacity-50" : ""
                 }`}
               >
@@ -257,7 +263,7 @@ export function MessageInput({
             <Send className="h-5 w-5" />
           )}
         </Button>
-      </form>
+      </form></div>
     </div>
   );
 }

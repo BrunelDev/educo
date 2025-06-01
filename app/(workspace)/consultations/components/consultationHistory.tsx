@@ -12,12 +12,24 @@ import {
   Consultation,
   getConsultations,
   updateConsultationStatus,
+  deleteConsultation,
 } from "@/lib/api/consultation";
-import { Ellipsis } from "lucide-react";
-
+import { Ellipsis, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Popover } from "../../components/popover";
+import { formatDateToFrench } from "@/lib/functions";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogClose,
+} from "@/components/ui/dialog";
+import { toast } from "sonner";
 /*const consultations: ConsultationProps[] = [
   {
     consultationType: ConsultationType.Orientation,
@@ -56,6 +68,9 @@ import { Popover } from "../../components/popover";
 export default function History() {
   const router = useRouter();
   const [consultations, setConsultations] = useState<Consultation[]>([]);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [consultationToDeleteId, setConsultationToDeleteId] = useState<number | null>(null);
+
   const updateConsultations = async () => {
     const response = await getConsultations();
     setConsultations(response);
@@ -67,93 +82,153 @@ export default function History() {
     };
     fetchConsultations();
   }, []);
+
+  const openDeleteDialog = (id: number) => {
+    setConsultationToDeleteId(id);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConsultation = async () => {
+    if (consultationToDeleteId === null) return;
+
+    const loadingToast = toast.loading("Suppression de la consultation...");
+    try {
+      await deleteConsultation(consultationToDeleteId);
+      setConsultations((prevConsultations) =>
+        prevConsultations.filter((c) => c.id !== consultationToDeleteId)
+      );
+      toast.dismiss(loadingToast);
+      toast.success("Consultation supprimée avec succès.");
+    } catch (error) {
+      console.error("Error deleting consultation:", error);
+      toast.dismiss(loadingToast);
+      toast.error("Erreur lors de la suppression de la consultation.");
+    } finally {
+      setIsDeleteDialogOpen(false);
+      setConsultationToDeleteId(null);
+    }
+  };
+
   return (
-    <Table>
-      <TableHeader>
-        <TableRow className="border rounded-2xl">
-          <TableHead className="w-[400px]">Consultation</TableHead>
-          <TableHead>Créé le</TableHead>
-          <TableHead>Document recu</TableHead>
-          <TableHead className="text-right">Date</TableHead>
-          <TableHead className="text-right">Status</TableHead>
-          <TableHead className="text-right">Action</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {consultations && consultations?.length >= 1
-          ? consultations?.map((consultation) => (
-              <TableRow
-                className="hover:bg-white cursor-pointer"
-                key={consultation.id + consultation.date_creation}
-              >
-                <TableCell
-                  className="font-medium"
-                  onClick={() => {
-                    router.push(`/consultations/details/${consultation.id}`);
-                  }}
+    <div className="overflow-x-auto">
+      <Table>
+        <TableHeader>
+          <TableRow className="border rounded-2xl">
+            <TableHead>Consultation</TableHead>
+            <TableHead>Créé le</TableHead>
+            <TableHead>Document recu</TableHead>
+            <TableHead className="text-right">Date</TableHead>
+            <TableHead className="text-right">Status</TableHead>
+            <TableHead className="text-center">Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {consultations && consultations?.length >= 1
+            ? consultations?.map((consultation) => (
+                <TableRow
+                  className="hover:bg-white"
+                  key={consultation.id + consultation.date_creation}
                 >
-                  {consultation.type_consultation}
-                </TableCell>
-                <TableCell
-                  onClick={() => {
-                    router.push(`/consultations/details/${consultation.id}`);
-                  }}
-                >
-                  {consultation.date_modification}
-                </TableCell>
-                <TableCell
-                  className="text-left"
-                  onClick={() => {
-                    router.push(`/consultations/details/${consultation.id}`);
-                  }}
-                >
-                  {`${consultation.documents.length}/3`}
-                </TableCell>
-                <TableCell
-                  className="text-right"
-                  onClick={() => {
-                    router.push(`/consultations/details/${consultation.id}`);
-                  }}
-                >
-                  {consultation.date_requise}
-                </TableCell>
-                <TableCell
-                  className="w-full flex justify-end"
-                  onClick={() => {
-                    router.push(`/consultations/details/${consultation.id}`);
-                  }}
-                >
-                  <div
-                    className={`${
-                      consultation.statut === "En attente"
-                        ? "bg-crimson-400"
-                        : "bg-white-50"
-                    } w-fit py-1 px-2 flex justify-center items-center rounded-full place-self-end`}
+                  <TableCell
+                    className="font-medium cursor-pointer"
+                    onClick={() => {
+                      router.push(`/consultations/details/${consultation.id}`);
+                    }}
                   >
-                    <h6
+                    {consultation.type_consultation}
+                  </TableCell>
+                  <TableCell
+                    className="cursor-pointer"
+                    onClick={() => {
+                      router.push(`/consultations/details/${consultation.id}`);
+                    }}
+                  >
+                    {formatDateToFrench(consultation.date_modification)}
+                  </TableCell>
+                  <TableCell
+                    className="text-left cursor-pointer"
+                    onClick={() => {
+                      router.push(`/consultations/details/${consultation.id}`);
+                    }}
+                  >
+                    {`${consultation.documents.length}`}
+                  </TableCell>
+                  <TableCell
+                    className="text-right cursor-pointer"
+                    onClick={() => {
+                      router.push(`/consultations/details/${consultation.id}`);
+                    }}
+                  >
+                    {formatDateToFrench(consultation.date_requise)}
+                  </TableCell>
+                  <TableCell
+                    className="w-full flex justify-end cursor-pointer"
+                    onClick={() => {
+                      router.push(`/consultations/details/${consultation.id}`);
+                    }}
+                  >
+                    <div
                       className={`${
-                        consultation.statut === "En attente" ? "text-white" : ""
-                      }`}
+                        consultation.statut === "En attente"
+                          ? "bg-crimson-400"
+                          : "bg-white-50"
+                      } w-fit py-1 px-2 flex justify-center items-center rounded-full place-self-end`}
                     >
-                      {consultation.statut}
-                    </h6>
-                  </div>
-                </TableCell>
-                <TableCell className="text-left"></TableCell>
-                <Popover
-                  PopoverTrigger={<Ellipsis />}
-                  PopoverContent={
-                    <PopoverContent
-                      id={consultation.id}
-                      updateConsultations={updateConsultations}
-                    />
-                  }
-                />
-              </TableRow>
-            ))
-          : null}
-      </TableBody>
-    </Table>
+                      <h6
+                        className={`${
+                          consultation.statut === "En attente" ? "text-white" : ""
+                        }`}
+                      >
+                        {consultation.statut}
+                      </h6>
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <div className="flex items-center justify-center space-x-2">
+                      <Popover
+                        PopoverTrigger={<Ellipsis className="cursor-pointer" />}
+                        PopoverContent={
+                          <PopoverContent
+                            id={consultation.id}
+                            updateConsultations={updateConsultations}
+                          />
+                        }
+                      />
+                      <Trash2
+                        className="cursor-pointer text-red-500 hover:text-red-700"
+                        size={20}
+                        onClick={(e) => {
+                          e.stopPropagation(); // Prevent row click navigation
+                          openDeleteDialog(consultation.id);
+                        }}
+                      />
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            : null}
+        </TableBody>
+      </Table>
+
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirmer la suppression</DialogTitle>
+            <DialogDescription>
+              Êtes-vous sûr de vouloir supprimer cette consultation ? Cette action est irréversible.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="outline">Annuler</Button>
+            </DialogClose>
+            <Button variant="destructive" onClick={handleDeleteConsultation}>
+              Supprimer
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
   );
 }
 

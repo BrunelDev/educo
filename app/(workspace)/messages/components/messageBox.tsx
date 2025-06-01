@@ -2,7 +2,18 @@ import { MessageType } from "@/lib/types";
 import { getCookies } from "@/lib/utils/cookies";
 import { formatDistanceToNow } from "date-fns";
 import { fr } from "date-fns/locale";
-import { Ellipsis, X, ZoomIn } from "lucide-react";
+import {
+  Download,
+  Ellipsis,
+  ExternalLink,
+  File,
+  FileAudio,
+  FileImage,
+  FileSpreadsheet,
+  FileText,
+  X,
+  ZoomIn,
+} from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 
@@ -199,15 +210,92 @@ export default function MessageBox({ message, className }: MessageBoxProps) {
           }
         }
 
+        // Determine file type based on extension or content type
+        const fileExtension = fileName.split(".").pop()?.toLowerCase() || "";
+
+        // Get file icon and styling based on extension
+        let IconComponent = File; // Default icon
+        let fileType = "Fichier";
+        let bgColor = "bg-gray-100";
+        let iconColor = "text-gray-500";
+
+        if (
+          /pdf/.test(fileExtension) ||
+          fileSource?.includes("application/pdf")
+        ) {
+          IconComponent = File;
+          fileType = "PDF";
+          bgColor = "bg-red-50";
+          iconColor = "text-red-500";
+        } else if (
+          /doc|docx/.test(fileExtension) ||
+          fileSource?.includes("word")
+        ) {
+          IconComponent = FileText;
+          fileType = "Word";
+          bgColor = "bg-blue-50";
+          iconColor = "text-blue-500";
+        } else if (
+          /xls|xlsx|csv/.test(fileExtension) ||
+          fileSource?.includes("spreadsheet") ||
+          fileSource?.includes("excel")
+        ) {
+          IconComponent = FileSpreadsheet;
+          fileType = "Excel";
+          bgColor = "bg-green-50";
+          iconColor = "text-green-500";
+        } else if (
+          /jpg|jpeg|png|gif|webp|svg/.test(fileExtension) ||
+          fileSource?.includes("image/")
+        ) {
+          IconComponent = FileImage;
+          fileType = "Image";
+          bgColor = "bg-purple-50";
+          iconColor = "text-purple-500";
+        } else if (
+          /mp3|wav|ogg|m4a/.test(fileExtension) ||
+          fileSource?.includes("audio/")
+        ) {
+          IconComponent = FileAudio;
+          fileType = "Audio";
+          bgColor = "bg-yellow-50";
+          iconColor = "text-yellow-500";
+        }
+
         return (
           fileSource && (
-            <a
-              href={fileSource}
-              download
-              className="flex items-center gap-2 text-blue-600 hover:underline bg-white-50 p-3 rounded-md"
+            <div
+              className={`${bgColor} rounded-md overflow-hidden border border-gray-200 max-w-[300px]`}
             >
-              📎 {fileName}
-            </a>
+              <div className="p-4 flex items-center gap-3">
+                <div className={`${iconColor} p-2 rounded-md`}>
+                  <IconComponent size={24} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium text-sm truncate">{fileName}</p>
+                  <p className="text-xs text-gray-500">{fileType}</p>
+                </div>
+              </div>
+              <div className="bg-white border-t border-gray-200 p-2 flex justify-end gap-2">
+                <a
+                  href={fileSource}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-1 rounded-md hover:bg-gray-100 text-gray-600"
+                  title="Ouvrir"
+                >
+                  <ExternalLink size={16} />
+                </a>
+                <a
+                  href={fileSource}
+                  download={fileName}
+                  className="p-1 rounded-md hover:bg-gray-100 text-gray-600"
+                  title="Télécharger"
+                >
+                  <Download size={16} />
+                </a>
+              </div>
+            </div>
           )
         );
       default:
@@ -234,7 +322,7 @@ export default function MessageBox({ message, className }: MessageBoxProps) {
                   JSON.parse(getCookies("userInfo") || "")?.id
                     ? ""
                     : "rounded-b-[8px] rounded-tr-[8px]"
-                } min-w-[100px] break-all max-w-[500px]`}
+                } min-w-[100px] break-all max-w-[280px] xs:max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg`}
               >
                 {message.content}
               </p>
@@ -291,7 +379,7 @@ export default function MessageBox({ message, className }: MessageBoxProps) {
               message.sender.id == JSON.parse(getCookies("userInfo") || "")?.id
                 ? ""
                 : "rounded-b-[8px] rounded-tr-[8px]"
-            } min-w-[100px] break-all max-w-[500px]`}
+            } min-w-[100px] break-all max-w-[280px] xs:max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg`}
           >
             {message.content}
           </p>

@@ -1,15 +1,20 @@
+import { Input } from "@/components/ui/input";
+import { deleteMeeting, updateMeeting } from "@/lib/api/reunion";
+import { formatDateToFrench } from "@/lib/functions";
 import { Meeting } from "@/lib/types";
+import { useMeetingStore } from "@/store/meetings";
 import {
   CalendarDays,
   Check,
   Download,
   Ellipsis,
   FilePenLine,
-  LucideIcon,
   Trash2,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
+import { toast } from "sonner";
 import { Popover } from "../../components/popover";
 
 interface MeetingCatdProps {
@@ -18,7 +23,7 @@ interface MeetingCatdProps {
 
 export default function MeetingCard({ meeting }: MeetingCatdProps) {
   return (
-    <div className="bg-[#FFFFFF99] rounded-[8px] py-2 px-3 w-[350px] relative">
+    <div className="bg-[#FFFFFF99] rounded-[8px] py-2 px-3 w-full sm:w-[350px] relative">
       <Link
         href={`/reunions/details_de_la_reunion/${meeting.id}`}
         className="flex flex-col gap-2"
@@ -30,15 +35,14 @@ export default function MeetingCard({ meeting }: MeetingCatdProps) {
               <h6 className="text-xs font-semibold">{meeting.type_reunion}</h6>
             </div>
             <h3 className="font-bold">{meeting.titre}</h3>
-            <p className="text-sm text-gray-600 text-nowrap">{meeting.objet}</p>
+            <p className="text-sm text-gray-600">{meeting.objet}</p>
           </div>
         </div>
 
         <div className="flex justify-between items-center">
           <div className="w-fit flex gap-2 text-xs">
             <CalendarDays size={14} />
-            <h6>{meeting.date_heure.toLocaleString()}</h6>
-            <h6>{meeting.date_heure.toLocaleString()}</h6>
+            <h6>{formatDateToFrench(meeting.date_heure.toString())}</h6>
           </div>
 
           <div className="flex gap-2">
@@ -55,24 +59,26 @@ export default function MeetingCard({ meeting }: MeetingCatdProps) {
           </div>
         </div>
         <div className="flex justify-between items-center">
-          <div className="flex -space-x-2">
-            {meeting.participants.map((attendee, index) => (
-              <Image
-                key={index}
-                src={attendee.utilisateur ? "/userProfile-img.png" : "null"}
-                alt={`Attendee ${index + 1}`}
-                width={32}
-                height={32}
-                className="rounded-full h-8 w-8 border-2 border-white"
-              />
-            ))}
+          <div className="flex -space-x-2 overflow-hidden">
             {meeting.participants && meeting.participants.length > 0 ? (
-              <div className="w-8 h-8 rounded-full bg-gray-200 border-2 border-white flex items-center justify-center">
-                <span className="text-xs text-gray-600">
-                  +{meeting.participants.length}
-                </span>
-              </div>
-            ) : null}
+              meeting.participants.map((attendee, index) => (
+                <Image
+                  key={attendee.utilisateur_details?.id || index} // Use a more stable key if possible
+                  src={attendee.utilisateur_details?.photo || "/user-icon.svg"} // Fallback to a default icon
+                  alt={attendee.utilisateur_details?.nom_complet || `Participant ${index + 1}`}
+                  width={32}
+                  height={32}
+                  className="rounded-full h-8 w-8 border-2 border-white object-cover"
+                  onError={(e) => {
+                    // Fallback if the primary image fails to load
+                    (e.target as HTMLImageElement).onerror = null; 
+                    (e.target as HTMLImageElement).src = "/user-icon.svg";
+                  }}
+                />
+              ))
+            ) : (
+              <div className="text-xs text-gray-500 italic pr-2">Aucun participant</div>
+            )}
           </div>
 
           <div
@@ -85,7 +91,7 @@ export default function MeetingCard({ meeting }: MeetingCatdProps) {
         </div>
       </Link>
       <Popover
-        PopoverContent={<PopoverContent />}
+        PopoverContent={<PopoverContent meeting={meeting} />}
         PopoverTrigger={
           <div className="p-1 absolute right-2 top-3 z-50 hover:bg-white-100 flex justify-center items-center rounded-[8px]">
             <Ellipsis size={20} />
@@ -96,57 +102,95 @@ export default function MeetingCard({ meeting }: MeetingCatdProps) {
   );
 }
 
-interface PopoverContent {
-  label: string;
-  handleClick: () => void;
-  icon?: LucideIcon;
+interface PopoverContentProps {
+  meeting: Meeting;
 }
 
-const deleteItem = () => {
-  console.log("delete");
-};
-const download = () => {
-  console.log("delete");
-};
-const rename = () => {
-  console.log("delete");
-};
+const PopoverContent = ({ meeting }: PopoverContentProps) => {
+  const [updatedName, setUpdatedName] = useState(meeting.titre);
+  const deleteMeetingFromStore = useMeetingStore(
+    (state) => state.deleteMeeting
+  );
 
-const PopoverContent = () => {
-  const content = [
-    {
-      label: "Télécharger",
-      icon: Download,
-      handleClick: download,
-    },
-    {
-      label: "Renommer",
-      icon: FilePenLine,
-      handleClick: rename,
-    },
-    {
-      label: "Supprimer",
-      icon: Trash2,
-      handleClick: deleteItem,
-    },
-  ];
+  // Function to handle meeting download
+  const handleDownload = () => {
+    // This is a placeholder for download functionality
+    // You might want to implement actual download logic here
+    toast.info("Téléchargement de la réunion...");
+    console.log("Downloading meeting:", meeting.id);
+  };
+
+  // Function to handle meeting deletion
+  const handleDelete = async () => {
+    if (
+      confirm(
+        `Êtes-vous sûr de vouloir supprimer la réunion "${meeting.titre}" ?`
+      )
+    ) {
+      try {
+        await deleteMeeting(meeting.id);
+        // Update the store if it's being used
+        deleteMeetingFromStore(meeting.id);
+        toast.success("Réunion supprimée avec succès");
+        window.location.reload();
+      } catch (error) {
+        console.error("Error deleting meeting:", error);
+        toast.error("Erreur lors de la suppression de la réunion");
+      }
+    }
+  };
+
+  // Function to update the meeting name
+  const handleUpdateMeetingName = async () => {
+    if (!updatedName.trim()) {
+      toast.error("Le nom de la réunion ne peut pas être vide");
+      return;
+    }
+
+    try {
+      await updateMeeting(meeting.id, { titre: updatedName });
+      toast.success("Réunion renommée avec succès");
+      window.location.reload();
+    } catch (error) {
+      console.error("Error updating meeting:", error);
+      toast.error("Erreur lors de la mise à jour de la réunion");
+    }
+  };
+
   return (
     <div className="py-2 px-1 text-sm w-[125px] flex flex-col gap-[6px]">
-      {content.map((content, i) => {
-        const Icon = content.icon;
-        return (
-          <div
-            key={content.label + i}
-            className="hover:bg-gray-100 cursor-pointer rounded-[4px] px-2 flex  items-center justify-around py-1"
-            onClick={() => {
-              content.handleClick();
-            }}
-          >
-            {Icon ? <Icon size={18} /> : null}
-            <h6>{content.label}</h6>
-          </div>
-        );
-      })}
+     
+
+      <div className="hover:bg-gray-100 cursor-pointer rounded-[4px] px-2 flex items-center justify-around py-1">
+        <FilePenLine size={18} />
+        <Popover
+          PopoverContent={
+            <div>
+              <Input
+                placeholder="Nom de la réunion"
+                value={updatedName}
+                onChange={(e) => {
+                  setUpdatedName(e.target.value);
+                }}
+                onKeyDown={async (e) => {
+                  if (e.key === "Enter") {
+                    handleUpdateMeetingName();
+                  }
+                }}
+              />
+            </div>
+          }
+          PopoverTrigger={<h6>Renommer</h6>}
+        />
+      </div>
+
+      <div
+        className="hover:bg-gray-100 cursor-pointer rounded-[4px] px-2 flex items-center justify-around py-1 text-red-600"
+        onClick={handleDelete}
+      >
+        <Trash2 size={18} />
+        <h6>Supprimer</h6>
+      </div>
     </div>
   );
 };

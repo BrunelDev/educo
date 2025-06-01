@@ -5,10 +5,14 @@ import AddMemberDialog from "@/app/(workspace)/reunions/details_de_la_reunion/co
 import { DialogComponent } from "@/app/_components/dialogComponent";
 import DocumentComponent from "@/app/_components/document";
 import EmptyState from "@/app/_components/EmptyState";
-import { Consultation, getOneConsultation } from "@/lib/api/consultation";
+import {
+  addDocument,
+  Consultation,
+  getOneConsultation,
+  updateConsultation,
+} from "@/lib/api/consultation";
 import { Ellipsis, Plus, Users } from "lucide-react";
 import { use, useEffect, useState } from "react";
-
 export default function ConsultationDetail({
   params,
 }: {
@@ -16,19 +20,90 @@ export default function ConsultationDetail({
 }) {
   const { id } = use(params);
   const [consultation, setConsultation] = useState<Consultation>();
-  useEffect(() => {
-    const fetchConsultationData = async () => {
+
+  // Function to fetch consultation data
+  const fetchConsultationData = async () => {
+    try {
       const response = await getOneConsultation(parseInt(id));
       setConsultation(response);
+    } catch (error) {
+      console.error("Error fetching consultation:", error);
+    }
+  };
+
+  // Function to handle adding members to the consultation
+  const handleAddMembers = async (users: number[]): Promise<void> => {
+    if (!consultation) return;
+
+    try {
+      // Update the consultation with the new participants
+      console.log(users);
+      await updateConsultation(consultation.id, {
+        participants: users,
+      });
+
+      // Refresh the consultation data
+      await fetchConsultationData();
+
+      // Reload the page to reflect changes
+      //window.location.reload();
+    } catch (error) {
+      console.error("Error adding members:", error);
+      throw error;
+    }
+  };
+
+  // Function to handle adding a document to the consultation
+  const handleAddDocument = async (fileUrl: string): Promise<void> => {
+    if (!consultation) return;
+
+    try {
+      // Extract filename from URL and decode it
+      const encodedFileName =
+        fileUrl.split("/").pop()?.split("?")[0] || "Document";
+      const fileName = decodeURIComponent(encodedFileName);
+
+      // Create document object with the new format
+      const document = {
+        nom: fileName,
+        url: fileUrl,
+        consultation: consultation.id,
+      };
+
+      // Use the new addDocument function with POST endpoint
+      await addDocument(document);
+
+      // Refresh the consultation data
+      const updatedConsultation = await getOneConsultation(consultation.id);
+      setConsultation(updatedConsultation);
+
+      // Reload the page to reflect changes
+      window.location.reload();
+    } catch (error) {
+      console.error("Error adding document:", error);
+      throw error;
+    }
+  };
+
+  // Define fetchConsultationData inside useEffect to avoid dependency issues
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await getOneConsultation(parseInt(id));
+        setConsultation(response);
+      } catch (error) {
+        console.error("Error fetching consultation:", error);
+      }
     };
-    fetchConsultationData();
+
+    fetchData();
   }, [id]);
   if (consultation) {
     return (
       <div>
         <div className="flex flex-col gap-5 pt-5">
           <div className="flex flex-col gap-4">
-            <div className="flex justify-between">
+            <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center gap-2">
               <div className="space-y-1">
                 <h1 className="text-lg font-bold">
                   Planifier la formation des élus sur le droit du travail
@@ -54,27 +129,29 @@ export default function ConsultationDetail({
                   </div>
                 }
                 dialogContent={
-                  <AddMemberDialog
-                    handleSubmission={function (
-                      users: number[]
-                    ): Promise<void> {
-                      console.log(users);
-                      throw new Error("Function not implemented.");
-                    }}
-                  />
+                  <AddMemberDialog handleSubmission={handleAddMembers} />
                 }
                 dialogTitle={null}
               />
             </div>
 
             <div className="flex justify-between">
-              <div className="grid grid-cols-2 gap-y-3 max-w-2/3 gap-x-5">
-                {consultation.participants?.length > 0 ? consultation.participants?.map((participant, index) => (
-                  <ParticipantComponent
-                    key={participant.id + index}
-                    participant={participant}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-3 w-full gap-x-5">
+                {consultation.participants_details?.length > 0 ? (
+                  consultation.participants_details?.map(
+                    (participant, index) => (
+                      <ParticipantComponent
+                        key={participant.utilisateur_details.id + index}
+                        participant={participant.utilisateur_details}
+                      />
+                    )
+                  )
+                ) : (
+                  <EmptyState
+                    title={"Pas de participants"}
+                    description={"Veuillez ajouter un participant"}
                   />
-                )) : <EmptyState title={"Pas de participants"} description={"Veuillez ajouter un participant"}/>}
+                )}
               </div>
             </div>
 
@@ -88,25 +165,28 @@ export default function ConsultationDetail({
                   </div>
                 }
                 dialogContent={
-                  <AddDocument
-                    handleFileSubmit={function (
-                      fileurl: string
-                    ): Promise<void> {
-                      console.log(fileurl);
-                      throw new Error("Function not implemented.");
-                    }}
-                  />
+                  <AddDocument handleFileSubmit={handleAddDocument} />
                 }
                 dialogTitle={null}
               />
             </div>
             <div className="flex justify-between">
-              <div className="grid grid-cols-2 gap-y-3 max-w-2/3 gap-x-5">
-                {consultation.documents?.length > 0 ?consultation.documents?.map((participant, index) => (
-                  <DocumentComponent document={participant} key={index * 3} />
-                )) : <div className="w-full flex justify-center items-center">
-                    <EmptyState title={"Pas de document"} description={"Veuillez ajouter un document"}/>
-                </div> }
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-3 w-full gap-x-5">
+                {consultation.documents?.length > 0 ? (
+                  consultation.documents?.map((document, index) => (
+                    <DocumentComponent document={{
+                      fichier: document.url,
+                      nom_fichier: document.nom,
+                    }} key={index * 3} />
+                  ))
+                ) : (
+                  <div className="w-full flex justify-center items-center">
+                    <EmptyState
+                      title={"Pas de document"}
+                      description={"Veuillez ajouter un document"}
+                    />
+                  </div>
+                )}
               </div>
             </div>
           </div>

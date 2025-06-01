@@ -1,33 +1,31 @@
 import axios from "axios";
 import { getCookies } from "./utils/cookies";
 
-
-
-
-const access_token = getCookies("access_token") ;
-
+const access_token = getCookies("access_token");
 
 export const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || "http://192.168.100.2:8000/api/",
   headers: {
     "Content-Type": "application/json",
-    "Authorization" : "Bearer " + access_token
+    Authorization: "Bearer " + access_token,
   },
 });
 
 // API endpoints
 export const endpoints = {
   auth: {
-    users: "auth/utilisateurs/",
+    users: "auth/utilisateurs/me/",
     login: "/auth/utilisateurs/connexion/",
     register: "auth/utilisateurs/inscription/",
     logout: "/auth/logout",
+    allUsers: "auth/utilisateurs/",
   },
   meetings: {
     list: "/reunion/reunions/",
     create: "/reunion/reunions/creer/",
     update: (id: string) => `/meetings/${id}`,
     delete: (id: string) => `/meetings/${id}`,
+    documents: "/reunion/documents/",
   },
   fichiers: {
     dossiers: {
@@ -37,8 +35,8 @@ export const endpoints = {
       delete: (id: string) => `/dossiers/${id}`,
     },
     fichiers: {
-      base : "fichiers/fichiers/"
-    }
+      base: "fichiers/fichiers/",
+    },
   },
   formations: {
     webinaires: {
@@ -52,7 +50,7 @@ export const endpoints = {
     },
   },
   equipes: {
-    base: "equipe/equipes/",
+    base: "equipe/organisations/",
   },
   organisation: {
     base: "equipe/organisations/",
@@ -60,24 +58,22 @@ export const endpoints = {
   consultations: {
     base: "consultations/",
     comment: {
-      base : "consultations/commentaires/",
-    }
+      base: "consultations/commentaires/",
+    },
   },
   messagerie: {
     base: "messagerie/",
   },
-  
+
   projets: {
-    base : "tasks/projets/",
+    base: "tasks/projets/",
   },
   taches: {
-    base : "tasks/taches/",
-  }, 
-  notifications: {
-    base :"notifications/"
+    base: "tasks/taches/",
   },
-  
-  
+  notifications: {
+    base: "notifications/",
+  },
 };
 
 export default api;

@@ -11,5 +11,9 @@ export default function Tabs({activeTab, setActiveTab} : TabsProps) {
             <h6>Ressources</h6>
             {activeTab === TabsState.Ressources ? <div className="bg-gradient-to-r from-[#FE6539] to-crimson-400 w-10 h-1 rounded-tr-xl"></div> : <div className="bg-white-200 w-10 h-1 hidden group-hover:block group-hover:animate-tab-grow-in animate-tab-grow-out rounded-tr-xl"></div>}
       </div>
+        <div onClick={()=>{setActiveTab(TabsState.Historique)}} className="group cursor-pointer">
+            <h6>Historique</h6>
+            {activeTab === TabsState.Historique ? <div className="bg-gradient-to-r from-[#FE6539] to-crimson-400 w-10 h-1 rounded-tr-xl"></div> : <div className="bg-white-200 w-10 h-1 hidden group-hover:block group-hover:animate-tab-grow-in rounded-tr-xl"></div>}
+        </div>
   </div>;
 }

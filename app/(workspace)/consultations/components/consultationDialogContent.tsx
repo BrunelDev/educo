@@ -2,10 +2,15 @@
 import { Select } from "@/app/_components/select";
 import { Button } from "@/components/ui/button";
 import { createConsultation } from "@/lib/api/consultation";
-import { ConsultationDialog, ConsultationType } from "@/lib/types";
+import {
+  ConsultationDialog,
+  ConsultationDialogProps,
+  ConsultationType,
+} from "@/lib/types";
 import { format } from "date-fns";
 import { useState } from "react";
 import { toast } from "sonner";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function ConsultationDialogContent({
   consultation,
@@ -13,14 +18,19 @@ export default function ConsultationDialogContent({
   const options: { value: ConsultationType }[] = [
     { value: ConsultationType.Accord },
     { value: ConsultationType.Fusion },
-    { value: ConsultationType.Gestion },
     { value: ConsultationType.Introduction },
     { value: ConsultationType.Modification },
     { value: ConsultationType.Orientation },
     { value: ConsultationType.Politique },
     { value: ConsultationType.Situation },
+    { value: ConsultationType.ReglementInterieur },
+    { value: ConsultationType.Accord },
+    { value: ConsultationType.ActivitePartielle },
+    { value: ConsultationType.DemenagementReorganisationSite },
+    { value: ConsultationType.RisquesProfessionnels },
+    { value: ConsultationType.AccordsCollectif },
   ];
-  const [value, setValue] = useState<string>(ConsultationType.Accord);
+  const [value, setValue] = useState<string>(consultation.consultationType);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleCreateConsultation = async () => {
@@ -30,9 +40,9 @@ export default function ConsultationDialogContent({
       const formattedDate = format(new Date(), "yyyy-MM-dd");
 
       const data = {
-        type_consultation: value,
+        type_consultation: consultation.consultationType,
         statut: "En attente",
-        description: "Une consultation test",
+        description: consultation.description,
         date_requise: formattedDate,
         participants: [],
       };
@@ -47,39 +57,326 @@ export default function ConsultationDialogContent({
       setIsLoading(false);
     }
   };
+  const consultationList: ConsultationDialogProps[] = [
+    {
+      consultationType: ConsultationType.Orientation, // Changed from Accord to Orientation for the first example, assuming it was a placeholder
+      description: `🟢 Comment ça se passe ?
+Cette réunion a lieu une fois par an. L’employeur présente la vision stratégique de l’entreprise à moyen terme (généralement sur 3 ans). Le CSE rend un avis consultatif, même s’il n’a pas de pouvoir de blocage.
+`,
+      process: [
+        `📌 Enjeux pour les élus
+- Anticiper les conséquences sur l’emploi, les métiers, les implantations.
+- Comprendre les risques liés à l’automatisation, à la réorganisation ou à la stratégie de croissance.
+- Proposer des mesures d’accompagnement ou de formation.`,
+        `📄 Documents à demander à l’employeur
+- Plan stratégique (présentation ou rapport).
+- Projets d’investissement, de réorganisation, d’innovation.
+- Données économiques, prévisions d’emploi, politique RH.
+`,
+        `
+🧠 Attitude à adopter
+- Lire les documents en amont, préparer des questions.
+- Demander une expertise si nécessaire (art. L2315-87).
+- Donner un avis écrit, même critique.`,
+        `🧩 Bonnes pratiques
+✔ Anticipez la réunion en demandant les documents.
+✔ Préparez une position commune.
+✔ Comparez les annonces aux réalités du terrain.`,
+      ],
+    },
+    {
+      consultationType: ConsultationType.Situation,
+      description: `📊 Réunion sur la situation économique et financière
+🟢 Comment ça se passe ?
+Réunion annuelle pour examiner les comptes, résultats et perspectives économiques. Elle permet aux élus de comprendre la santé de l’entreprise.`,
+      process: [
+        `📌 Enjeux pour les élus
+- Identifier les marges de manœuvre financières.
+- Détecter les signaux faibles de difficultés ou opportunités.
+- Poser les bases d'une stratégie sociale.`,
+        `📄 Documents à demander à l’employeur
+- Bilans, comptes de résultats, rapports du commissaire aux comptes.
+- Budget prévisionnel.
+- Présentation financière de la direction.`,
+        `🧠 Attitude à adopter
+- Demander une présentation pédagogique.
+- Comparer avec les années précédentes.
+- Appuyer sur les écarts et les risques.`,
+        `🧩 Bonnes pratiques
+✔ Demander les documents 8 jours avant.
+✔ S'appuyer sur un expert-comptable si besoin.
+✔ Proposer des alternatives.`,
+      ],
+    },
+    {
+      consultationType: ConsultationType.Politique,
+      description: `👥 Réunion sur la politique sociale, l’emploi et les conditions de travail
+🟢 Comment ça se passe ?
+Réunion annuelle pour faire le point sur les pratiques RH. L’objectif est de détecter les difficultés et faire avancer les droits sociaux.`,
+      process: [
+        `📌 Enjeux pour les élus
+- Suivre l’évolution des effectifs, contrats, égalité, absentéisme.
+- Identifier les risques sociaux et tensions organisationnelles.
+- Proposer des actions correctives.`,
+        `📄 Documents à demander à l’employeur
+- Bilan social ou base de données économiques et sociales (BDES).
+- Données sur les salaires, temps de travail, santé, égalité professionnelle.
+- Plan de formation.`,
+        `🧠 Attitude à adopter
+- Croiser les chiffres avec les remontées terrain.
+- Poser des questions concrètes.
+- Mettre en avant les besoins des salariés.`,
+        `🧩 Bonnes pratiques
+✔ Organiser une relecture à plusieurs élus.
+✔ Proposer des priorités d’action.
+✔ Ne pas hésiter à relancer l’employeur après la réunion.`,
+      ],
+    },
+    {
+      consultationType: ConsultationType.Introduction,
+      description: `🖥 Introduction de nouvelles technologies
+🟢 Comment ça se passe ?
+Le CSE doit être consulté avant toute mise en place de nouvelles technologies (logiciels, machines, IA, etc.).`,
+      process: [
+        `📌 Enjeux pour les élus
+- Anticiper les conséquences sur l’emploi, les compétences, la charge mentale.
+- Évaluer les impacts sur les conditions de travail et la sécurité.`,
+        `📄 Documents à demander à l’employeur
+- Description des outils ou technologies.
+- Objectifs visés, planning de déploiement.
+- Évaluation des impacts sociaux.`,
+        `🧠 Attitude à adopter
+- Demander une simulation ou un test pilote.
+- Proposer des accompagnements.
+- S'appuyer sur une expertise si besoin.`,
+        `🧩 Bonnes pratiques
+✔ Rappeler que la consultation est obligatoire.
+✔ Vérifier que la formation est prévue.
+✔ Proposer une évaluation post-déploiement.`,
+      ],
+    },
+    {
+      consultationType: ConsultationType.Modification,
+      description: `🔄 Modification des conditions de travail
+🟢 Comment ça se passe ?
+Toute modification importante (horaires, lieu, organisation) impose une consultation du CSE.`,
+      process: [
+        `📌 Enjeux pour les élus
+- Préserver la santé des salariés.
+- Éviter les désorganisations ou tensions.`,
+        `📄 Documents à demander à l’employeur
+- Projet de changement.
+- Justification, calendrier, impact RH.
+- Mesures d’accompagnement.`,
+        `🧠 Attitude à adopter
+- Interroger les services ou métiers impactés.
+- Vérifier la cohérence avec les accords existants.
+- Proposer des ajustements.`,
+        `🧩 Bonnes pratiques
+✔ Faire des visites terrain si besoin.
+✔ Prévoir une période d’expérimentation.
+✔ Être vigilant sur les horaires et amplitudes.`,
+      ],
+    },
+    {
+      consultationType: ConsultationType.Fusion,
+      description: `🔗 Fusions, cessions, acquisitions
+🟢 Comment ça se passe ?
+Le CSE doit être informé et consulté avant toute opération de ce type.`,
+      process: [
+        `📌 Enjeux pour les élus
+- Identifier les risques pour l’emploi, les statuts, les sites.
+- Obtenir des garanties.`,
+        `📄 Documents à demander à l’employeur
+- Note de présentation du projet.
+- Conséquences sociales et organisationnelles.
+- Planning prévisionnel.`,
+        `🧠 Attitude à adopter
+- Poser des questions sur l’impact réel.
+- Demander une expertise économique.
+- Interpeller sur les engagements sociaux.`,
+        `🧩 Bonnes pratiques
+✔ Demander des garanties écrites.
+✔ S’informer sur l’entreprise repreneuse.
+✔ Mobiliser les salariés si besoin.`,
+      ],
+    },
+    {
+      consultationType: ConsultationType.Accord, // Mapping PSE to Accord as per enum
+      description: `🚨 Plan de sauvegarde de l’emploi (PSE)
+🟢 Comment ça se passe ?
+Quand un licenciement économique collectif est prévu, l’employeur doit consulter le CSE.`,
+      process: [
+        `📌 Enjeux pour les élus
+- Sauvegarder un maximum d’emplois.
+- Améliorer les mesures de reclassement.`,
+        `📄 Documents à demander à l’employeur
+- Projet de licenciement et PSE.
+- Critères d’ordre, mesures d’accompagnement.
+- Données économiques justifiant le plan.`,
+        `🧠 Attitude à adopter
+- Contester les suppressions injustifiées.
+- Proposer des alternatives.
+- Travailler avec un expert.`,
+        `🧩 Bonnes pratiques
+✔ Suivre un calendrier précis.
+✔ Impliquer les salariés dans la défense de leurs postes.
+✔ Exiger des comptes-rendus réguliers.`,
+      ],
+    },
+    {
+      consultationType: ConsultationType.ReglementInterieur,
+      description: `📜 Règlement intérieur
+🟢 Comment ça se passe ?
+Avant toute création ou modification du règlement, le CSE doit être consulté.`,
+      process: [
+        `📌 Enjeux pour les élus
+- Prévenir les abus disciplinaires.
+- Garantir des règles claires et légales.`,
+        `📄 Documents à demander à l’employeur
+- Projet de règlement ou modification.
+- Motifs et objectifs de chaque règle.`,
+        `🧠 Attitude à adopter
+- Lire chaque article en détail.
+- Comparer avec le Code du travail.
+- S’opposer aux clauses abusives.`,
+        `🧩 Bonnes pratiques
+✔ Proposer des formulations alternatives.
+✔ Vérifier la cohérence avec les usages de l’entreprise.`,
+      ],
+    },
+    {
+      consultationType: ConsultationType.AccordsCollectif, // Mapping Accord collectif to Accord
+      description: `🤝 Accord collectif (temps de travail, égalité…)
+🟢 Comment ça se passe ?
+Le CSE est informé ou consulté sur certains accords selon leur nature.`,
+      process: [
+        `📌 Enjeux pour les élus
+- Éviter les reculs sociaux.
+- Protéger les équilibres vie pro/perso.`,
+        `📄 Documents à demander à l’employeur
+- Projet d’accord.
+- Étude d’impact si existante.
+- Position de la direction.`,
+        `🧠 Attitude à adopter
+- Lire l’accord ligne par ligne.
+- Demander des précisions sur chaque changement.
+- Rédiger un avis argumenté.`,
+        `🧩 Bonnes pratiques
+✔ Comparer avec l’accord précédent.
+✔ Échanger avec les salariés concernés.`,
+      ],
+    },
+    {
+      consultationType: ConsultationType.ActivitePartielle,
+      description: `⏳ Activité partielle (chômage partiel)
+🟢 Comment ça se passe ?
+Avant toute demande d’activité partielle, l’employeur doit consulter le CSE.`,
+      process: [
+        `📌 Enjeux pour les élus
+- Comprendre les causes réelles.
+- Limiter les pertes de revenus.
+- Suivre les engagements pris.`,
+        `📄 Documents à demander à l’employeur
+- Demande d’activité partielle.
+- Catégories concernées, période visée.
+- Engagements de maintien de l’emploi.`,
+        `🧠 Attitude à adopter
+- Vérifier les justifications.
+- Demander un suivi régulier.
+- Proposer des solutions alternatives.`,
+        `🧩 Bonnes pratiques
+✔ S’assurer que tous les services sont traités équitablement.
+✔ Veiller à la durée et aux conditions de reprise.`,
+      ],
+    },
+    {
+      consultationType: ConsultationType.DemenagementReorganisationSite,
+      description: `📦 Déménagement ou réorganisation de site
+🟢 Comment ça se passe ?
+Tout projet ayant un impact sur l’organisation du travail nécessite une consultation.`,
+      process: [
+        `📌 Enjeux pour les élus
+- Anticiper les risques de désorganisation.
+- Négocier des compensations.`,
+        `📄 Documents à demander à l’employeur
+- Projet de réorganisation.
+- Cartographie des impacts RH.
+- Planning prévu.`,
+        `🧠 Attitude à adopter
+- Demander des garanties logistiques (temps de trajet, adaptation…).
+- Impliquer les salariés.
+- Proposer une phase test.`,
+        `🧩 Bonnes pratiques
+✔ Vérifier les mesures de transition.
+✔ Suivre les conditions réelles post-changement.`,
+      ],
+    },
+    {
+      consultationType: ConsultationType.RisquesProfessionnels,
+      description: `⚠️ Risques professionnels / santé / sécurité
+🟢 Comment ça se passe ?
+Le CSE est systématiquement consulté sur les mesures liées à la sécurité, au DUERP, et à la prévention.`,
+      process: [
+        `📌 Enjeux pour les élus
+- Éviter les accidents et maladies professionnelles.
+- Protéger la santé physique et mentale.`,
+        `📄 Documents à demander à l’employeur
+- DUERP, plan de prévention, rapports AT/MP.
+- Fiches de poste, résultats des contrôles.`,
+        `🧠 Attitude à adopter
+- Visiter les postes de travail.
+- Proposer des mesures concrètes.
+- Alerter si besoin.`,
+        `🧩 Bonnes pratiques
+✔ Impliquer les salariés dans les retours terrain.
+✔ Vérifier la mise en œuvre réelle des mesures.`,
+      ],
+    },
+  ];
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-5">
-        <h6>Type de consultation</h6>
+    <ScrollArea className="h-[calc(100vh-100px)] px-5">
+      <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-5">
+          <h6>Type de consultation</h6>
 
-        <Select
-          placeholder={"Choisissez un type de consultation"}
-          options={options}
-          label={"Consultations"}
-          value={value}
-          setValue={(e) => {
-            setValue(e);
-          }}
-        />
-        <p className="text-sm">{consultation.description}</p>
+          <Select
+            placeholder={"Choisissez un type de consultation"}
+            options={options}
+            label={"Consultations"}
+            value={value}
+            setValue={(e) => {
+              setValue(e);
+            }}
+          />
+        </div>
+        <div className="flex pl-10 items-center bg-gradient-to-l from-[#FE6539] to-crimson-400 text-white-50 rounded-[8px] p-2 text-sm">
+          <h6>Comment ca se passe</h6>
+        </div>
+        <p className="text-sm">
+          {
+            consultationList.find((c) => c.consultationType === value)
+              ?.description
+          }
+        </p>
+
+        <div className="flex flex-col gap-4">
+          {consultationList
+            .find((c) => c.consultationType === value)
+            ?.process.map((item, index) => (
+              <pre
+                key={index}
+                className="whitespace-pre-wrap font-sans text-sm leading-relaxed"
+              >
+                {item}
+              </pre>
+            ))}
+        </div>
+        <Button onClick={handleCreateConsultation} disabled={isLoading}>
+          {isLoading ? "Création..." : "Créer"}
+        </Button>
       </div>
-      <div className="flex pl-10 items-center bg-gradient-to-l from-[#FE6539] to-crimson-400 text-white-50 rounded-[8px] p-2 text-sm">
-        <h6>Comment ca se passe</h6>
-      </div>
-      <div className="flex flex-col gap-4">
-        {consultation.process.map((item, index) => (
-          <pre
-            key={index}
-            className="whitespace-pre-wrap font-sans text-sm leading-relaxed"
-          >
-            {item}
-          </pre>
-        ))}
-      </div>
-      <Button onClick={handleCreateConsultation} disabled={isLoading}>
-        {isLoading ? "Création..." : "Créer"}
-      </Button>
-    </div>
+    </ScrollArea>
   );
 }

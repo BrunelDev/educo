@@ -75,7 +75,7 @@ export default function AddMemberDialog({teamId} : {teamId?: number}) {
       <div>
         <h6 className="font-medium text-[10px]">Invitation en attente</h6>
         <ScrollArea  className=" mt-3 flex flex-col gap-3">
-          {users?.length  ? users.map((user, index) => (
+          {users ? users.map((user, index) => (
             <div key={index} className="flex justify-between">
               <div className="flex gap-3">
                 <div className="h-[28px] w-[28px] flex items-center justify-center border border-dashed rounded-full">

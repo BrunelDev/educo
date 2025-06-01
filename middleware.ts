@@ -1,31 +1,102 @@
+import axios from "axios";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { getUser } from "./lib/api/users";
-import { AxiosError } from "axios";
+
+// Simple cache with 5-minute expiration
+const USER_CACHE = new Map<string, { user: unknown; timestamp: number }>();
+const CACHE_EXPIRATION = 5 * 60 * 1000;
+
+// Get API URL from environment or use fallback
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://51.15.246.64:8000/api/";
+const WS_URL =
+  process.env.NEXT_PUBLIC_WEBSOCKET_URL || "ws://51.15.246.64:8000/ws/chat/";
+
+// Extract domain for CSP
+const getHostFromUrl = (url: string) => {
+  try {
+    const urlObj = new URL(url);
+    return `${urlObj.protocol}//${urlObj.host}`;
+  } catch {
+    // Fallback if URL parsing fails
+    return url.split("/").slice(0, 3).join("/");
+  }
+};
+
+const API_HOST = getHostFromUrl(API_URL);
+const WS_HOST = getHostFromUrl(WS_URL);
+
+// Get S3 bucket name from environment
+const S3_BUCKET = process.env.NEXT_PUBLIC_AWS_BUCKET_NAME || "cse-impact";
+const S3_REGION = process.env.NEXT_PUBLIC_AWS_REGION || "eu-north-1";
+
+// Security headers object for reuse
+const SECURITY_HEADERS = {
+  "X-Content-Type-Options": "nosniff",
+  "X-Frame-Options": "DENY",
+  "X-XSS-Protection": "1; mode=block",
+  "Referrer-Policy": "strict-origin-when-cross-origin",
+  "Content-Security-Policy": `
+    default-src 'self';
+    connect-src 'self' ${API_HOST} ${WS_HOST} *.amazonaws.com ${S3_BUCKET}.s3.${S3_REGION}.amazonaws.com;
+    img-src 'self' data: https: *.amazonaws.com ${S3_BUCKET}.s3.${S3_REGION}.amazonaws.com;
+    script-src 'self' 'unsafe-inline';
+    style-src 'self' 'unsafe-inline';
+  `
+    .replace(/\s+/g, " ")
+    .trim(),
+};
 
 export async function middleware(request: NextRequest) {
-  // Example: Check if the user is authenticated
-  const token = request.cookies.get("access_token");
+  // Get access token from request cookies (server-side)
+  const accessToken = request.cookies.get("access_token")?.value;
+  const response = NextResponse.next();
 
-  if (!token) {
-    // Redirect to login page if not authenticated
+  // Apply security headers
+  Object.entries(SECURITY_HEADERS).forEach(([key, value]) => {
+    response.headers.set(key, value);
+  });
+
+  // Redirect to login if no token
+  if (!accessToken) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
+
   try {
-    //const user = await getUser();
-    //request.cookies.set("userInfo", JSON.stringify(user));
-    console.log("pass")
-  } catch (error: unknown) {
-    if (error instanceof AxiosError) {
-      console.error("Error fetching user:", (error as AxiosError));
-    throw error
+    // Use cached user data if available and not expired
+    const cacheKey = accessToken;
+    const cachedData = USER_CACHE.get(cacheKey);
+    const now = Date.now();
 
+    if (cachedData && now - cachedData.timestamp < CACHE_EXPIRATION) {
+      return response;
     }
-    return NextResponse.redirect(new URL("/login", request.url));
-  }
 
-  // Allow the request to proceed
-  return NextResponse.next();
+    // Create a direct API call instead of using the getUser function
+    // This avoids the client-side cookie issues
+    await axios.get(`${API_URL}auth/utilisateurs/me/`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    // If we get here without error, the token is valid
+    USER_CACHE.set(cacheKey, { user: {}, timestamp: now });
+
+    return response;
+  } catch (error) {
+    console.error("Middleware error:", error);
+
+    // Create redirect response
+    const loginRedirect = NextResponse.redirect(new URL("/login", request.url));
+
+    // Clear all auth cookies
+    ["access_token", "refresh_token", "userInfo"].forEach((cookie) => {
+      loginRedirect.cookies.delete(cookie);
+    });
+
+    return loginRedirect;
+  }
 }
 
 // Apply middleware to specific routes

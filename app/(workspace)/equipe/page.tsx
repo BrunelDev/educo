@@ -3,7 +3,7 @@ import { DialogComponent } from "@/app/_components/dialogComponent";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { useEffect, useState } from "react";
-import SearchBar from "../components/searchBar";
+//import SearchBar from "../components/searchBar";
 import AssociateCard from "./components/associateCard";
 import Contact from "./components/contact";
 import AddOrganisation from "./components/addOrganisation";
@@ -14,7 +14,7 @@ import EmptyState from "@/app/_components/EmptyState";
 
 export default function Equipe() {
   
-  const [searchValue, setSearchValue] = useState<string>("");
+  //const [searchValue, setSearchValue] = useState<string>("");
   const [users, setUsers] = useState<OrganizationResponse>();
        useEffect(() => {
           const fun = async () => {
@@ -35,58 +35,81 @@ export default function Equipe() {
        }, []);
 
     return (
-      <div className="flex relative flex-col gap-6">
-        <h6>Equipe</h6>
+      <div className="flex relative flex-col gap-6 w-full px-4 sm:px-6">
+        <h6 className="text-xl sm:text-2xl font-semibold">Equipe</h6>
         <Contact />
-        <div className="flex justify-between">
-          {users?.membres ? <h6>{users.membres?.length} associés</h6> : <h6>Aucune équipe liée.</h6>}
-          <div className="flex gap-3 items-center ">
-            {users?.membres ? <SearchBar
-              value={searchValue}
-              handleChange={setSearchValue}
-              placeholder={"Recherhcer"}
-            /> : null}
-            <div className="absolute right-6 -top-11">
+        
+        {/* Header section with responsive layout */}
+        <div className="flex flex-col sm:flex-row justify-between gap-4 sm:gap-0">
+          {users?.membres ? 
+            <h6 className="text-lg font-medium">{users.membres?.length} associés</h6> : 
+            <h6 className="text-lg font-medium">Aucune équipe liée.</h6>
+          }
+          
+          {/* Actions container with responsive adjustments */}
+          <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+            {users?.membres ? 
+              <div className="w-full sm:w-auto">
+                {/*<SearchBar
+                  value={searchValue}
+                  handleChange={setSearchValue}
+                  placeholder={"Rechercher"}
+                />*/}
+              </div> : null
+            }
+            
+            {/* Organization button - repositioned for mobile */}
+            {!users?.organisation &&
+            <div className="sm:absolute sm:right-6 sm:-top-11 order-first sm:order-none mb-2 sm:mb-0">
             <DialogComponent
-                className={"sm:max-w-[768px]"}
-                dialoTrigger={
-                  <Button
-                    variant={"default"}
-                    className="cursor-pointer bg-gradient-to-r from-[#FE6539] to-crimson-400"
-                  >
-                    <Plus /> Ajouter une organisation
-                  </Button>
-                }
-                dialogContent={<AddOrganisation/>}
-                dialogTitle={null}
-              />
-            </div>
-            <div className="w-full">
-              {users?.organisation?.id ?
-              <DialogComponent
+              className={"sm:max-w-[768px]"}
               dialoTrigger={
                 <Button
                   variant={"default"}
-                  className="cursor-pointer bg-gradient-to-r from-[#FE6539] to-crimson-400"
+                  className="cursor-pointer bg-gradient-to-r from-[#FE6539] to-crimson-400 w-full sm:w-auto"
                 >
-                  <Plus /> Ajouter un membre
+                  <Plus className="mr-1" /> <span className="whitespace-nowrap">Ajouter une organisation</span>
                 </Button>
               }
-              dialogContent={<TeamFormHandler orgId={users?.organisation?.id}/>}
+              dialogContent={<AddOrganisation/>}
               dialogTitle={null}
-            /> : null}
-              
+            />
+          </div> }
+            
+            
+            {/* Add member button */}
+            <div className="w-full sm:w-auto">
+              {users?.organisation?.id ?
+                <DialogComponent
+                  dialoTrigger={
+                    <Button
+                      variant={"default"}
+                      className="cursor-pointer bg-gradient-to-r from-[#FE6539] to-crimson-400 w-full sm:w-auto"
+                    >
+                      <Plus className="mr-1" /> <span className="whitespace-nowrap">Ajouter un membre</span>
+                    </Button>
+                  }
+                  dialogContent={<TeamFormHandler orgId={users?.organisation?.id}/>}
+                  dialogTitle={null}
+                /> : null
+              }
             </div>
           </div>
         </div>
-        <div className="flex flex-wrap gap-4">
+        
+        {/* Cards grid with responsive sizing */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {users
             ? users.membres?.map((user, index) => (
-                
-                    <AssociateCard key={user.id + index} associate={user} />
+                <AssociateCard key={user.id + index} associate={user} />
               ))
-            : <div className="w-full flex justify-center items-center">
-            <EmptyState title={"Vous n'appartenez à aucune organisation"} description={"Veuillez créer une organisation pour commencer."}/></div>}
+            : <div className="col-span-full flex justify-center items-center py-8">
+                <EmptyState 
+                  title={"Vous n'appartenez à aucune organisation"} 
+                  description={"Veuillez créer une organisation pour commencer."}
+                />
+              </div>
+          }
         </div>
         {/*<div className="flex flex-wrap gap-6">
           {associates.map((associate, index) => (

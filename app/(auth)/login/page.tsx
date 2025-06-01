@@ -8,7 +8,8 @@ export default function LoginPage() {
     <div className="grid min-h-svh md:grid-cols-2 bg-coral-500">
       <div className="relative hidden md:flex px-20 py-8  md:flex-col md:justify-around">
         <div className="flex gap-1">
-          <TempLogo color="bg-white-50" /> <h6 className="text-white-50">Bonjour CSE</h6>
+          <TempLogo color="bg-white-50" /> <h6 className="text-white-50">Impact CSE
+          </h6>
         </div>
         <p className=" font-extrabold text-3xl text-white-50">
           Retrouvez votre espace dédié aux élus : réunions, formations,
