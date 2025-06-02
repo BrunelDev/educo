@@ -18,7 +18,7 @@ export const endpoints = {
     login: "/auth/utilisateurs/connexion/",
     register: "auth/utilisateurs/inscription/",
     logout: "/auth/logout",
-    allUsers: "auth/utilisateurs/",
+    allUsers: "/auth/utilisateurs/",
   },
   meetings: {
     list: "/reunion/reunions/",

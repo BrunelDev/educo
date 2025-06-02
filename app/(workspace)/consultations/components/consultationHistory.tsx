@@ -11,8 +11,8 @@ import {
 import {
   Consultation,
   getConsultations,
-  updateConsultationStatus,
   deleteConsultation,
+  updateConsultation,
 } from "@/lib/api/consultation";
 import { Ellipsis, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -241,30 +241,34 @@ const PopoverContent = ({
 }) => {
   return (
     <div className="p-2 flex flex-col gap-2 text-sm">
-      <button
+      <span
+      className="cursor-pointer"
         onClick={async () => {
-          updateConsultationStatus(id, "En cours");
+          await updateConsultation(id, { statut: "En cours" });
           await updateConsultations();
         }}
       >
-        En cours
-      </button>{" "}
-      <button
+        <h6>En cours</h6>
+      </span>{" "}
+      <span
+      className="cursor-pointer"
+
         onClick={async () => {
-          updateConsultationStatus(id, "En attente");
+            await updateConsultation(id, { statut: "En attente" });
           await updateConsultations();
         }}
       >
-        En attente
-      </button>{" "}
-      <button
+        <h6>En attente</h6>
+      </span>{" "}
+      <span
+      className="cursor-pointer"
         onClick={async () => {
-          updateConsultationStatus(id, "Terminé");
+          await updateConsultation(id, { statut: "Terminé" });
           await updateConsultations();
         }}
       >
-        Terminé
-      </button>
+        <h6>Terminé</h6>
+      </span>
     </div>
   );
 };

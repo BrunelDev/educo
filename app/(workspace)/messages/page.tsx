@@ -16,6 +16,8 @@ import {
 import { PlusCircle } from "lucide-react";
 import { useState } from "react";
 import CreateGroupForm from "./components/CreateGroupForm";
+import { getCookies } from "@/lib/utils/cookies";
+import { User } from "@/lib/api/users";
 
 export default function MessagePage() {
   const [isCreateGroupDialogOpen, setIsCreateGroupDialogOpen] = useState(false);
@@ -32,6 +34,7 @@ export default function MessagePage() {
     ],
     conversationImageUrl: "/enterprise-image.png",
   };
+  const user : User = JSON.parse(getCookies("userInfo") || "{}");
  
 
 
@@ -58,7 +61,7 @@ export default function MessagePage() {
             </DialogHeader>
             <CreateGroupForm 
               onGroupCreated={() => setIsCreateGroupDialogOpen(false)}
-              currentUserId={1} // TODO: Replace with actual current user ID from auth/context
+              currentUserId={user.id} // TODO: Replace with actual current user ID from auth/context
             />
             {/* DialogFooter can be removed if CreateGroupForm handles its own cancel/submit buttons internally */}
             {/* Or keep it if you want global Cancel button outside the form */}

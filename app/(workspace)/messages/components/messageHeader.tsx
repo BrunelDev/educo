@@ -1,14 +1,13 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { User } from "@/lib/api/users";
-import { MessageHeaderProps } from "@/lib/types";
 import { getCookies } from "@/lib/utils/cookies";
 import { useMessageStore } from "@/store/message";
 import { ChevronDown, Info } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 
-const MessageHeader = ({ ...props }: MessageHeaderProps) => {
+const MessageHeader = () => {
   const { activeConversation } = useMessageStore();
   const userInfo: User = JSON.parse(getCookies("userInfo") || "{}");
   const [showAllParticipants, setShowAllParticipants] = useState(false);
@@ -54,7 +53,7 @@ const MessageHeader = ({ ...props }: MessageHeaderProps) => {
         {/* Avatar/Image */}
         <div className="relative">
           <Image
-            src={props.conversationImageUrl || "/placeholder-avatar.png"}
+            src={activeConversation.participants.filter((participant) => participant._id !== userInfo.id)[0].avatar || "/userProfile-img.png"}
             alt={conversationName}
             height={40}
             width={40}

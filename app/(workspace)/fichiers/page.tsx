@@ -11,48 +11,7 @@ import EmptyState from "@/app/_components/EmptyState";
 
 export default function FichiersPage() {
  
-  /*const folders: FolderProps[] = [
-    {
-      name: "Documents CSE 2024",
-      id: 1,
-    },
-    {
-      name: "Procès-verbaux",
-      id: 2,
-    },
-    {
-      name: "Formations & Webinaires",
-      id: 3,
-    },
-    {
-      name: "Budgets et Finances",
-      id: 4,
-    },
-    {
-      name: "Réglementations & Accords",
-      id: 5,
-    },
-    {
-      name: "Élections CSE",
-      id: 6,
-    },
-    {
-      name: "Sécurité & CSSCT",
-      id: 7,
-    },
-    {
-      name: "Communications",
-      id: 8,
-    },
-    {
-      name: "Archives 2023",
-      id: 9,
-    },
-    {
-      name: "Archives 2025",
-      id: 10,
-    },
-  ];*/
+
   const [folders, setFolders] = useState<DossierResponse>();
  
   const fetchDossiers = async () => {
@@ -124,7 +83,7 @@ const CreateFolder = () => {
     <form action="" className="flex flex-col gap-3" onSubmit={handleSubmit}>
       <label htmlFor="folderName">Nom du dossier</label>
       <Input type="text" id="folderName" required name="nom" />
-      <Button type="submit">Créer</Button>
+      <Button type="submit" className="rounded-[8px] bg-gradient-to-r from-[#FE6539] to-crimson-400">Créer</Button>
     </form>
   )
 }

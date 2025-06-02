@@ -22,21 +22,6 @@ export default function Formations() {
         />*/}
       </div>
       
-      {activeTab === TabsState.Ressources && (
-        <div>
-          {/* Contenu pour Ressources */}
-          <p>Contenu des ressources ici...</p>
-        </div>
-      )}
-      {activeTab === TabsState.Historique && (
-        <div>
-          {/* Contenu pour Historique */}
-          <p>Contenu de l&apos;historique des formations...</p>
-        </div>
-      )}
-      
-
-      
       {activeTab === TabsState.Webinaires ? (
         <WebinarContent />
       ) : (

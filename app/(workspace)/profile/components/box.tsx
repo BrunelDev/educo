@@ -109,7 +109,7 @@ export function ThirdBox() {
 
       <h1 className="text-white-800 font-bold text-[16px] sm:text-[18px] mt-2">Accès</h1>
       <DialogComponent
-      className="sm:max-w-[600px]"
+      className="sm:max-w-[650px]"
         dialoTrigger={
           <div className="bg-white flex items-center gap-2 sm:gap-3 p-3 rounded-[8px] cursor-pointer hover:bg-white-100 transition-colors">
             <Users size={16} className="text-gray-600" />

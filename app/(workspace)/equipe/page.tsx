@@ -66,7 +66,7 @@ export default function Equipe() {
               dialoTrigger={
                 <Button
                   variant={"default"}
-                  className="cursor-pointer bg-gradient-to-r from-[#FE6539] to-crimson-400 w-full sm:w-auto"
+                  className="cursor-pointer bg-gradient-to-r from-[#FE6539] to-crimson-400 flex w-full sm:w-auto"
                 >
                   <Plus className="mr-1" /> <span className="whitespace-nowrap">Ajouter une organisation</span>
                 </Button>
@@ -84,7 +84,7 @@ export default function Equipe() {
                   dialoTrigger={
                     <Button
                       variant={"default"}
-                      className="cursor-pointer bg-gradient-to-r from-[#FE6539] to-crimson-400 w-full sm:w-auto"
+                      className="cursor-pointer bg-gradient-to-r from-[#FE6539] to-crimson-400 flex w-full sm:w-auto"
                     >
                       <Plus className="mr-1" /> <span className="whitespace-nowrap">Ajouter un membre</span>
                     </Button>
@@ -98,7 +98,7 @@ export default function Equipe() {
         </div>
         
         {/* Cards grid with responsive sizing */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="flex flex-wrap gap-4">
           {users
             ? users.membres?.map((user, index) => (
                 <AssociateCard key={user.id + index} associate={user} />

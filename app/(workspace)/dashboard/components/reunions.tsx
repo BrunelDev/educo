@@ -16,7 +16,7 @@ export default function Reunions() {
       setMeetings(response.results);
     };
     fetchMeetings();
-  }, [meetings]);
+  }, []);
   return (
     <div className="flex flex-col gap-4 overflow-hidden">
       <div className="flex justify-between items-center">
@@ -55,21 +55,19 @@ const ReunionComponent = ({ meeting }: MeetingComponentProps) => {
         </div>
         <div className="flex gap-2 font-medium text-xs items-center">
           <Image
-            unoptimized
             src={"/calendar-icon.svg"}
             width={12}
             height={12}
             alt="calendar icon"
           />
-          <h6>{formatDateToFrench(meeting.date_heure.toLocaleString())} :</h6>
+          <h6>{formatDateToFrench(meeting.date_heure.toLocaleString())}</h6>
           
         </div>
       </div>
       <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center gap-1 sm:gap-0">
-        <h6 className="font-extrabold text-[14px]">{meeting.titre}</h6>
+        <h6 className="font-extrabold text-[14px] text-wrap">{meeting.titre}</h6>
         <div className="cursor-pointer">
           <Image
-            unoptimized
             src={"/dots-icon.svg"}
             width={13.5}
             height={1.5}

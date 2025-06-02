@@ -38,8 +38,6 @@ export function RegisterForm() {
             return;
           }
 
-          
-
           // Confirm password validation
           if (password !== confirmPassword) {
             toast.error("Les mots de passe ne correspondent pas");
@@ -155,7 +153,7 @@ export function RegisterForm() {
         <div className="flex justify-center items-center gap-5">
           <Link href={"#"}>
             <Image
-              unoptimized
+              
               src={"/icon_google.svg"}
               width={28}
               height={28}
@@ -164,7 +162,7 @@ export function RegisterForm() {
           </Link>
           <Link href={"#"}>
             <Image
-              unoptimized
+              
               src={"/icon_apple.svg"}
               width={22}
               height={22}

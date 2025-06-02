@@ -373,7 +373,8 @@ Le CSE est systématiquement consulté sur les mesures liées à la sécurité, 
               </pre>
             ))}
         </div>
-        <Button onClick={handleCreateConsultation} disabled={isLoading}>
+        <Button
+        className="bg-gradient-to-r from-coral-400 to-crimson-400" onClick={handleCreateConsultation} disabled={isLoading}>
           {isLoading ? "Création..." : "Créer"}
         </Button>
       </div>

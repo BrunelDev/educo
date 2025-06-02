@@ -12,10 +12,18 @@ export default function Suggestions() {
       <h6 className="text-crimson-500 text-lg font-medium">Suggestions IA</h6>
       <ul className="text-white-800 pl-5">
         {suggestions.map((suggestion, index) => (
-          <li key={index} className="list-disc w-fit">{suggestion}</li>
+          <li key={index} className="list-disc w-fit">
+            {suggestion}
+          </li>
         ))}
       </ul>
-      <Image unoptimized src={"/sparkles.svg"} width={100} height={100} alt="sparkle icon" className="hidden sm:block absolute top-1/2 right-1 -translate-y-1/2"/>
+      <Image
+        src={"/sparkles.svg"}
+        width={100}
+        height={100}
+        alt="sparkle icon"
+        className="hidden sm:block absolute top-1/2 right-1 -translate-y-1/2"
+      />
     </div>
   );
 }

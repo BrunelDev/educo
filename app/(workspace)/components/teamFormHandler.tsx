@@ -22,7 +22,7 @@ export default function TeamFormHandler({ orgId }: { orgId: number }) {
 
         console.log("token", storedData);
         const response = await getAllusers();
-        console.log("res", response)
+        console.log("res", response);
         setUsers(response.results);
       } catch (error) {
         console.error("error geting users", error);
@@ -63,37 +63,38 @@ export default function TeamFormHandler({ orgId }: { orgId: number }) {
 
   return (
     <form onSubmit={handleSubmit} className="mt-3 flex flex-col gap-3 p-3">
-      {users ? users.map((user, index) => (
-        <div
-          key={index}
-          className="flex items-center justify-between space-x-2"
-        >
-          <div className="flex gap-3 items-center">
-            <div className="h-[28px] w-[28px] flex items-center justify-center border border-dashed rounded-full">
-              <Image
-                unoptimized
-                src={"user-icon.svg"}
-                width={16}
-                height={19}
-                alt="user icon"
+      {users
+        ? users.map((user, index) => (
+            <div
+              key={index}
+              className="flex items-center justify-between space-x-2"
+            >
+              <div className="flex gap-3 items-center">
+                <div className="h-[28px] w-[28px] flex items-center justify-center border border-dashed rounded-full">
+                  <Image
+                    src={"user-icon.svg"}
+                    width={16}
+                    height={19}
+                    alt="user icon"
+                  />
+                </div>
+                <label
+                  htmlFor={`user-${user.id}`}
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  {user.email}
+                </label>
+              </div>
+              <Checkbox
+                id={`user-${user.id}`}
+                checked={selectedMembers.includes(user.id)}
+                onCheckedChange={(checked) =>
+                  handleCheckboxChange(checked as boolean, user.id)
+                }
               />
             </div>
-            <label
-              htmlFor={`user-${user.id}`}
-              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-            >
-              {user.email}
-            </label>
-          </div>
-          <Checkbox
-            id={`user-${user.id}`}
-            checked={selectedMembers.includes(user.id)}
-            onCheckedChange={(checked) =>
-              handleCheckboxChange(checked as boolean, user.id)
-            }
-          />
-        </div>
-      )) : null }
+          ))
+        : null}
       <Button
         type="submit"
         className="mt-4 px-4 py-2 bg-gradient-to-r from-coral-400 to-crimson-400 text-white rounded"

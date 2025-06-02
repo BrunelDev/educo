@@ -6,6 +6,7 @@ import { useMessageStore } from "@/store/message";
 import { Conversation, ConversationResponse, getConversationList } from "@/lib/api/message";
 import { getCookies } from "@/lib/utils/cookies";
 import { User } from "@/lib/api/users";
+import { getGroups, Group } from "@/lib/api/messagerie";
 
 
 const userInfo : User = JSON.parse(getCookies("userInfo") || "{}")
@@ -13,10 +14,14 @@ const userInfo : User = JSON.parse(getCookies("userInfo") || "{}")
 export default function ConversationsList() {
   //const [serachValue, setSearchValue] = useState<string>("");
   const [conversations, setConversations] = useState<ConversationResponse>();
+  const [groups, setGroups] = useState<Group[] | null>();
   useEffect(() => {
     const fetchData = async () => {
       const response = await getConversationList();
       setConversations(response);
+      const groupsResponse = await getGroups();
+      setGroups(groupsResponse?.results);
+      console.log(groupsResponse);
     };
     fetchData();
   }, []);
@@ -42,6 +47,12 @@ export default function ConversationsList() {
           lastSpeakerName={"John"}
         />
       </div>*/}
+      {groups ? groups.map((group) => (
+        <GroupDiscussion
+          {...group}
+          key={group.id}
+        />
+      )) : null}
       <div className="flex flex-col gap-3">
         <h6 className="font-semibold">Discussion</h6>
         <div className="flex flex-col gap-3">
@@ -56,44 +67,7 @@ export default function ConversationsList() {
   );
 }
 
-/*interface TeamGroupProps {
-  groupName: string;
-  groupImageUrl: string;
-  lastSpeakerImageUrl: string;
-  lastMessage: string;
-  lastMessageHour: string;
-  lastSpeakerName: string;
-}*/
-{/*const TeamGroup = ({ ...props }: TeamGroupProps) => {
-  return (
-    <div className="w-full bg-[#FFFFFF80] border border-white-50 p-2 flex flex-col gap-[6px] items-center rounded-[8px] h-fit">
-      <div className="w-full flex justify-between items-center">
-        <div className="flex gap-2 items-center">
-          <Image
-            src={props.groupImageUrl}
-            width={28}
-            height={28}
-            alt="group icon"
-            className="rounded-full"
-          />
-          <h6>{props.groupName}</h6>
-        </div>
-        <h6>{props.lastMessageHour}</h6>
-      </div>
-      <div className="w-full flex items-center gap-1">
-        <Image
-          src={props.lastSpeakerImageUrl}
-          width={32}
-          height={32}
-          alt="speaker icon"
-          className="rounded-full"
-        />
-        <h6 className="">{props.lastSpeakerName}: </h6>
-        <h6 className="truncate">{props.lastMessage}</h6>
-      </div>
-    </div>
-  );
-};*/}
+
 
 
 const Discussion = ({ ...props }: Conversation ) => {
@@ -122,3 +96,36 @@ const Discussion = ({ ...props }: Conversation ) => {
     </div>
   );
 };
+
+const GroupDiscussion = ({ ...props }: Group ) => {
+  const { 
+    setActiveConversation,  
+  } = useMessageStore();
+  
+  return (
+    <div className="flex flex-col gap-3 hover:bg-[#ffffffd4] p-2 rounded-[8px]" onClick={() => {
+      setActiveConversation({
+        id: props.id,
+        //name: props.nom,
+        description: props.description,
+        members: props.membres,
+      })
+    }}>
+      <div className="w-full flex justify-between items-center ">
+        <div className="flex w-2/3 gap-2 items-center">
+          <Image
+            src={props.groupImage || "/group-img.png"}
+            width={28}
+            height={28}
+            alt="group icon"
+            className="rounded-full"
+          />
+          <h6 className="gap-2 truncate">{props.groupName || "Group Name"}</h6>
+        </div>
+        <h6 className="w-[33px] truncate"></h6>
+      </div>
+      <p className="w-full truncate"></p>
+    </div>
+  );
+};
+

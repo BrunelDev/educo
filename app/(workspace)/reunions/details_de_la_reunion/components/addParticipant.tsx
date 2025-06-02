@@ -73,7 +73,6 @@ export default function AddMemberDialog({
                   <div className="flex gap-3">
                     <div className="h-[28px] w-[28px] flex items-center justify-center border border-dashed rounded-full">
                       <Image
-                        unoptimized
                         src={"/user-icon.svg"}
                         width={16}
                         height={19}

@@ -38,55 +38,54 @@ export default function Consultation() {
     {
       title: "Règlement intérieur",
       barNumber: 1,
-    },{
+    },
+    {
       title: "Accord collectif",
       barNumber: 1,
-    },{
+    },
+    {
       title: "Activité partielle (chômage partiel)",
       barNumber: 1,
-    },{
+    },
+    {
       title: "Déménagement ou réorganisation de site",
       barNumber: 1,
-    },{
+    },
+    {
       title: "Risques professionnels / santé / sécurité",
       barNumber: 1,
     },
-    
-    
-    
-    
   ];
-  const defaultConsultation: ConsultationDialogProps =  {
+  const defaultConsultation: ConsultationDialogProps = {
     consultationType: ConsultationType.Accord,
-  description:
-    `🟢 Comment ça se passe ?
+    description: `
 Cette réunion a lieu une fois par an. L’employeur présente la vision stratégique de l’entreprise à moyen terme (généralement sur 3 ans). Le CSE rend un avis consultatif, même s’il n’a pas de pouvoir de blocage.
 `,
-  process: [
-    `📌 Enjeux pour les élus
+    process: [
+      `📌 Enjeux pour les élus
 - Anticiper les conséquences sur l’emploi, les métiers, les implantations.
 - Comprendre les risques liés à l’automatisation, à la réorganisation ou à la stratégie de croissance.
 - Proposer des mesures d’accompagnement ou de formation.`,
-`📄 Documents à demander à l’employeur
+      `📄 Documents à demander à l’employeur
 - Plan stratégique (présentation ou rapport).
 - Projets d’investissement, de réorganisation, d’innovation.
 - Données économiques, prévisions d’emploi, politique RH.
-`, `
+`,
+      `
 🧠 Attitude à adopter
 - Lire les documents en amont, préparer des questions.
 - Demander une expertise si nécessaire (art. L2315-87).
 - Donner un avis écrit, même critique.`,
-`🧩 Bonnes pratiques
+      `🧩 Bonnes pratiques
 ✔ Anticipez la réunion en demandant les documents.
 ✔ Préparez une position commune.
-✔ Comparez les annonces aux réalités du terrain.`
-  ],
+✔ Comparez les annonces aux réalités du terrain.`,
+    ],
   };
-  const consultationList : ConsultationDialogProps[] = [
+  const consultationList: ConsultationDialogProps[] = [
     {
       consultationType: ConsultationType.Orientation, // Changed from Accord to Orientation for the first example, assuming it was a placeholder
-      description:
-        `🟢 Comment ça se passe ?
+      description: `
 Cette réunion a lieu une fois par an. L’employeur présente la vision stratégique de l’entreprise à moyen terme (généralement sur 3 ans). Le CSE rend un avis consultatif, même s’il n’a pas de pouvoir de blocage.
 `,
       process: [
@@ -98,7 +97,7 @@ Cette réunion a lieu une fois par an. L’employeur présente la vision straté
 - Plan stratégique (présentation ou rapport).
 - Projets d’investissement, de réorganisation, d’innovation.
 - Données économiques, prévisions d’emploi, politique RH.
-`, 
+`,
         `
 🧠 Attitude à adopter
 - Lire les documents en amont, préparer des questions.
@@ -107,13 +106,13 @@ Cette réunion a lieu une fois par an. L’employeur présente la vision straté
         `🧩 Bonnes pratiques
 ✔ Anticipez la réunion en demandant les documents.
 ✔ Préparez une position commune.
-✔ Comparez les annonces aux réalités du terrain.`
+✔ Comparez les annonces aux réalités du terrain.`,
       ],
     },
     {
       consultationType: ConsultationType.Situation,
       description: `📊 Réunion sur la situation économique et financière
-🟢 Comment ça se passe ?
+
 Réunion annuelle pour examiner les comptes, résultats et perspectives économiques. Elle permet aux élus de comprendre la santé de l’entreprise.`,
       process: [
         `📌 Enjeux pour les élus
@@ -131,13 +130,13 @@ Réunion annuelle pour examiner les comptes, résultats et perspectives économi
         `🧩 Bonnes pratiques
 ✔ Demander les documents 8 jours avant.
 ✔ S'appuyer sur un expert-comptable si besoin.
-✔ Proposer des alternatives.`
+✔ Proposer des alternatives.`,
       ],
     },
     {
       consultationType: ConsultationType.Politique,
       description: `👥 Réunion sur la politique sociale, l’emploi et les conditions de travail
-🟢 Comment ça se passe ?
+
 Réunion annuelle pour faire le point sur les pratiques RH. L’objectif est de détecter les difficultés et faire avancer les droits sociaux.`,
       process: [
         `📌 Enjeux pour les élus
@@ -155,13 +154,13 @@ Réunion annuelle pour faire le point sur les pratiques RH. L’objectif est de 
         `🧩 Bonnes pratiques
 ✔ Organiser une relecture à plusieurs élus.
 ✔ Proposer des priorités d’action.
-✔ Ne pas hésiter à relancer l’employeur après la réunion.`
+✔ Ne pas hésiter à relancer l’employeur après la réunion.`,
       ],
     },
     {
       consultationType: ConsultationType.Introduction,
       description: `🖥 Introduction de nouvelles technologies
-🟢 Comment ça se passe ?
+
 Le CSE doit être consulté avant toute mise en place de nouvelles technologies (logiciels, machines, IA, etc.).`,
       process: [
         `📌 Enjeux pour les élus
@@ -178,13 +177,13 @@ Le CSE doit être consulté avant toute mise en place de nouvelles technologies 
         `🧩 Bonnes pratiques
 ✔ Rappeler que la consultation est obligatoire.
 ✔ Vérifier que la formation est prévue.
-✔ Proposer une évaluation post-déploiement.`
+✔ Proposer une évaluation post-déploiement.`,
       ],
     },
     {
       consultationType: ConsultationType.Modification,
       description: `🔄 Modification des conditions de travail
-🟢 Comment ça se passe ?
+
 Toute modification importante (horaires, lieu, organisation) impose une consultation du CSE.`,
       process: [
         `📌 Enjeux pour les élus
@@ -201,13 +200,13 @@ Toute modification importante (horaires, lieu, organisation) impose une consulta
         `🧩 Bonnes pratiques
 ✔ Faire des visites terrain si besoin.
 ✔ Prévoir une période d’expérimentation.
-✔ Être vigilant sur les horaires et amplitudes.`
+✔ Être vigilant sur les horaires et amplitudes.`,
       ],
     },
     {
       consultationType: ConsultationType.Fusion,
       description: `🔗 Fusions, cessions, acquisitions
-🟢 Comment ça se passe ?
+
 Le CSE doit être informé et consulté avant toute opération de ce type.`,
       process: [
         `📌 Enjeux pour les élus
@@ -224,13 +223,13 @@ Le CSE doit être informé et consulté avant toute opération de ce type.`,
         `🧩 Bonnes pratiques
 ✔ Demander des garanties écrites.
 ✔ S’informer sur l’entreprise repreneuse.
-✔ Mobiliser les salariés si besoin.`
+✔ Mobiliser les salariés si besoin.`,
       ],
     },
     {
       consultationType: ConsultationType.Accord, // Mapping PSE to Accord as per enum
       description: `🚨 Plan de sauvegarde de l’emploi (PSE)
-🟢 Comment ça se passe ?
+
 Quand un licenciement économique collectif est prévu, l’employeur doit consulter le CSE.`,
       process: [
         `📌 Enjeux pour les élus
@@ -247,13 +246,13 @@ Quand un licenciement économique collectif est prévu, l’employeur doit consu
         `🧩 Bonnes pratiques
 ✔ Suivre un calendrier précis.
 ✔ Impliquer les salariés dans la défense de leurs postes.
-✔ Exiger des comptes-rendus réguliers.`
+✔ Exiger des comptes-rendus réguliers.`,
       ],
     },
     {
       consultationType: ConsultationType.ReglementInterieur,
       description: `📜 Règlement intérieur
-🟢 Comment ça se passe ?
+
 Avant toute création ou modification du règlement, le CSE doit être consulté.`,
       process: [
         `📌 Enjeux pour les élus
@@ -268,13 +267,13 @@ Avant toute création ou modification du règlement, le CSE doit être consulté
 - S’opposer aux clauses abusives.`,
         `🧩 Bonnes pratiques
 ✔ Proposer des formulations alternatives.
-✔ Vérifier la cohérence avec les usages de l’entreprise.`
+✔ Vérifier la cohérence avec les usages de l’entreprise.`,
       ],
     },
     {
       consultationType: ConsultationType.Accord, // Mapping Accord collectif to Accord
       description: `🤝 Accord collectif (temps de travail, égalité…)
-🟢 Comment ça se passe ?
+
 Le CSE est informé ou consulté sur certains accords selon leur nature.`,
       process: [
         `📌 Enjeux pour les élus
@@ -290,13 +289,13 @@ Le CSE est informé ou consulté sur certains accords selon leur nature.`,
 - Rédiger un avis argumenté.`,
         `🧩 Bonnes pratiques
 ✔ Comparer avec l’accord précédent.
-✔ Échanger avec les salariés concernés.`
+✔ Échanger avec les salariés concernés.`,
       ],
     },
     {
       consultationType: ConsultationType.ActivitePartielle,
       description: `⏳ Activité partielle (chômage partiel)
-🟢 Comment ça se passe ?
+
 Avant toute demande d’activité partielle, l’employeur doit consulter le CSE.`,
       process: [
         `📌 Enjeux pour les élus
@@ -313,13 +312,13 @@ Avant toute demande d’activité partielle, l’employeur doit consulter le CSE
 - Proposer des solutions alternatives.`,
         `🧩 Bonnes pratiques
 ✔ S’assurer que tous les services sont traités équitablement.
-✔ Veiller à la durée et aux conditions de reprise.`
+✔ Veiller à la durée et aux conditions de reprise.`,
       ],
     },
     {
-      consultationType: ConsultationType.DemarchementReorganisationSite,
+      consultationType: ConsultationType.DemenagementReorganisationSite,
       description: `📦 Déménagement ou réorganisation de site
-🟢 Comment ça se passe ?
+
 Tout projet ayant un impact sur l’organisation du travail nécessite une consultation.`,
       process: [
         `📌 Enjeux pour les élus
@@ -335,13 +334,13 @@ Tout projet ayant un impact sur l’organisation du travail nécessite une consu
 - Proposer une phase test.`,
         `🧩 Bonnes pratiques
 ✔ Vérifier les mesures de transition.
-✔ Suivre les conditions réelles post-changement.`
+✔ Suivre les conditions réelles post-changement.`,
       ],
     },
     {
       consultationType: ConsultationType.RisquesProfessionnels,
       description: `⚠️ Risques professionnels / santé / sécurité
-🟢 Comment ça se passe ?
+
 Le CSE est systématiquement consulté sur les mesures liées à la sécurité, au DUERP, et à la prévention.`,
       process: [
         `📌 Enjeux pour les élus
@@ -356,10 +355,10 @@ Le CSE est systématiquement consulté sur les mesures liées à la sécurité, 
 - Alerter si besoin.`,
         `🧩 Bonnes pratiques
 ✔ Impliquer les salariés dans les retours terrain.
-✔ Vérifier la mise en œuvre réelle des mesures.`
+✔ Vérifier la mise en œuvre réelle des mesures.`,
       ],
-    }
-  ]
+    },
+  ];
 
   return (
     <div className="relative">
@@ -367,9 +366,9 @@ Le CSE est systématiquement consulté sur les mesures liées à la sécurité, 
       <div className="flex flex-wrap gap-2 mb-8">
         {consultationTiltes.map((consultationTitle, index) => (
           <DialogComponent
-          className={
-            "sm:max-w-[980px] flex items-center justify-center py-10 px-20"
-          }
+            className={
+              "sm:max-w-[980px] flex items-center justify-center py-10 px-20"
+            }
             key={consultationTitle.title + index}
             dialoTrigger={
               <ConsultationTitle
@@ -377,7 +376,11 @@ Le CSE est systématiquement consulté sur les mesures liées à la sécurité, 
                 barNumber={consultationTitle.barNumber}
               />
             }
-            dialogContent={<ConsultationDialogContent consultation={consultationList[index]} />}
+            dialogContent={
+              <ConsultationDialogContent
+                consultation={consultationList[index]}
+              />
+            }
             dialogTitle={null}
           />
         ))}

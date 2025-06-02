@@ -1,7 +1,7 @@
 import WebinarCard from "./webinarCard";
 import { useEffect, useState } from "react";
 import { getWebinaires, Webinaire } from "@/lib/api/formations";
-
+import EmptyState from "@/app/_components/EmptyState";
 export default function WebinarContent() {
   const [allWebinars, setAllWebinars] = useState<Webinaire[]>([]);
   const [upcomingWebinars, setUpcomingWebinars] = useState<Webinaire[]>([]);
@@ -54,12 +54,16 @@ export default function WebinarContent() {
     return <p className="text-center py-10 text-red-500">{error}</p>;
   }
 
+  if (allWebinars.length === 0) {
+    return <EmptyState title="Aucun webinar trouvé" description="" />;
+  }
+
   return (
     <div className="flex flex-col gap-10">
       <section>
         <h2 className="text-2xl font-semibold mb-6">Prochains Webinaires</h2>
         {upcomingWebinars.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="flex flex-wrap gap-4">
             {upcomingWebinars.map((webinar) => (
               <WebinarCard key={webinar.id} webinar={webinar} />
             ))}

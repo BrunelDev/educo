@@ -13,9 +13,12 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { getOrganisationMembers, OrganizationMember } from "@/lib/api/organisation";
+import { createGroup } from "@/lib/api/messagerie";
 import { toast } from "sonner";
 import Image from "next/image";
 
@@ -25,6 +28,8 @@ interface CreateGroupFormProps {
 }
 
 const formSchema = z.object({
+  nom: z.string().min(1, { message: "Le nom du groupe est requis." }),
+  description: z.string().optional(),
   selectedMemberIds: z.array(z.number()).min(1, { message: "Veuillez sélectionner au moins un membre." }),
 });
 
@@ -36,6 +41,8 @@ export default function CreateGroupForm({ onGroupCreated, currentUserId }: Creat
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      nom: "",
+      description: "",
       selectedMemberIds: [],
     },
   });
@@ -60,18 +67,54 @@ export default function CreateGroupForm({ onGroupCreated, currentUserId }: Creat
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
-    console.log("Selected members for new group:", values.selectedMemberIds);
-    // Simulate API call for createMessageGroup
-    // await createMessageGroup(values.selectedMemberIds);
-    toast.success(`Groupe créé avec ${values.selectedMemberIds.length} membre(s).`);
-    setIsLoading(false);
-    onGroupCreated(); // Close the dialog
-    form.reset(); // Reset form for next time
+    try {
+      const payload = {
+        nom: values.nom,
+        description: values.description || undefined, // Send undefined if empty, so API can use default or ignore
+        membres: values.selectedMemberIds,
+      };
+      const newGroup = await createGroup(payload);
+      toast.success(`Groupe "${newGroup.nom}" créé avec succès !`);
+      onGroupCreated(); // Close the dialog and potentially refresh group list
+      form.reset(); 
+    } catch (error) {
+      console.error("Error creating group:", error);
+      toast.error(error instanceof Error ? error.message : "Échec de la création du groupe.");
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <FormField
+            control={form.control}
+            name="nom"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Nom du groupe</FormLabel>
+                <FormControl>
+                  <Input placeholder="Ex: Équipe Marketing" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Description (Optionnel)</FormLabel>
+                <FormControl>
+                  <Textarea placeholder="Ex: Discussions sur les campagnes à venir" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         <FormField
           control={form.control}
           name="selectedMemberIds"
