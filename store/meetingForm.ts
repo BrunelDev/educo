@@ -6,7 +6,7 @@ export interface MeetingFormState {
   type_reunion: MeetingType;
   titre: string;
   objet: string;
-  emplacement: string;
+  emplacement: string[];
   lien_reunion?: string;
 
   // Step 2 - Schedule
@@ -19,11 +19,7 @@ export interface MeetingFormState {
   }>;
 
   // Step 3 - Participants
-  participants: Array<{
-    utilisateur: number;
-    est_hote: boolean;
-    statut_invitation: "EN_ATTENTE" | "ACCEPTE" | "REFUSE" | null;
-  }>;
+  participants: string[];
 
   // Step 4 - Agenda
   ordre_du_jour: Array<{
@@ -36,7 +32,7 @@ export interface MeetingFormState {
       type_reunion: MeetingType;
       titre: string;
       objet: string;
-      emplacement: string;
+      emplacement: string[];
       lien_reunion: string;
     }>
   ) => void;
@@ -53,13 +49,7 @@ export interface MeetingFormState {
     }>
   ) => void;
 
-  updateStep3: (
-    participants: Array<{
-      utilisateur: number;
-      est_hote: boolean;
-      statut_invitation: "EN_ATTENTE" | "ACCEPTE" | "REFUSE" | null;
-    }>
-  ) => void;
+  updateStep3: (participants: string[]) => void;
 
   updateStep4: (ordre_du_jour: Array<{ description: string }>) => void;
 
@@ -70,7 +60,7 @@ const initialState = {
   type_reunion: MeetingType.Ordinary,
   titre: "",
   objet: "",
-  emplacement: "",
+  emplacement: [],
   lien_reunion: "",
   date_heure: "",
   frequence: "",
@@ -97,7 +87,7 @@ export const useMeetingForm = create<MeetingFormState>((set) => ({
   updateStep3: (participants) =>
     set((state) => ({
       ...state,
-      participants,
+      participants: participants.map((p) => p),
     })),
 
   updateStep4: (ordre_du_jour) =>

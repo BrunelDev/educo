@@ -18,8 +18,8 @@ export default function LoginPage() {
         <Image
           width={366}
           height={366}
-          src="/ellipse16.svg"
-          alt="ellipse"
+          src="/logo.svg"
+          alt="impact cse"
           className="self-center"
         />
       </div>

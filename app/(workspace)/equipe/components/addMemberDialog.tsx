@@ -87,7 +87,7 @@ export default function AddMemberDialog({ teamId }: { teamId?: number }) {
                   </div>
                 </div>
               ))
-            : null}
+            : <h6 className="font-medium text-[10px]">Aucun membre</h6>}
         </ScrollArea>
       </div>
     </div>

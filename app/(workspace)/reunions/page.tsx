@@ -1,16 +1,12 @@
 "use client";
 import { DialogComponent } from "@/app/_components/dialogComponent";
 import { Button } from "@/components/ui/button";
-import { getOrganization } from "@/lib/api/organisation";
 import { getMeetings } from "@/lib/api/reunion";
 import { Meeting, MeetingType } from "@/lib/types";
 import { useMeetingStore } from "@/store/meetings";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { toast } from "sonner";
 import CreateMeeting from "./components/createMeeting";
 import MeetingCard from "./components/meetingCard";
-import { AxiosError } from "axios";
 import EmptyState from "@/app/_components/EmptyState";
 
 export default function Reunions() {
@@ -77,26 +73,7 @@ export default function Reunions() {
     fetchMeetings();
   }, [setMeetings]);
 
-  const router = useRouter();
-
-  useEffect(() => {
-
-    const getOrg = async () => {
-      try {
-        await getOrganization();
-        
-      } catch (error : unknown) {
-      if (error instanceof AxiosError) {
-        toast.error("Vous devez d'abord créer une organisation");
-        router.push("/equipe");
-      }
-        
-      }
-      
-      
-    };
-    getOrg();
-  }, [router]);
+ 
 
   return (
     <div className="flex flex-col gap-5 relative">

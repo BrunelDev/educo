@@ -7,61 +7,73 @@ import { useState } from "react";
 import { Popover } from "../../components/popover";
 import Image from "next/image";
 
-
-export default function FolderCard({ folder, fetchDossiers }: {folder :Dossier, fetchDossiers : ()=>Promise<void>}) {
-  
-  if(folder.type_dossier === "DEFAULT") return (
-    <Link href={`/fichiers/dossiers/${folder.id}`}>
-    <div className="w-[186px] flex flex-col gap-2 justify-center items-center group hover:bg-[#ffffffb7] duration-200 rounded-[8px] relative">
-
-      <Image
-        src={"/folder-icon.svg"}
-        width={100}
-        height={100}
-        alt="document icon"
-      />
-       <h6 className="text-center">{folder.nom}</h6>
-      
-      </div></Link>
-      
-     
-  );
-  else { return (
-    <div className="flex items-center justify-between p-3 bg-white rounded-lg hover:bg-gray-50 w-[237px] h-12">
-      <Link
-        href={`/fichiers/dossiers/${folder.id}`}
-        className="flex items-center gap-3 w-[90%]"
-      >
-        <FolderClosed />
-        <h6 className="text-sm truncate w-full">{folder.nom}</h6>
+export default function FolderCard({
+  folder,
+  fetchDossiers,
+}: {
+  folder: Dossier;
+  fetchDossiers: () => void;
+}) {
+  if (folder.type_dossier === "DEFAULT")
+    return (
+      <Link href={`/fichiers/dossiers/${folder.id}`}>
+        <div className="w-[186px] flex flex-col gap-2 justify-center items-center group hover:bg-[#ffffffb7] duration-200 rounded-[8px] relative">
+          <Image
+            src={"/folder-icon.svg"}
+            width={100}
+            height={100}
+            alt="document icon"
+          />
+          <h6 className="text-center">{folder.nom}</h6>
+        </div>
       </Link>
-      <Popover
-        PopoverContent={<PopoverContent folder={folder} fetchDossiers={fetchDossiers} />}
-        PopoverTrigger={
-          <div className="w-6 h-6 justify-center items-center rounded-sm cursor-pointer flex hover:bg-coral-50  duration-200">
-            <MoreVertical className="" size={18} />
-          </div>
-        }
-      />
-    </div>
-  );}
+    );
+  else {
+    return (
+      <div className="flex items-center justify-between p-3 bg-white rounded-lg hover:bg-gray-50 w-[237px] h-12">
+        <Link
+          href={`/fichiers/dossiers/${folder.id}`}
+          className="flex items-center gap-3 w-[90%]"
+        >
+          <FolderClosed />
+          <h6 className="text-sm truncate w-full">{folder.nom}</h6>
+        </Link>
+        <Popover
+          PopoverContent={
+            <PopoverContent folder={folder} fetchDossiers={fetchDossiers} />
+          }
+          PopoverTrigger={
+            <div className="w-6 h-6 justify-center items-center rounded-sm cursor-pointer flex hover:bg-coral-50  duration-200">
+              <MoreVertical className="" size={18} />
+            </div>
+          }
+        />
+      </div>
+    );
+  }
 }
 
-const PopoverContent = ({ folder, fetchDossiers }: {folder :Dossier, fetchDossiers : ()=>Promise<void>}) => {
-
+const PopoverContent = ({
+  folder,
+  fetchDossiers,
+}: {
+  folder: Dossier;
+  fetchDossiers: () => void;
+}) => {
   const removeFolder = useFolderStore((state) => state.removeFolder);
 
   const deleteFolder = async () => {
     try {
       await deleteDossier(folder.id);
       removeFolder(folder.id);
-      fetchDossiers()
+      fetchDossiers();
     } catch (error: unknown) {
       console.error("Error deleting folder", error);
       // You might want to add toast notification here
     }
   };
   const [updatedName, setUpdatedName] = useState(folder.nom);
+  const [open, setOpen] = useState(false)
 
   return (
     <div className="py-2 px-1 text-sm w-[125px] flex flex-col gap-[6px]">
@@ -79,10 +91,12 @@ const PopoverContent = ({ folder, fetchDossiers }: {folder :Dossier, fetchDossie
       >
         <FilePenLine size={18} />
         <Popover
+        open={open}
+        onOpenChange={setOpen}
           PopoverContent={
             <div>
               <Input
-                placeholder="Nom du fichier"
+                placeholder="Nom du dossier"
                 value={updatedName}
                 onChange={(e) => {
                   setUpdatedName(e.target.value);
@@ -91,14 +105,9 @@ const PopoverContent = ({ folder, fetchDossiers }: {folder :Dossier, fetchDossie
                   if (e.key === "Enter") {
                     console.log("Key Enter down");
                     try {
-                      editDossier(
-                        folder.id,
-                        updatedName
-                      );
-                      setUpdatedName("");
-                      
-                      window.location.reload()
-                      //router.refresh();
+                      editDossier(folder.id, updatedName);
+                      fetchDossiers();
+                      setOpen(false)
                     } catch (error) {
                       console.error("Error editing folder", error);
                     }
@@ -113,9 +122,8 @@ const PopoverContent = ({ folder, fetchDossiers }: {folder :Dossier, fetchDossie
       <div
         className="hover:bg-gray-100 cursor-pointer rounded-[4px] px-2 flex items-center justify-around py-1 text-red-600"
         onClick={() => {
-          deleteFolder()
-        }
-        }
+          deleteFolder();
+        }}
       >
         <Trash2 size={18} />
         <h6>Supprimer</h6>

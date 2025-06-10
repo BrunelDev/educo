@@ -5,12 +5,13 @@ interface FileStore {
   filesList: {
     file: File;
     fileUrl: string;
+    name: string;
   }[];
   isLoading: boolean;
   error: string | null;
 
   // File Actions
-  addFileWithUrl: (file: File, url: string) => void;
+  addFileWithUrl: (file: File, url: string, name: string) => void;
   removeFileWithUrl: (file: File) => void;
   clearFilesAndUrls: () => void;
   setLoading: (status: boolean) => void;
@@ -24,9 +25,9 @@ export const useFileStore = create<FileStore>((set) => ({
   error: null,
 
   // Actions
-  addFileWithUrl: (file, url) =>
+  addFileWithUrl: (file, url, name) =>
     set((state) => ({
-      filesList: [...state.filesList, { file, fileUrl: url }],
+      filesList: [...state.filesList, { file, fileUrl: url, name }],
       error: null,
     })),
 

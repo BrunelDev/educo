@@ -146,3 +146,36 @@ export const addDocument = async (
     throw error;
   }
 };
+
+export const removeDocumentFromMeeting = async (
+  document_id: number
+): Promise<DocumentResponse> => {
+  try {
+    const response = await api.delete<DocumentResponse>(
+      `reunion/documents/${document_id}/`
+      
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error removing document from meeting:", error);
+    throw error;
+  }
+};
+
+export const addMemberToMeeting = async (
+  meeting_id: number,
+  user_id: number[]
+): Promise<Meeting  > => {
+  try {
+    const response = await api.post<Meeting>(
+      `reunion/reunions/${meeting_id}/participants/`,
+      {
+        participants: user_id,
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error adding member to meeting:", error);
+    throw error;
+  }
+};

@@ -78,11 +78,11 @@ export function LoginForm() {
     } catch (err: unknown) {
       if (err instanceof Error) {
         // Assuming login function throws error with a message for incorrect credentials
-        toast.error(err.message || "Mot de passe ou email incorrect"); 
+        toast.error(err.message || "Mot de passe ou email incorrect");
       } else {
         toast.error("Une erreur est survenue lors de la connexion");
       }
-      console.error("Login error:", err); 
+      console.error("Login error:", err);
     } finally {
       setIsLoading(false);
     }
@@ -132,6 +132,12 @@ export function LoginForm() {
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
+            <a
+              href="/motDePasseOublie"
+              className="ml-auto text-sm text-coral-500 font-medium underline-offset-4 hover:underline"
+            >
+              Mot de passe oublié ?
+            </a>
           </div>
           <Button
             type="submit"
@@ -164,7 +170,8 @@ export function LoginForm() {
           <DialogHeader>
             <DialogTitle>Ajouter votre organisation</DialogTitle>
             <DialogDescription>
-              Pour accéder à toutes les fonctionnalités, veuillez enregistrer les informations de votre organisation.
+              Pour accéder à toutes les fonctionnalités, veuillez enregistrer
+              les informations de votre organisation.
             </DialogDescription>
           </DialogHeader>
           <AddOrganisationAfterLogin onComplete={handleOrgDialogComplete} />

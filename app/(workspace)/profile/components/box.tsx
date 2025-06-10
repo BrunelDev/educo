@@ -6,12 +6,14 @@ import { Label } from "@/components/ui/label";
 import { getCookies } from "@/lib/utils/cookies";
 import { Lock, Users } from "lucide-react";
 import Image from "next/image";
+import { useState } from "react";
 import { AccessForm } from "./AccessForm";
 import { PasswordForm } from "./passwordForm";
 import { ProfileForm } from "./profileForm";
 
 const userInfo: User = JSON.parse(getCookies("userInfo") || "{}");
 export function FirstBox() {
+  const [isProfileFormOpen, setIsProfileFormOpen] = useState(false);
   return (
     <div className="w-full bg-[#FFFFFF99] rounded-[8px] p-3 sm:p-4 flex flex-col sm:flex-row sm:justify-between gap-4 sm:gap-0">
       <div className="flex gap-3 sm:gap-4 items-center">
@@ -30,9 +32,12 @@ export function FirstBox() {
           <h6 className="text-sm text-gray-600 truncate">{userInfo.email}</h6>
         </div>
       </div>
+      <div>
       <DialogComponent
+        open={isProfileFormOpen}
+        onOpenChange={setIsProfileFormOpen}
         dialoTrigger={
-          <div className="self-start sm:self-center">
+          <div className="self-start sm:self-end">
             <Button className="bg-white-100 hover:bg-white-300 text-white-800 cursor-pointer h-8 text-xs sm:text-sm w-full sm:w-auto">
               Modifier
             </Button>
@@ -41,11 +46,13 @@ export function FirstBox() {
         dialogContent={<ProfileForm />}
         dialogTitle={null}
       />
+      </div>
     </div>
   );
 }
 
 export function SecondBox() {
+  const [isProfileFormOpen, setIsProfileFormOpen] = useState(false);
   return (
     <div className="w-full bg-[#FFFFFF99] rounded-[8px] p-3 sm:p-4 flex flex-col sm:flex-row sm:justify-between gap-4 sm:gap-0 text-sm">
       <div className="flex flex-col gap-4">
@@ -77,7 +84,10 @@ export function SecondBox() {
           </div>
         </div>
       </div>
+      <div>
       <DialogComponent
+        open={isProfileFormOpen}
+        onOpenChange={setIsProfileFormOpen}
         dialoTrigger={
           <div className="self-start sm:self-center">
             <Button className="bg-white-100 hover:bg-white-300 text-white-800 cursor-pointer h-8 text-xs sm:text-sm w-full sm:w-auto">
@@ -88,35 +98,42 @@ export function SecondBox() {
         dialogContent={<ProfileForm />}
         dialogTitle={null}
       />
+      </div>
     </div>
   );
 }
 
 export function ThirdBox() {
+  const [isPasswordFormOpen, setIsPasswordFormOpen] = useState(false);
+  const [isAccessFormOpen, setIsAccessFormOpen] = useState(false);
   return (
     <div className="relative w-full bg-[#FFFFFF99] rounded-[8px] p-3 sm:p-4 flex flex-col gap-4 sm:gap-5">
       <h1 className="text-white-800 font-bold text-[16px] sm:text-[18px]">Sécurité</h1>
       <DialogComponent
+        open={isPasswordFormOpen}
+        onOpenChange={setIsPasswordFormOpen}
         dialoTrigger={
           <div className="bg-white flex items-center gap-2 sm:gap-3 p-3 rounded-[8px] cursor-pointer hover:bg-white-100 transition-colors">
             <Lock size={16} className="text-gray-600" />
             <h6 className="text-sm sm:text-base font-medium">Changer de mot de passe</h6>
           </div>
         }
-        dialogContent={<PasswordForm />}
+        dialogContent={<PasswordForm handleClose={() => setIsPasswordFormOpen(false)} />}
         dialogTitle={null}
       />
 
       <h1 className="text-white-800 font-bold text-[16px] sm:text-[18px] mt-2">Accès</h1>
       <DialogComponent
-      className="sm:max-w-[650px]"
+        open={isAccessFormOpen}
+        onOpenChange={setIsAccessFormOpen}
+        className="sm:max-w-[650px]"
         dialoTrigger={
           <div className="bg-white flex items-center gap-2 sm:gap-3 p-3 rounded-[8px] cursor-pointer hover:bg-white-100 transition-colors">
             <Users size={16} className="text-gray-600" />
             <h6 className="text-sm sm:text-base font-medium">Gérer les accès</h6>
           </div>
         }
-        dialogContent={<AccessForm />}
+        dialogContent={<AccessForm handleClose={() => setIsAccessFormOpen(false)} />}
         dialogTitle={null}
       />
     </div>

@@ -157,7 +157,7 @@ const editorConfig = {
   theme: ExampleTheme,
 };
 
-export default function Editor() {
+export default function Editor({disabled = false}: {disabled?: boolean}) {
   const { updateStep4 } = useMeetingForm();
   const [editorStateJSON, setEditorStateJSON] = useState("");
   
@@ -193,9 +193,11 @@ export default function Editor() {
         <ToolbarPlugin />
         <div className="editor-inner">
           <RichTextPlugin
+          
             contentEditable={
               <ContentEditable
-                className="editor-input w-full h-[300px] border rounded-[8px]"
+              disabled={disabled}
+                className="editor-input w-full h-[300px] border rounded-[8px] pt-4 pl-2"
                 aria-placeholder={placeholder}
                 placeholder={
                   <div className="editor-placeholder">{placeholder}</div>

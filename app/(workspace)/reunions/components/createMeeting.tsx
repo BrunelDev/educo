@@ -86,9 +86,9 @@ export default function CreateMeeting() {
   };
 
   return (
-    <div className="flex flex-col gap-6 py-10 px-20 w-[900px]">
+    <div className="flex flex-col gap-6 py-6 sm:py-8 md:py-10 px-4 sm:px-8 md:px-12 lg:px-20 w-full max-w-[900px] mx-auto">
       <StepProgress steps={steps} />
-      <div>
+      <div className="w-full">
         {currentStep === 1 ? (
           <StepOne errors={form1Error} setErrors={setForm1Error} />
         ) : currentStep === 2 ? (
@@ -100,83 +100,86 @@ export default function CreateMeeting() {
         ) : null}
       </div>
 
-      <div className="flex justify-between gap-4">
-        {currentStep > 1 ? (
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-6">
+        <div className="self-start sm:self-auto">
+          {currentStep > 1 ? (
+            <Button
+              onClick={() => setCurrentStep(Math.max(1, currentStep - 1))}
+              className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300 transition-colors w-full sm:w-auto"
+            >
+              Retour
+            </Button>
+          ) : (
+            <div className="hidden sm:block"></div>
+          )}
+        </div>
+
+        <div className="w-full sm:w-auto flex justify-end">
           <Button
-            onClick={() => setCurrentStep(Math.max(1, currentStep - 1))}
-            className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300 transition-colors"
+            onClick={async () => {
+              if (currentStep === 1) {
+                const isValid = validateStep1(form1Error);
+                if (!isValid) {
+                  toast.error(
+                    "Veuillez remplir tous les champs obligatoires de l'étape 1"
+                  );
+                  return;
+                }
+              } else if (currentStep === 2) {
+                const isValid = validateStep2(form2Error);
+                if (!isValid) {
+                  toast.error(
+                    "Veuillez remplir tous les champs obligatoires de l'étape 2"
+                  );
+                  return;
+                }
+              } else if (currentStep === 3) {
+                if (
+                  !formData.participants ||
+                  formData.participants.length === 0
+                ) {
+                  toast.error(
+                    "Veuillez sélectionner au moins un participant à la réunion"
+                  );
+                  return;
+                }
+              }
+
+              if (currentStep === 4) {
+                try {
+                  toast.loading("Création de la réunion en cours...");
+                  const filesToUpload = filesList.map((item) => item.file);
+                  await handleFileUpload(filesToUpload);
+                  const res = await uploadToS3(
+                    filesList.map((item) => item.file)
+                  );
+                  formData.documents = res.map((item) => ({
+                    fichier: item,
+                    nom_fichier: extractFilenameFromUrl(item),
+                    type_document: "DOCUMENT",
+                  }));
+
+                  await createMeeting(formData);
+                  toast.dismiss();
+                  toast.success("La réunion a été créée avec succès!");
+                  window.location.reload();
+                } catch (error) {
+                  //hide loading toast
+                  toast.dismiss();
+                  toast.error("Erreur lors de la création de la réunion");
+                  console.error("Error creating meeting:", error);
+                  return;
+                }
+                return;
+              }
+
+              setCurrentStep(Math.min(4, currentStep + 1));
+            }}
+            className="px-4 py-2 bg-gradient-to-r from-[#FE6539] to-crimson-400 text-white rounded-md hover:bg-rose-600 transition-colors w-full sm:w-auto"
           >
-            Retour
+            {currentStep === 4 ? "Soumettre" : "Suivant"}
           </Button>
-        ) : (
-          <div></div>
-        )}
-
-        <Button
-          onClick={async () => {
-            if (currentStep === 1) {
-              const isValid = validateStep1(form1Error);
-              if (!isValid) {
-                toast.error(
-                  "Veuillez remplir tous les champs obligatoires de l'étape 1"
-                );
-                return;
-              }
-            } else if (currentStep === 2) {
-              const isValid = validateStep2(form2Error);
-              if (!isValid) {
-                toast.error(
-                  "Veuillez remplir tous les champs obligatoires de l'étape 2"
-                );
-                return;
-              }
-            } else if (currentStep === 3) {
-              if (
-                !formData.participants ||
-                formData.participants.length === 0
-              ) {
-                toast.error(
-                  "Veuillez sélectionner au moins un participant à la réunion"
-                );
-                return;
-              }
-              
-            }
-
-            if (currentStep === 4) {
-              try {
-                toast.loading("Création de la réunion en cours...");
-                const filesToUpload = filesList.map((item) => item.file);
-                await handleFileUpload(filesToUpload);
-                const res = await uploadToS3(
-                  filesList.map((item) => item.file)
-                );
-                formData.documents = res.map((item) => ({
-                  fichier: item,
-                  nom_fichier: extractFilenameFromUrl(item),
-                  type_document: "DOCUMENT",
-                }));
-
-                await createMeeting(formData);
-                toast.dismiss();
-                toast.success("La réunion a été créée avec succès!");
-                window.location.reload();
-              } catch (error) {
-                //hide loading toast
-                toast.dismiss();
-                toast.error("Erreur lors de la création de la réunion");
-                console.error("Error creating meeting:", error);
-                return;
-              }
-              return;
-            }
-
-            setCurrentStep(Math.min(4, currentStep + 1));
-          }}
-          className="px-4 py-2 bg-rose-500 text-white rounded-md hover:bg-rose-600 transition-colors"
-        >
-          {currentStep === 4 ? "Soumettre" : "Suivant"}
-        </Button>
+        </div>
       </div>
     </div>
   );
@@ -189,17 +192,16 @@ const StepOne = ({
   errors: Error1;
   setErrors: (error: Error1) => void;
 }) => {
-  const { type_reunion, titre, objet, emplacement, lien_reunion, updateStep1 } =
+  const { type_reunion, objet, emplacement, lien_reunion, updateStep1 } =
     useMeetingForm();
 
   // Meeting type state
   const [localMeetingType, setLocalMeetingType] =
     useState<MeetingType>(type_reunion);
-  const [localMeetingTitle, setLocalMeetingTitle] = useState<string>(
-    titre || "Réunion ordinaire du CSE"
-  );
+  const [localMeetingTitle, setLocalMeetingTitle] =
+    useState<string>(localMeetingType);
   const [localMeetingPurpose, setLocalMeetingPurpose] = useState<string>(objet);
-  const [localLocation, setLocalLocation] = useState<string>(emplacement);
+  const [localLocation, setLocalLocation] = useState<string[]>(emplacement);
   const [localMeetingLink, setLocalMeetingLink] = useState<string>(
     lien_reunion || ""
   );
@@ -238,8 +240,8 @@ const StepOne = ({
     // Purpose validation
     if (!localMeetingPurpose.trim()) {
       newErrors.purpose = "L'objet est requis";
-    } else if (localMeetingPurpose.length < 10) {
-      newErrors.purpose = "L'objet doit contenir au moins 10 caractères";
+    } else if (localMeetingPurpose.length < 3) {
+      newErrors.purpose = "L'objet doit contenir au moins 3 caractères";
     }
 
     // Location validation
@@ -278,13 +280,16 @@ const StepOne = ({
   // Add this to handle form submission
 
   return (
-    <div className="flex flex-col gap-5">
-      <div className="">
+    <div className="flex flex-col gap-5 w-full">
+      <div className="w-full">
+        <Label className="text-sm font-medium text-gray-700 block mb-2">
+          Type de réunion
+        </Label>
         <RadioGroup
           value={localMeetingType}
           defaultValue={MeetingType.Ordinary}
           onValueChange={(value: MeetingType) => setLocalMeetingType(value)}
-          className="flex flex-row gap-6"
+          className="flex flex-wrap gap-x-6 gap-y-3"
         >
           <div className="flex items-center space-x-2">
             <RadioGroupItem value={MeetingType.Ordinary} id="r1" />
@@ -305,27 +310,31 @@ const StepOne = ({
         </RadioGroup>
       </div>
       {/* Titre de la réunion */}
-      <div className="space-y-2">
-        <label className="text-sm font-medium text-gray-700">
-          Titre de la réunion
-        </label>
-        <select
-          className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 ${
-            errors.title ? "border-red-500" : "border-gray-300"
-          }`}
-          value={localMeetingTitle}
-          onChange={(e) => setLocalMeetingTitle(e.target.value)}
-        >
-          <option>Réunion ordinaire du CSE</option>
-        </select>
-        {errors.title && (
+      <div className="space-y-2 w-full">
+        {localMeetingType === MeetingType.Others && (
+          <>
+            <label className="text-sm font-medium text-gray-700 block mb-1">
+              Titre de la réunion
+            </label>
+            <Input
+              type="text"
+              value={localMeetingTitle}
+              onChange={(e) => setLocalMeetingTitle(e.target.value)}
+              placeholder="Titre de la réunion"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </>
+        )}
+        {errors.title && localMeetingType === MeetingType.Others && (
           <p className="text-red-500 text-sm mt-1">{errors.title}</p>
         )}
       </div>
 
       {/* Objet */}
-      <div className="space-y-2">
-        <label className="text-sm font-medium text-gray-700">Objet</label>
+      <div className="space-y-2 w-full">
+        <label className="text-sm font-medium text-gray-700 block mb-1">
+          Objet
+        </label>
         <Input
           type="text"
           value={localMeetingPurpose}
@@ -340,19 +349,23 @@ const StepOne = ({
         )}
       </div>
       {/* Emplacement */}
-      <div className="space-y-2">
-        <label className="text-sm font-medium text-gray-700">Emplacement</label>
-        <div className="space-y-2">
+      <div className="space-y-2 w-full">
+        <label className="text-sm font-medium text-gray-700 block mb-1">
+          Emplacement
+        </label>
+        <div className="flex flex-wrap gap-4 sm:gap-6 mb-1">
           <label className="flex items-center">
             <Input
               type="checkbox"
               value="PHYSIQUE"
-              checked={localLocation === "PHYSIQUE"}
+              checked={localLocation.includes("PHYSIQUE")}
               onChange={(e) => {
                 if (e.target.checked) {
-                  setLocalLocation("PHYSIQUE");
+                  setLocalLocation((prev) => [...prev, "PHYSIQUE"]);
                 } else {
-                  setLocalLocation("");
+                  setLocalLocation((prev) =>
+                    prev.filter((item) => item !== "PHYSIQUE")
+                  );
                 }
               }}
               className="w-4 h-4 text-blue-600 rounded"
@@ -367,9 +380,11 @@ const StepOne = ({
               checked={localLocation.includes("enligne")}
               onChange={(e) => {
                 if (e.target.checked) {
-                  setLocalLocation("enligne");
+                  setLocalLocation((prev) => [...prev, "enligne"]);
                 } else {
-                  setLocalLocation("");
+                  setLocalLocation((prev) =>
+                    prev.filter((item) => item !== "enligne")
+                  );
                 }
               }}
               className="w-4 h-4 text-blue-600 rounded"
@@ -382,8 +397,8 @@ const StepOne = ({
         )}
       </div>
       {/* Lien de la réunion */}
-      <div className="space-y-2">
-        <label className="text-sm font-medium text-gray-700">
+      <div className="space-y-2 w-full">
+        <label className="text-sm font-medium text-gray-700 block mb-1">
           Lien de la réunion
         </label>
         <Input
@@ -394,6 +409,7 @@ const StepOne = ({
             setLocalMeetingLink(e.target.value);
           }}
           className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+          placeholder="https://meet.google.com/abc-defg-hij"
         />
         {errors.link && (
           <p className="text-red-500 text-sm mt-1">{errors.link}</p>
@@ -457,40 +473,45 @@ const StepTwo = ({
     const newFile = e.target.files[0];
     if (newFile) {
       const url = URL.createObjectURL(newFile);
-      addFileWithUrl(newFile, url);
+      const name = newFile.name;
+      addFileWithUrl(newFile, url, name);
       console.log(url);
     }
   };
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex w-full gap-4 justify-between">
-        <div className="w-1/3">
-          <label className="font-medium text-white-800 text-xs">Date</label>
+    <div className="flex flex-col gap-6 w-full">
+      <div className="flex flex-col sm:flex-row w-full gap-4 justify-between">
+        <div className="w-full sm:w-1/3">
+          <label className="font-medium text-white-800 text-xs block mb-1">
+            Date
+          </label>
           <Input
             type="date"
             value={localDate}
             onChange={(e) => setLocalDate(e.target.value)}
-            className={errors.date ? "border-red-500" : ""}
+            className={`w-full ${errors.date ? "border-red-500" : ""}`}
           />
           {errors.date && (
             <p className="text-red-500 text-sm mt-1">{errors.date}</p>
           )}
         </div>
-        <div className="w-1/3">
-          <label className="font-medium text-white-800 text-xs">Heure</label>
+        <div className="w-full sm:w-1/3">
+          <label className="font-medium text-white-800 text-xs block mb-1">
+            Heure
+          </label>
           <Input
             type="time"
             value={localTime}
             onChange={(e) => setLocalTime(e.target.value)}
-            className={errors.time ? "border-red-500" : ""}
+            className={`w-full ${errors.time ? "border-red-500" : ""}`}
           />
           {errors.time && (
             <p className="text-red-500 text-sm mt-1">{errors.time}</p>
           )}
         </div>
-        <div className="w-1/3">
-          <label className="font-medium text-white-800 text-xs">
+        <div className="w-full sm:w-1/3">
+          <label className="font-medium text-white-800 text-xs block mb-1">
             Fréquence
           </label>
           <Select value={localFrequency} onValueChange={setLocalFrequency}>
@@ -515,8 +536,8 @@ const StepTwo = ({
           )}
         </div>
       </div>
-      <div>
-        <label className="font-medium text-white-800 text-xs">
+      <div className="w-full">
+        <label className="font-medium text-white-800 text-xs block mb-2">
           Pièces jointes
         </label>
         <div className="relative rounded-[8px] overflow-hidden border border-dashed border-white-300">
@@ -528,18 +549,20 @@ const StepTwo = ({
           />
           <div className="absolute top-0 left-0 w-full h-[135px] bg-white-50 flex flex-col gap-2 justify-center items-center pointer-events-none">
             <CirclePlus />
-            <h6>Glissez et déposez ou cliquez ici pour choisir un fichier</h6>
-            <div>Taille maximale 10MB</div>
+            <h6 className="text-sm text-center px-4">
+              Glissez et déposez ou cliquez ici pour choisir un fichier
+            </h6>
+            <div className="text-xs">Taille maximale 10MB</div>
           </div>
         </div>
       </div>
       {filesList.length > 0 ? (
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full">
           {filesList.map((file, index) => (
             <FileComponent
               key={index}
               link={file.fileUrl}
-              fileName={`Fichier ${index}`}
+              fileName={file.name}
               handleRemove={() => {
                 removeFileWithUrl(file.file);
                 URL.revokeObjectURL(file.fileUrl);
@@ -554,31 +577,19 @@ const StepTwo = ({
 
 const StepThree = () => {
   const { participants, updateStep3 } = useMeetingForm();
-  const [localParticipants, setLocalParticipants] = useState<
-    {
-      utilisateur: number;
-      est_hote: boolean;
-      statut_invitation: "EN_ATTENTE" | "ACCEPTE" | "REFUSE" | null;
-    }[]
-  >(participants);
+  const [localParticipants, setLocalParticipants] =
+    useState<string[]>(participants);
 
-  const handleParticipantChange = (userId: number, checked: boolean) => {
+  const handleParticipantChange = (userEmail: string, checked: boolean) => {
     setLocalParticipants((prev) => {
       if (checked) {
         // Add participant if not already in the list
-        if (!prev.some((p) => p.utilisateur === userId)) {
-          return [
-            ...prev,
-            {
-              utilisateur: userId,
-              est_hote: false,
-              statut_invitation: "EN_ATTENTE",
-            },
-          ];
+        if (!prev.some((p) => p === userEmail)) {
+          return [...prev, userEmail];
         }
       } else {
         // Remove participant if unchecked
-        return prev.filter((p) => p.utilisateur !== userId);
+        return prev.filter((p) => p !== userEmail);
       }
       return prev;
     });
@@ -606,51 +617,107 @@ const StepThree = () => {
     };
     fun();
   }, []);
+  const [localEmail, setLocalEmail] = useState<string>("");
 
   return (
-    <div className="flex flex-col gap-4 rounded-[12px] py-10 px-20 w-full">
-      <div className=" flex gap-2 items-center">
-        <Input
-          type="email"
-          placeholder="Invitez des gens par nom ou par email"
-        />
+    <div className="flex flex-col gap-4 rounded-[12px] py-5 sm:py-8 md:py-10 px-4 sm:px-8 md:px-16 lg:px-20 w-full">
+      <div className="flex flex-col sm:flex-row gap-2 sm:items-end w-full">
+        <div className="relative w-full">
+          <Label
+            htmlFor="membres_cse_invites"
+            className="font-medium text-white-800 text-xs mb-2 block"
+          >
+            Invitez des gens à votre réunion (emails séparés par virgule)
+          </Label>
+          <Input
+            value={localEmail}
+            onChange={(e) => {
+              setLocalEmail(e.target.value);
+            }}
+            id="membres_cse_invites"
+            name="membres_cse_invites"
+            type="email"
+            placeholder="invite1@gmail.com, invite2@gmail.com"
+            className="w-full"
+          />
+        </div>
+
         <Button
           variant="default"
-          className="rounded-[8px] bg-gradient-to-r from-[#FE6539] to-crimson-400"
+          className="rounded-[8px] bg-gradient-to-r from-[#FE6539] to-crimson-400 mt-2 sm:mt-0 whitespace-nowrap"
+          onClick={() => {
+            const tempEmail: string = localEmail.replace(" ", "");
+            const emails = tempEmail.split(",");
+            emails.forEach((email) => {
+              email.trim();
+            });
+            const validEmails = emails.filter((email) => {
+              const emailRegex =
+                /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+              return emailRegex.test(email);
+            });
+            if (validEmails.length < emails.length) {
+              toast.error(
+                "Veuillez entrer des adresses email valides et les séparés d'une virgule"
+              );
+              return;
+            }
+
+            validEmails.forEach((email) => {
+              setLocalParticipants((prev) => {
+                if (!prev.some((p) => p === email)) {
+                  return [...prev, email];
+                }
+                return prev;
+              });
+            });
+            console.log(validEmails);
+            setLocalEmail("");
+            toast.success(
+              "Des messages d'invitations seront envoyés à ces adresses une fois la réunion créée"
+            );
+          }}
         >
           Inviter
         </Button>
       </div>
-      <div>
-        <h6 className="font-medium text-[10px]">Qui a accès ?</h6>
-        <div className=" mt-3 flex flex-col gap-3">
-          {users.map((user, index) => (
-            <div key={index} className="flex justify-between">
-              <div className="flex gap-3">
-                <div className="h-[28px] w-[28px] flex items-center justify-center border border-dashed rounded-full">
-                  <Image
-                    src={"user-icon.svg"}
-                    width={16}
-                    height={19}
-                    alt="user icon"
+      <div className="w-full">
+        <h6 className="font-medium text-[10px] mb-2">Qui a accès ?</h6>
+        {users.length === 0 ? (
+          <p>Aucun membre appartenant à votre organisation trouvé</p>
+        ) : (
+          <div className="mt-3 flex flex-col gap-3">
+            {users.map((user, index) => (
+              <div
+                key={index}
+                className="flex justify-between items-center flex-wrap sm:flex-nowrap p-1 hover:bg-gray-50 rounded"
+              >
+                <div className="flex gap-3 items-center mb-1 sm:mb-0">
+                  <div className="h-[28px] w-[28px] flex items-center justify-center border border-dashed rounded-full flex-shrink-0">
+                    <Image
+                      src={"user-icon.svg"}
+                      width={16}
+                      height={19}
+                      alt="user icon"
+                    />
+                  </div>
+
+                  <span className="text-sm truncate max-w-[240px] sm:max-w-xs">
+                    {user.email}
+                  </span>
+                </div>
+                <div className="h-5 w-5 rounded-sm flex justify-center items-center hover:bg-coral-50 cursor-pointer">
+                  <Checkbox
+                    checked={localParticipants.some((p) => p === user.email)}
+                    onCheckedChange={(checked) =>
+                      handleParticipantChange(user.email, checked as boolean)
+                    }
                   />
                 </div>
-
-                {user.email}
               </div>
-              <div className="h-5 w-5 rounded-sm flex justify-center items-center hover:bg-coral-50 cursor-pointer">
-                <Checkbox
-                  checked={localParticipants.some(
-                    (p) => p.utilisateur === user.id
-                  )}
-                  onCheckedChange={(checked) =>
-                    handleParticipantChange(user.id, checked as boolean)
-                  }
-                />
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -658,7 +725,8 @@ const StepThree = () => {
 
 const StepFour = () => {
   return (
-    <div className="w-full">
+    <div className="w-full px-4 sm:px-0">
+      <h6 className="font-medium text-gray-700 text-sm mb-3">Ordre du jour</h6>
       <Editor />
     </div>
   );

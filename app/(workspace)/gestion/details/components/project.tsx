@@ -11,14 +11,17 @@ export default function TaskCard({
   description,
   id,
   participant,
+  onTaskUpdate,
 }: {
   title: string;
   description: string;
   id: number;
   participant: TaskUser[];
+  onTaskUpdate: () => void;
 }) {
   const router = useRouter();
   const pathname = usePathname();
+  const [open, setOpen] = useState(false);
   return (
     <div
       className="py-2 px-3 rounded-[8px] flex flex-col gap-3 bg-[#FFFFFF99] cursor-pointer hover:bg-gray-100"
@@ -29,8 +32,12 @@ export default function TaskCard({
 
         <div onClick={(e) => e.stopPropagation()}>
           <Popover
+            open={open}
+            onOpenChange={setOpen}
             PopoverTrigger={<Ellipsis />}
-            PopoverContent={<PopoverContent taskId={id} taskTitle={title} />}
+            PopoverContent={<PopoverContent taskId={id} taskTitle={title} onSubmit={() => {onTaskUpdate()
+              setOpen(false)
+            }}/>}
           />
         </div>
       </div>
@@ -49,9 +56,10 @@ export default function TaskCard({
 interface PopoverContentProps {
   taskId: number;
   taskTitle: string;
+  onSubmit: () => void;
 }
 
-const PopoverContent = ({ taskId, taskTitle }: PopoverContentProps) => {
+const PopoverContent = ({ taskId, taskTitle, onSubmit }: PopoverContentProps) => {
   const [updatedName, setUpdatedName] = useState(taskTitle);
 
   // Function to delete the task
@@ -59,7 +67,7 @@ const PopoverContent = ({ taskId, taskTitle }: PopoverContentProps) => {
     try {
       await deleteTask(taskId);
       toast.success("Tâche supprimée avec succès");
-      window.location.reload();
+      onSubmit()
     } catch (error: unknown) {
       console.error("Error deleting task:", error);
       toast.error("Erreur lors de la suppression de la tâche");
@@ -76,18 +84,21 @@ const PopoverContent = ({ taskId, taskTitle }: PopoverContentProps) => {
     try {
       await updateTask(taskId, { title: updatedName });
       toast.success("Tâche renommée avec succès");
-      window.location.reload();
+      onSubmit()
     } catch (error: unknown) {
       console.error("Error updating task:", error);
       toast.error("Erreur lors de la mise à jour de la tâche");
     }
   };
+  const [open, setOpen] = useState(false);
 
   return (
     <div className="py-2 px-1 text-sm w-[125px] flex flex-col gap-[6px]">
       <div className="hover:bg-gray-100 cursor-pointer rounded-[4px] px-2 flex items-center justify-around py-1">
         <FilePenLine size={18} />
         <Popover
+          open={open}
+          onOpenChange={setOpen}
           PopoverContent={
             <div>
               <Input
@@ -99,6 +110,7 @@ const PopoverContent = ({ taskId, taskTitle }: PopoverContentProps) => {
                 onKeyDown={async (e) => {
                   if (e.key === "Enter") {
                     handleUpdateTaskName();
+                    onSubmit();
                   }
                 }}
               />

@@ -3,14 +3,36 @@ import { Button } from "@/components/ui/button";
 import { User } from "@/lib/api/users";
 import { getCookies } from "@/lib/utils/cookies";
 import { useMessageStore } from "@/store/message";
-import { ChevronDown, Info } from "lucide-react";
+import { ChevronDown, ChevronLeft, Info } from "lucide-react";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const MessageHeader = () => {
-  const { activeConversation } = useMessageStore();
+  const { activeConversation, setActiveConversation } = useMessageStore();
   const userInfo: User = JSON.parse(getCookies("userInfo") || "{}");
   const [showAllParticipants, setShowAllParticipants] = useState(false);
+  const [isMobileView, setIsMobileView] = useState(false);
+  
+  // Handle responsive layout
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobileView(window.innerWidth < 768);
+    };
+    
+    // Set initial value
+    handleResize();
+    
+    // Add event listener
+    window.addEventListener('resize', handleResize);
+    
+    // Cleanup
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  
+  // Handle back button click (mobile only)
+  const handleBackClick = () => {
+    setActiveConversation(null);
+  };
 
   if (!activeConversation) {
     return (
@@ -49,6 +71,16 @@ const MessageHeader = () => {
 
   return (
     <div className="flex justify-between items-center mx-2 sm:mx-6 py-4 border-b">
+      {isMobileView && (
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="mr-2" 
+          onClick={handleBackClick}
+        >
+          <ChevronLeft className="h-5 w-5" />
+        </Button>
+      )}
       <div className="flex items-center gap-3">
         {/* Avatar/Image */}
         <div className="relative">

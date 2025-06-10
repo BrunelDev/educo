@@ -1,6 +1,6 @@
 "use client";
 import { getCookies } from "@/lib/utils/cookies";
-//import Actuality from "./components/actuality";
+import Actuality from "./components/actuality";
 import Formations from "./components/formations";
 import Reunions from "./components/reunions";
 import Suggestions from "./components/suggestions";
@@ -24,11 +24,11 @@ export default function DashboardPage() {
           <Formations />
           <Reunions />
         </div>
-        {/*<div className="w-full md:w-[38%]">
+    <div className="w-full lg:w-[38%]">
           <h3 className="font-semibold text-[14px] mb-1">Actualités</h3>
 
           <Actuality />
-        </div>*/}
+        </div>
       </div>
     </div>
   );

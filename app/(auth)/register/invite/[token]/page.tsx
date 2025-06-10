@@ -2,8 +2,10 @@
 import { RegisterForm } from "@/app/_components/register-form";
 import TempLogo from "@/app/_components/temLogo";
 import Image from "next/image";
+import { use } from "react";
 
-export default function RegisterPage() {
+export default function RegisterPage({ params }: { params: Promise<{ token: string }> }) {
+  const { token } = use(params);
   return (
     <div className="grid min-h-svh md:grid-cols-2 bg-coral-500 h-screen overflow-hidden">
       <div className="relative hidden md:flex pl-20 pr-5 pt-8  md:flex-col md:gap-5">
@@ -27,7 +29,7 @@ export default function RegisterPage() {
       </div>
       <div className="flex items-center w-full bg-white p-6 md:p-24 rounded-tl-[28px] rounded-bl-[28px] h-screen overflow-hidden">
         <div className="w-full">
-          <RegisterForm />
+          <RegisterForm token={token}/>
         </div>
       </div>
     </div>

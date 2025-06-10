@@ -26,9 +26,11 @@ import { toast } from "sonner";
 export default function TaskForm({
   projectId,
   categoryLabel,
+  onSubmitTask,
 }: {
   projectId: number;
   categoryLabel: string;
+  onSubmitTask: () => void;
 }) {
   const defaultCategory =
     categoryLabel == "En cours"
@@ -72,6 +74,7 @@ export default function TaskForm({
       console.log(data);
       await createTask(data);
       toast("La tâche a été créée");
+      onSubmitTask()
       //window.location.reload();
     } catch (error: unknown) {
       toast("La création de la tâche a échoué");
@@ -93,9 +96,7 @@ export default function TaskForm({
 
       <div>
         <Textarea
-          {...register("description", {
-            required: "La description est requise",
-          })}
+          {...register("description")}
           placeholder="Description de la tâche"
         />
         {errors.description && (

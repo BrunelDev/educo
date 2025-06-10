@@ -9,13 +9,18 @@ export function Popover({
   PopoverContent,
   PopoverTrigger,
   className,
+  open,
+  onOpenChange,
+
 }: {
   PopoverContent: JSX.Element;
     PopoverTrigger: JSX.Element;
     className? : string;
+    open?: boolean;
+    onOpenChange?: (open: boolean) => void;
 }) {
   return (
-    <PopoverComponent>
+    <PopoverComponent open={open} onOpenChange={onOpenChange}>
       <Trigger asChild className={className ? className : ""}>{PopoverTrigger}</Trigger>
       <Content className="w-fit p-0">{PopoverContent}</Content>
     </PopoverComponent>

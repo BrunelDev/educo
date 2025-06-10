@@ -8,7 +8,7 @@ import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 
-export default function TeamFormHandler({ orgId }: { orgId: number }) {
+export default function TeamFormHandler({ orgId, handleClose }: { orgId: number; handleClose?: () => void; }) {
   const [users, setUsers] = useState<User[]>([]);
   const [selectedMembers, setSelectedMembers] = useState<number[]>([]);
 
@@ -49,7 +49,7 @@ export default function TeamFormHandler({ orgId }: { orgId: number }) {
       await addToOrganization(orgId, selectedMembers);
       toast.success("Membres ajoutés avec succès à l'organisation");
       setSelectedMembers([]); // Reset selection
-      window.location.reload();
+      handleClose?.();
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
         toast.error(error.response?.data?.detail);

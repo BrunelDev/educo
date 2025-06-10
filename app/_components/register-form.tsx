@@ -1,14 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { register } from "@/lib/functions";
+import { register, registerWithToken } from "@/lib/functions";
 import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
-export function RegisterForm() {
+export function RegisterForm({ token }: { token?: string }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -45,7 +45,17 @@ export function RegisterForm() {
           }
 
           // Attempt registration
-          const response = await register(email, password);
+          if (!token) {
+            const response = await register(email, password);
+            if (response?.message) {
+              toast.success(
+                "Inscription réussie ! Un e-mail de confirmation a été envoyé. Veuillez vérifier votre boîte de réception pour activer votre compte."
+              );
+              router.push("/login");
+            }
+            return;
+          }
+          const response = await registerWithToken(email, password, token);
 
           if (response?.message) {
             toast.success(

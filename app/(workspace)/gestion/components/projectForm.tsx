@@ -20,7 +20,7 @@ interface CreateProjectParams {
   team: number;
 }
 
-export default function ProjectForm({ teamId }: { teamId :number}) {
+export default function ProjectForm({ teamId, onSubmit }: { teamId :number, onSubmit: () => void}) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [members, setMembers] = useState<OrganizationMember[]>([]);
@@ -74,6 +74,7 @@ export default function ProjectForm({ teamId }: { teamId :number}) {
       setTitle("");
       setDescription("");
       setSelectedMembers([]);
+      onSubmit();
     } catch (error : unknown) {
       if (error instanceof AxiosError) {
         toast.error(error.response?.data.detail);

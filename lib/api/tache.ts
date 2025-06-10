@@ -13,11 +13,21 @@ export interface ProjectDetails {
   id: number;
   title: string;
 }
+export interface File {
+  id: number;
+  nom: string;
+  url: string;
+  type_fichier: string;
+  dossier: number;
+  utilisateur: number;
+  reunion: number;
+}
 
 export interface Task {
   id: number;
   project: number;
   project_details: ProjectDetails;
+  fichiers: File[];
   title: string;
   description: string;
   task_type: TaskType;
@@ -27,6 +37,7 @@ export interface Task {
   creator: TaskUser;
   date_creation: string;
   date_modification: string;
+  compte_rendu?: string; // Added for task report
 }
 
 export interface TaskResponse {
@@ -81,8 +92,9 @@ export interface UpdateTaskDto {
   title?: string;
   description?: string;
   task_type?: TaskType;
-  file_url?: string;
-  assigned_members?: number[];
+  fichiers_urls?: string[];
+  assigned_member_ids?: number[];
+  compte_rendu?: string; // Added for task report
 }
 
 /**
@@ -190,28 +202,44 @@ export interface AddDocumentDto {
  */
 export const addDocument = async (data: AddDocumentDto): Promise<Task> => {
   try {
-    // First get the current task data
-    const taskData = await getTaskById(data.task_id);
-
-    // Prepare the PUT request payload with all required fields
-    const payload = {
-      project: taskData.project,
-      title: taskData.title,
-      description: taskData.description,
-      task_type: taskData.task_type,
-      file_url: data.file_url,
-      assigned_member_ids: taskData.assigned_members.map((member) => member.id),
-    };
-
-    // Send the PUT request
-    const response = await api.put<Task>(
+    const response = await api.patch<Task>(
       `${endpoints.taches.base}${data.task_id}/`,
-      payload
+      data
     );
 
     return response.data;
   } catch (error) {
     console.error("Error adding document to task:", error);
+    throw error;
+  }
+};
+
+export const removeMemberFromTask = async (
+  task_id: number,
+  user_id: number
+): Promise<Task> => {
+  try {
+    const response = await api.delete<Task>(
+      `tasks/taches/${task_id}/assigned_members/${user_id}/`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error removing member from task:", error);
+    throw error;
+  }
+};
+
+export const removeDocumentFromTask = async (
+  document_id: number,
+  task_id: number
+): Promise<Task> => {
+  try {
+    const response = await api.delete<Task>(
+      `tasks/taches/${task_id}/fichiers/${document_id}/`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error removing document from task:", error);
     throw error;
   }
 };

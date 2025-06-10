@@ -4,7 +4,12 @@ import { DialogComponent } from "@/app/_components/dialogComponent";
 import DocumentComponent from "@/app/_components/document";
 import EmptyState from "@/app/_components/EmptyState";
 import LexicalView from "@/app/_components/LexicalView";
-import { addDocument, getOneMeting, updateMeeting } from "@/lib/api/reunion";
+import {
+  addDocument,
+  addMemberToMeeting,
+  getOneMeting,
+  removeDocumentFromMeeting,
+} from "@/lib/api/reunion";
 import { formatDateToFrench } from "@/lib/functions";
 import { Meeting } from "@/lib/types";
 import { Calendar, Plus, Users } from "lucide-react";
@@ -20,6 +25,7 @@ export default function Detail({
 }) {
   const { id } = use(params);
   const [meeting, setMeeting] = useState<Meeting>();
+  const [refresh, setRefresh] = useState(false);
   useEffect(() => {
     const fetchMeeting = async () => {
       const response = await getOneMeting(parseInt(id));
@@ -27,7 +33,9 @@ export default function Detail({
       console.log(response.ordre_du_jour[0].description);
     };
     fetchMeeting();
-  }, [id]);
+  }, [id, refresh]);
+  const [dialogOpen1, setDialogOpen1] = useState(false);
+  const [dialogOpen2, setDialogOpen2] = useState(false);
   if (meeting) {
     return (
       <div className="flex flex-col gap-5 pt-5 text-sm">
@@ -51,6 +59,8 @@ export default function Detail({
               <Users />
               <h6>Participants</h6>
               <DialogComponent
+                open={dialogOpen1}
+                onOpenChange={setDialogOpen1}
                 dialoTrigger={
                   <div className="h-6 w-6 bg-[#FFFFFF] flex justify-center items-center rounded-[4px]">
                     <Plus size={20} />
@@ -65,9 +75,7 @@ export default function Detail({
                         if (!meeting) return;
 
                         // Format the new participants
-                        const newParticipants = users.map((userId) => (
-                          userId
-                        ));
+                        const newParticipants = users.map((userId) => userId);
 
                         // Get existing participant IDs to avoid duplicates
                         const existingParticipantIds = meeting.participants.map(
@@ -85,22 +93,25 @@ export default function Detail({
                         }
 
                         // Combine existing and new participants
-                        const updatedParticipants : number [] = [
-                          ...meeting.participants.map((p) => 
-                            p.utilisateur),
+                        const updatedParticipants: number[] = [
+                          ...meeting.participants.map((p) => p.utilisateur),
                           ...uniqueNewParticipants,
                         ];
 
                         // Update the meeting with the new participants
-                        const updatedMeeting = await updateMeeting(meeting.id, {
-                          participants: updatedParticipants,
-                        });
+                        const updatedMeeting = await addMemberToMeeting(
+                          meeting.id,
+                          updatedParticipants
+                        );
 
                         // Update the local state
                         setMeeting(updatedMeeting);
 
                         // Reload the page to ensure all data is up-to-date
-                        window.location.reload();
+                        setRefresh((v: boolean) => {
+                          return !v;
+                        });
+                        setDialogOpen1(false);
                       } catch (error) {
                         console.error("Error adding participants:", error);
                         throw error;
@@ -113,7 +124,7 @@ export default function Detail({
             </div>
 
             <div className="flex justify-between">
-              <div className="flex flex-row flex-wrap gap-y-3 w-full gap-x-4">
+              <div className="flex flex-row flex-wrap gap-3 w-full">
                 {meeting.participants.length > 0 ? (
                   meeting.participants.map((participant, index) => (
                     <ParticipantComponent
@@ -134,6 +145,8 @@ export default function Detail({
               <Users />
               <h6>Documents joints</h6>
               <DialogComponent
+                open={dialogOpen2}
+                onOpenChange={setDialogOpen2}
                 dialoTrigger={
                   <div className="h-6 w-6 bg-[#FFFFFF] flex justify-center items-center rounded-[4px]">
                     <Plus size={20} />
@@ -173,7 +186,10 @@ export default function Detail({
                         });
 
                         // Reload the page to ensure all data is up-to-date
-                        window.location.reload();
+                        setRefresh((v: boolean) => {
+                          return !v;
+                        });
+                        setDialogOpen2(false);
                       } catch (error) {
                         console.error("Error adding document:", error);
                         throw error;
@@ -187,8 +203,18 @@ export default function Detail({
             <div className="flex justify-between">
               <div className="flex flex-row flex-wrap gap-y-3 w-full gap-x-4">
                 {meeting.documents.length > 0 ? (
-                  meeting.documents.map((participant, index) => (
-                    <DocumentComponent document={participant} key={index * 3} />
+                  meeting.documents.map((document, index) => (
+                    <DocumentComponent
+                      document={document}
+                      key={index * 3}
+                      handleDelete={async () => {
+                        await removeDocumentFromMeeting(document.id);
+                        setRefresh((v: boolean) => {
+                          return !v;
+                        });
+                        setDialogOpen2(false);
+                      }}
+                    />
                   ))
                 ) : (
                   <EmptyState

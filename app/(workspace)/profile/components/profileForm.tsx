@@ -188,6 +188,7 @@ export function ProfileForm() {
               {imagePreview && (
                 <div className="mt-4 w-32 h-32 rounded-full overflow-hidden mx-auto border-2 border-gray-300 shadow-md">
                   {imagePreview.startsWith('data:image') ? (
+                    // eslint-disable-next-line @next/next/no-img-element
                     <img src={imagePreview} alt="Aperçu de l'image" className="w-full h-full object-cover" />
                   ) : (
                     <Image src={imagePreview} alt="Aperçu de l'image" width={128} height={128} className="w-full h-full object-cover" />

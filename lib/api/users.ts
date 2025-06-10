@@ -47,7 +47,7 @@ interface UserToPatch {
   is_active?: boolean;
 }
 interface UpdateUserResponse {
-  message : string;
+  message: string;
   user: User;
 }
 const userInfo: User = JSON.parse(getCookies("userInfo") || "{}");
@@ -68,41 +68,97 @@ export const updateProfile = async (
   }
 };
 
-export const updatePassword = async (formData: { old_password: string; new_password: string; confirm_password: string }): Promise<string> => {
+export const updatePassword = async (formData: {
+  old_password: string;
+  new_password: string;
+  confirm_password: string;
+}): Promise<string> => {
   try {
-    const response = await api.patch<{ message: string }>(`${endpoint}change_password/`, {
-      "old_password": formData.old_password,
-      "new_password": formData.new_password,
-      "confirm_password": formData.confirm_password
-    });
+    const response = await api.patch<{ message: string }>(
+      `${endpoint}change_password/`,
+      {
+        old_password: formData.old_password,
+        new_password: formData.new_password,
+        confirm_password: formData.confirm_password,
+      }
+    );
     return response.data.message;
-  } catch (error :unknown) {
+  } catch (error: unknown) {
     console.error("Error updating password", error);
     //check if error is instance of AxiosError
     if (error instanceof AxiosError) {
-      return JSON.stringify(error.response?.data?.error)
+      return JSON.stringify(error.response?.data?.error);
     }
     throw error;
   }
-}
+};
 
-export const getUser = async () : Promise<User> => {
+export const getUser = async (): Promise<User> => {
   try {
     const response = await api.get<User>(`${endpoint}me/`);
     return response.data;
-    
   } catch (error: unknown) {
     if (error instanceof AxiosError) {
-      console.error("error fetching users",JSON.stringify(error.response?.data?.error))
-    throw error;
-
+      console.error(
+        "error fetching users",
+        JSON.stringify(error.response?.data?.error)
+      );
+      throw error;
     }
     throw error;
-    
   }
-}
+};
 export const logout = () => {
   removeCookie("access_token");
   removeCookie("refresh_token");
   removeCookie("userInfo");
-}
+};
+
+export const requestPasswordReset = async (
+  email: string
+): Promise<{ message: string }> => {
+  try {
+    // Use fetch instead of axios to avoid sending the authorization header
+    const baseURL =
+      process.env.NEXT_PUBLIC_API_URL || "http://192.168.100.2:8000/api/";
+    const response = await fetch(`${baseURL}auth/forgot-password/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email }),
+    });
+
+    const data = await response.json();
+    return data;
+  } catch (error: unknown) {
+    console.error("Error requesting password reset", error);
+    return {
+      message:
+        "Une erreur est survenue lors de la réinitialisation du mot de passe",
+    };
+  }
+};
+
+export const confirmPasswordReset = async (
+  uid: string,
+  token: string,
+  password: string
+): Promise<{ message: string }> => {
+    // Use fetch instead of axios to avoid sending the authorization header
+    const baseURL =
+      process.env.NEXT_PUBLIC_API_URL || "http://192.168.100.2:8000/api/";
+
+    const response = await fetch(`${baseURL}auth/reset-password/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ uid, token, new_password : password }),
+    }).then((response) => response.json()).catch((error) => {
+      console.error("Error confirming password reset", error);
+      throw error;
+    });
+
+    return response;
+};

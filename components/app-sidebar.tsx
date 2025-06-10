@@ -118,12 +118,15 @@ export function AppSidebar() {
           className="flex justify-between items-center px-2 py-1 hover:pl-4 hover:bg-white-100 duration-200 rounded-[8px]"
         >
           <div className="flex items-center gap-5 ">
+            <div className="relative h-[32px] w-[32px] rounded-full overflow-hidden bg-gray-100">
             <Image
               width={32}
               height={32}
               src={userInfo.image ? userInfo.image : "/userProfile-img.png"}
               alt={"user profile image"}
             />
+            </div>
+            
             <h6
               className={`text-white-800 font-semibold text-sm ${
                 userInfo.first_name ? "" : "truncate w-[100px]"

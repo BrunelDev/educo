@@ -4,7 +4,6 @@ import { formatDistanceToNow } from "date-fns";
 import { fr } from "date-fns/locale";
 import {
   Download,
-  Ellipsis,
   ExternalLink,
   File,
   FileAudio,
@@ -15,7 +14,8 @@ import {
   ZoomIn,
 } from "lucide-react";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { getUser, User } from "@/lib/api/users";
 
 export interface MessageSender {
   id: number;
@@ -45,6 +45,20 @@ interface MessageBoxProps {
 export default function MessageBox({ message, className }: MessageBoxProps) {
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const [imageError, setImageError] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await getUser();
+        setUser(res);
+      } catch (error) {
+        console.error("Error fetching user:", error);
+      }
+    };
+    fetchUser();
+  }, [message.sender.id]);
+
   const renderContent = () => {
     switch (message.type_message) {
       case MessageType.IMAGE:
@@ -396,8 +410,8 @@ export default function MessageBox({ message, className }: MessageBoxProps) {
       }`}
     >
       <Image
-        src={"/userProfile-img.png"}
-        alt={message.sender.email}
+        src={message.sender.id === user?.id ? user.image! : "/userProfile-img.png"}
+        alt={message.sender.first_name}
         width={30}
         height={30}
         className="rounded-full w-[30px] h-[30px]"
@@ -414,7 +428,7 @@ export default function MessageBox({ message, className }: MessageBoxProps) {
               addSuffix: true,
             })}
           </span>
-          <Ellipsis size={18} className="absolute top-1 -right-6" />
+          {/*<Ellipsis size={18} className="absolute top-1 -right-6" />*/}
         </div>
       </div>
     </div>

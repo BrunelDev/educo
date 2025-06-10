@@ -1,6 +1,6 @@
 "use client";
 import { Input } from "@/components/ui/input";
-import { createFolder, DossierResponse, getDossiers } from "@/lib/api/fichiers";
+import { createFolder, Dossier, getDossiers } from "@/lib/api/fichiers";
 import { useEffect, useState } from "react";
 import { DialogComponent } from "@/app/_components/dialogComponent";
 import FolderCard from "./components/folder";
@@ -10,39 +10,45 @@ import { AxiosError } from "axios";
 import EmptyState from "@/app/_components/EmptyState";
 
 export default function FichiersPage() {
+  const [isCreateFolderDialogOpen, setIsCreateFolderDialogOpen] = useState(false);
+  const [folders, setFolders] = useState<Dossier[]>();
  
-
-  const [folders, setFolders] = useState<DossierResponse>();
- 
-  const fetchDossiers = async () => {
-    const response = await getDossiers();
-      setFolders(response);
-    
-  }
+  const [refresh, setRefresh] = useState(false)
   useEffect(() => {
     const fun = async () => {
       const response = await getDossiers();
       setFolders(response);
     };
     fun();
-  }, []);
+  }, [refresh]);
   return (
     <div className="flex flex-col gap-10 bg-[#FFFFFF99] rounded-[12px] py-5 px-3 sm:px-6 min-h-[690px] relative w-full">
+      <div className="flex justify-center items-center w-full">
       <DialogComponent
+        open={isCreateFolderDialogOpen}
+        onOpenChange={setIsCreateFolderDialogOpen}
         className=""
-        dialogContent={<CreateFolder />}
+        dialogContent={<CreateFolder handleClose={() => { setIsCreateFolderDialogOpen(false); setRefresh(!refresh); }} />}
         dialoTrigger={
-          <Button className="bg-gradient-to-r from-[#FE6539] to-crimson-400 w-full sm:w-fit absolute right-3 sm:right-6 -top-11 sm:-top-11 text-sm sm:text-base">
+          <Button className="bg-gradient-to-r from-[#FE6539] to-crimson-400 w-2/3 sm:w-fit absolute right-8 sm:right-6 -top-11 sm:-top-11 text-sm sm:text-base">
             Nouveau
           </Button>
         }
         dialogTitle={null}
       />
+      </div>
+      
      
       {/* Folders grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {folders && folders.results?.length > 0 ? folders?.results.map((folder, index) => (
-          <FolderCard key={folder.id + index} folder={folder} fetchDossiers={fetchDossiers} />
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
+        {folders && folders.length > 0 ? folders.filter((folder) => folder.type_dossier === "DEFAULT").map((folder, index) => (
+          <FolderCard key={folder.id + index} folder={folder} fetchDossiers={() => {setRefresh(!refresh)}} />
+        )) : <div className="col-span-full flex justify-center items-center py-8">
+        <EmptyState title={"Aucun dossier pour le moment."} description={"Veuillez créez un dossier."}/></div>}
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {folders && folders.length > 0 ? folders.filter((folder) => folder.type_dossier !== "DEFAULT").map((folder, index) => (
+          <FolderCard key={folder.id + index} folder={folder} fetchDossiers={() => {setRefresh(!refresh)}} />
         )) : <div className="col-span-full flex justify-center items-center py-8">
         <EmptyState title={"Aucun dossier pour le moment."} description={"Veuillez créez un dossier."}/></div>}
       </div>
@@ -55,7 +61,7 @@ export default function FichiersPage() {
   );
 }
 
-const CreateFolder = () => {
+const CreateFolder = ({ handleClose }: { handleClose?: () => void }) => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
@@ -65,7 +71,7 @@ const CreateFolder = () => {
         await createFolder(folderName?.toString(), null)
         toast.message("Dossier créé avec succès.")
       }
-      window.location.reload();
+      handleClose?.();
       console.log("Creating folder:", folderName);
       
       

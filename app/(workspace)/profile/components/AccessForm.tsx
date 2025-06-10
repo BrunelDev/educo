@@ -8,6 +8,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   getOrganisationMembers,
@@ -34,12 +35,25 @@ const accessRoles = [
   "Responsable des réunions",
 ] as const;
 
-const formSchema = z.object({
-  memberEmail: z.string().min(1, { message: "Veuillez sélectionner un membre." }),
-  role: z.string().min(1, { message: "Veuillez sélectionner un rôle pour le membre choisi." }),
-});
+const formSchema = z
+  .object({
+    memberEmail: z.string(),
+    role: z.string(),
+  })
+  .refine(
+    (data) => {
+      if (data.memberEmail !== "") {
+        return data.role !== ""; // If a member is selected, a role must be selected
+      }
+      return true; // If no member is selected, validation passes
+    },
+    {
+      message: "Veuillez sélectionner un rôle pour le membre choisi.",
+      path: ["role"],
+    }
+  );
 
-export function AccessForm() {
+export function AccessForm({ handleClose }: { handleClose: () => void }) {
   const [members, setMembers] = useState<OrganizationMember[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [memberRoles, setMemberRoles] = useState<{
@@ -53,8 +67,6 @@ export function AccessForm() {
       role: "",
     },
   });
-
-  const { formState: { errors } } = form;
 
   // Fetch organization members
   useEffect(() => {
@@ -83,13 +95,19 @@ export function AccessForm() {
         "Selected Role:",
         values.role
       );
-      const role = values.role === "Responsable des documents" ? {"peut_modifier_fichier": true} : values.role === "Responsable de l'IA" ? {"peut_utiliser_ia" : true} : values.role === "Responsable des réunions" ? {"peut_creer_reunion": true}  : null;
+      const role =
+        values.role === "Responsable des documents"
+          ? { peut_modifier_fichier: true }
+          : values.role === "Responsable de l'IA"
+          ? { peut_utiliser_ia: true }
+          : values.role === "Responsable des réunions"
+          ? { peut_creer_reunion: true }
+          : null;
       await grantAccess(values.memberEmail, role);
 
       // Mock API call success
+      handleClose()
       toast.success("Accès mis à jour avec succès");
-
-      
     } catch (error) {
       toast.error("Échec de la mise à jour des accès");
       console.error(error);
@@ -100,18 +118,37 @@ export function AccessForm() {
 
   const handleRoleChange = (memberEmail: string, newRole: string) => {
     setMemberRoles((prevRoles) => ({ ...prevRoles, [memberEmail]: newRole }));
-    // When a role is selected for a member, that member and role become the active selection for the form.
-    form.setValue("memberEmail", memberEmail, { shouldValidate: true });
-    form.setValue("role", newRole, { shouldValidate: true });
+    // If this member is currently selected in the form, update the form's role value too.
+    if (form.getValues("memberEmail") === memberEmail) {
+      form.setValue("role", newRole, { shouldValidate: true });
+    }
+  };
+
+  const handleCheckboxChange = (checked: boolean, memberEmail: string) => {
+    const currentFormMemberEmail = form.getValues("memberEmail");
+    if (checked) {
+      // Checkbox is being checked
+      form.setValue("memberEmail", memberEmail, { shouldValidate: true });
+      form.setValue("role", memberRoles[memberEmail] || "", {
+        shouldValidate: true,
+      });
+    } else if (currentFormMemberEmail === memberEmail) {
+      // Checkbox is being unchecked, and it was the one corresponding to form's memberEmail
+      form.setValue("memberEmail", "", { shouldValidate: true });
+      form.setValue("role", "", { shouldValidate: true });
+    }
   };
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form
+        onSubmit={(e) => form.handleSubmit(onSubmit)(e)}
+        className="space-y-4"
+      >
         <FormField
           control={form.control}
           name="memberEmail"
-          render={() => (
+          render={({ field }) => (
             <FormItem>
               <FormLabel>Sélectionner un membre et assigner un rôle</FormLabel>
               <FormControl>
@@ -170,6 +207,15 @@ export function AccessForm() {
                               ))}
                             </SelectContent>
                           </Select>
+                          <Checkbox
+                            checked={field.value === member.email} // field.value is form.getValues("memberEmail")
+                            onCheckedChange={(isChecked) =>
+                              handleCheckboxChange(
+                                isChecked as boolean,
+                                member.email
+                              )
+                            }
+                          />
                         </div>
                       </div>
                     ))
@@ -180,21 +226,22 @@ export function AccessForm() {
                   )}
                 </ScrollArea>
               </FormControl>
-              <FormMessage /> {/* Displays errors for memberEmail */}
+              <FormMessage />
+              {form.formState.errors.role && (
+                <p className="text-sm font-medium text-destructive">
+                  {form.formState.errors.role.message}
+                </p>
+              )}
             </FormItem>
           )}
         />
-        {errors.role && (
-          <p className="text-sm font-medium text-destructive">
-            {errors.role.message}
-          </p>
-        )}
+
         <Button
           type="submit"
+          className="w-full bg-gradient-to-r from-coral-400 to-crimson-400"
           disabled={isLoading}
-          className="w-full sm:w-auto"
         >
-          {isLoading ? "Mise à jour..." : "Mettre à jour les accès"}
+          {isLoading ? "Mise à jour..." : "Valider"}
         </Button>
       </form>
     </Form>

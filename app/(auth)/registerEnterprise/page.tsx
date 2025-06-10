@@ -1,11 +1,9 @@
 "use client"
 import React from 'react'
 import AddOrganisation from "@/app/(workspace)/equipe/components/addOrganisation"
-import { useRouter } from 'next/navigation'
 
 import { cn } from '@/lib/utils'
 export default function RegisterEnterprise() {
-  const router = useRouter()
   return (
     <div>
       <div className={cn(

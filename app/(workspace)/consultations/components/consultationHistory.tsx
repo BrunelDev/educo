@@ -65,7 +65,7 @@ import { toast } from "sonner";
   },
 ];*/
 
-export default function History() {
+export default function History({refresh}: {refresh: boolean}) {
   const router = useRouter();
   const [consultations, setConsultations] = useState<Consultation[]>([]);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -81,7 +81,7 @@ export default function History() {
       setConsultations(response);
     };
     fetchConsultations();
-  }, []);
+  }, [refresh]);
 
   const openDeleteDialog = (id: number) => {
     setConsultationToDeleteId(id);

@@ -5,9 +5,11 @@ import Link from "next/link";
 
 interface AssociateCardProps {
   associate: User;
+  teamId: number;
+  refresh: () => void;
 }
 const userId = JSON.parse(getCookies("userInfo") || "{}")?.id;
-export default function AssociateCard({ associate }: AssociateCardProps) {
+export default function AssociateCard({ associate, teamId, refresh }: AssociateCardProps) {
   return (
     <div className="bg-[#FFFFFF99] w-[330px] h-[140px] p-3 rounded-[8px] flex flex-col justify-between">
       <div className="flex justify-between">
@@ -24,8 +26,9 @@ export default function AssociateCard({ associate }: AssociateCardProps) {
           className="p-3 h-1 overflow-hidden hover:bg-gray-100 rounded-lg"
           onClick={async () => {
             try {
-              const res = await removeFromTeam(associate.id);
+              const res = await removeFromTeam(teamId, associate.id);
               console.log(res);
+              refresh();
             } catch (error: unknown) {
               console.error("Failed to remove associate from team", error);
             }

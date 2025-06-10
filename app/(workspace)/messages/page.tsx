@@ -1,6 +1,5 @@
 "use client";
 
-import { MessageHeaderProps } from "@/lib/types";
 import MessageHeader from "./components/messageHeader";
 import MessageList from "./components/messageList";
 import { Button } from "@/components/ui/button";
@@ -11,7 +10,6 @@ import {
   DialogTitle,
   DialogTrigger,
   DialogDescription,
-  // DialogFooter, // Removed as it's no longer used directly here
 } from "@/components/ui/dialog";
 import { PlusCircle } from "lucide-react";
 import { useState } from "react";
@@ -21,25 +19,7 @@ import { User } from "@/lib/api/users";
 
 export default function MessagePage() {
   const [isCreateGroupDialogOpen, setIsCreateGroupDialogOpen] = useState(false);
-  const messageHeader: MessageHeaderProps = {
-    conversationName: "Nouvelle conversation",
-    speakers: [
-      "Victoria",
-      "John DOE",
-      "Jane SMITH",
-      "Sarah Johnson",
-      "Emily BROWN",
-      "William TAYLOR",
-      "Olivia MARTIN",
-    ],
-    conversationImageUrl: "/enterprise-image.png",
-  };
   const user : User = JSON.parse(getCookies("userInfo") || "{}");
- 
-
-
-
-
 
   return (
     <div className="w-full">
@@ -48,8 +28,8 @@ export default function MessagePage() {
         <h1 className="text-2xl font-semibold text-gray-800 dark:text-white">Messages</h1>
         <Dialog open={isCreateGroupDialogOpen} onOpenChange={setIsCreateGroupDialogOpen}>
           <DialogTrigger asChild>
-            <Button variant="outline">
-              <PlusCircle className="mr-2 h-4 w-4" /> Create Group
+            <Button variant="outline" className="flex">
+              <PlusCircle className="mr-2 h-4 w-4" /> Créer un groupe
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[500px]">
@@ -69,7 +49,7 @@ export default function MessagePage() {
           </DialogContent>
         </Dialog>
       </div>
-      <MessageHeader {...messageHeader} />
+      <MessageHeader />
       <MessageList />
     </div>
   );

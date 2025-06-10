@@ -47,6 +47,9 @@ export default function ConversationsList() {
           lastSpeakerName={"John"}
         />
       </div>*/}
+      <div className="flex flex-col gap-3">
+        <h6 className="font-semibold">Groupes</h6>
+      </div>
       {groups ? groups.map((group) => (
         <GroupDiscussion
           {...group}
@@ -76,7 +79,7 @@ const Discussion = ({ ...props }: Conversation ) => {
   } = useMessageStore();
   
   return (
-    <div className="flex flex-col gap-3 hover:bg-[#ffffffd4] p-2 rounded-[8px]" onClick={() => {
+    <div className="flex flex-col gap-3 bg-gray-50 cursor-pointer hover:bg-gray-100 p-2 rounded-[8px]" onClick={() => {
       setActiveConversation(props)
     }}>
       <div className="w-full flex justify-between items-center ">
@@ -88,43 +91,39 @@ const Discussion = ({ ...props }: Conversation ) => {
             alt="group icon"
             className="rounded-full"
           />
-          <h6 className="gap-2 truncate">{props.participants.filter((participant)=>participant._id !== userInfo.id)[0].name || "John Doe"}</h6>
+          <h6 className="gap-2 truncate">{props.participants.filter((participant)=>participant._id !== userInfo.id)[0].name || "Anonyme"}</h6>
         </div>
-        <h6 className="w-[33px] truncate"></h6>
       </div>
-      <p className="w-full truncate"></p>
     </div>
   );
 };
 
 const GroupDiscussion = ({ ...props }: Group ) => {
-  const { 
+  /*const { 
     setActiveConversation,  
-  } = useMessageStore();
+  } = useMessageStore();*/
   
   return (
     <div className="flex flex-col gap-3 hover:bg-[#ffffffd4] p-2 rounded-[8px]" onClick={() => {
-      setActiveConversation({
+      /*setActiveConversation({
         id: props.id,
         //name: props.nom,
         description: props.description,
         members: props.membres,
-      })
+      })*/
     }}>
       <div className="w-full flex justify-between items-center ">
         <div className="flex w-2/3 gap-2 items-center">
           <Image
-            src={props.groupImage || "/group-img.png"}
+            src={"/group-img.png"}
             width={28}
             height={28}
             alt="group icon"
             className="rounded-full"
           />
-          <h6 className="gap-2 truncate">{props.groupName || "Group Name"}</h6>
+          <h6 className="gap-2 truncate">{props.nom || "Group Name"}</h6>
         </div>
-        <h6 className="w-[33px] truncate"></h6>
       </div>
-      <p className="w-full truncate"></p>
     </div>
   );
 };

@@ -9,9 +9,11 @@ import {
   addDocument,
   Consultation,
   getOneConsultation,
+  removeDocumentFromConsultation,
+  removeMemberFromConsultation,
   updateConsultation,
 } from "@/lib/api/consultation";
-import { Ellipsis, Plus, Users } from "lucide-react";
+import { Plus, Users } from "lucide-react";
 import { use, useEffect, useState } from "react";
 export default function ConsultationDetail({
   params,
@@ -20,7 +22,7 @@ export default function ConsultationDetail({
 }) {
   const { id } = use(params);
   const [consultation, setConsultation] = useState<Consultation>();
-
+  const [refresh, setRefresh] = useState(false);
   // Function to fetch consultation data
   const fetchConsultationData = async () => {
     try {
@@ -30,7 +32,8 @@ export default function ConsultationDetail({
       console.error("Error fetching consultation:", error);
     }
   };
-
+  const [openDialog, setOpenDialog] = useState(false);
+  const [openDocumentDialog, setOpenDocumentDialog] = useState(false);
   // Function to handle adding members to the consultation
   const handleAddMembers = async (users: number[]): Promise<void> => {
     if (!consultation) return;
@@ -50,6 +53,8 @@ export default function ConsultationDetail({
     } catch (error) {
       console.error("Error adding members:", error);
       throw error;
+    } finally {
+      setOpenDialog(false);
     }
   };
 
@@ -72,16 +77,15 @@ export default function ConsultationDetail({
 
       // Use the new addDocument function with POST endpoint
       await addDocument(document);
-
+      setRefresh(!refresh);
       // Refresh the consultation data
       const updatedConsultation = await getOneConsultation(consultation.id);
       setConsultation(updatedConsultation);
-
-      // Reload the page to reflect changes
-      window.location.reload();
     } catch (error) {
       console.error("Error adding document:", error);
       throw error;
+    } finally {
+      setOpenDocumentDialog(false);
     }
   };
 
@@ -97,32 +101,44 @@ export default function ConsultationDetail({
     };
 
     fetchData();
-  }, [id]);
+  }, [id, refresh]);
   if (consultation) {
     return (
       <div>
         <div className="flex flex-col gap-5 pt-5">
           <div className="flex flex-col gap-4">
             <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center gap-2">
-              <div className="space-y-1">
-                <h1 className="text-lg font-bold">
-                  Planifier la formation des élus sur le droit du travail
-                </h1>
+              <div className="space-y-2 w-full">
+                <div className="flex items-center justify-between w-full">
+                  <h1 className="text-lg font-bold">
+                    {consultation.type_consultation_display}
+                  </h1>
+                  <div
+                    className={`${
+                      consultation.statut === "En attente"
+                        ? "bg-crimson-400"
+                        : "bg-white-50"
+                    } w-fit py-1 px-2 flex justify-center items-center rounded-full place-self-end`}
+                  >
+                    <h6
+                      className={`${
+                        consultation.statut === "En attente" ? "text-white" : ""
+                      }`}
+                    >
+                      {consultation.statut}
+                    </h6>
+                  </div>
+                </div>
 
-                <h6>
-                  Rédiger et structurer le compte rendu de la réunion du 15 mars
-                  sur les sujets abordés : budget, formation des élus, actions
-                  sociales, etc.
-                </h6>
-              </div>
-              <div>
-                <Ellipsis />
+                <h6>{consultation.description}</h6>
               </div>
             </div>
             <div className="flex gap-3">
               <Users />
               <h6>Participants</h6>
               <DialogComponent
+                open={openDialog}
+                onOpenChange={setOpenDialog}
                 dialoTrigger={
                   <div className="h-6 w-6 bg-[#FFFFFF] flex justify-center items-center rounded-[4px]">
                     <Plus size={20} />
@@ -141,6 +157,14 @@ export default function ConsultationDetail({
                   consultation.participants_details?.map(
                     (participant, index) => (
                       <ParticipantComponent
+                        handleDelete={async () => {
+                          await removeMemberFromConsultation(
+                            consultation.id,
+                            participant.utilisateur_details.id
+                          );
+                          await fetchConsultationData();
+                          setRefresh(!refresh);
+                        }}
                         key={participant.utilisateur_details.id + index}
                         participant={participant.utilisateur_details}
                       />
@@ -159,6 +183,8 @@ export default function ConsultationDetail({
               <Users />
               <h6>Documents joints</h6>
               <DialogComponent
+                open={openDocumentDialog}
+                onOpenChange={setOpenDocumentDialog}
                 dialoTrigger={
                   <div className="h-6 w-6 bg-[#FFFFFF] flex justify-center items-center rounded-[4px]">
                     <Plus size={20} />
@@ -174,10 +200,21 @@ export default function ConsultationDetail({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-3 w-full gap-x-5">
                 {consultation.documents?.length > 0 ? (
                   consultation.documents?.map((document, index) => (
-                    <DocumentComponent document={{
-                      fichier: document.url,
-                      nom_fichier: document.nom,
-                    }} key={index * 3} />
+                    <DocumentComponent
+                      document={{
+                        fichier: document.url,
+                        nom_fichier: document.nom,
+                        id: document.id,
+                        reunion: document.id,
+                        type_document: document.nom_fichier,
+                      }}
+                      handleDelete={async () => {
+                        await removeDocumentFromConsultation(document.id);
+                        await fetchConsultationData();
+                        setRefresh(!refresh);
+                      }}
+                      key={index * 3}
+                    />
                   ))
                 ) : (
                   <div className="w-full flex justify-center items-center">

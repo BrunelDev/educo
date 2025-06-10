@@ -170,46 +170,21 @@ export const addDocument = async (
   }
 };
 
-/**
- * Adds a single document to a consultation
- * @param id - The ID of the consultation to update
- * @param document - Document to add
- * @returns The updated consultation data
- * @deprecated Use addDocument instead with the new POST endpoint format
- */
-export const addDocumentToConsultation = async (
-  id: number,
-  document: AddDocumentDto
-): Promise<Consultation> => {
-  console.warn(
-    "addDocumentToConsultation is deprecated. Use addDocument instead."
-  );
-  return addDocumentsToConsultation(id, [document]);
-};
+
 
 /**
  * Removes a document from a consultation by its ID
- * @param consultationId - The ID of the consultation
  * @param documentId - The ID of the document to remove
  * @returns The updated consultation data
  */
 export const removeDocumentFromConsultation = async (
-  consultationId: number,
   documentId: number
 ): Promise<Consultation> => {
   try {
-    // First, get the current consultation to access its documents
-    const consultation = await getOneConsultation(consultationId);
-
-    // Filter out the document to remove
-    const updatedDocuments = consultation.documents.filter(
-      (doc) => doc.id !== documentId
+    const response = await api.delete<Consultation>(
+      `/consultations/documents/${documentId}/`
     );
-
-    // Update the consultation with the filtered documents
-    return updateConsultation(consultationId, {
-      documents: updatedDocuments,
-    });
+    return response.data;
   } catch (error: unknown) {
     console.error(
       "Error removing document from consultation",
@@ -282,6 +257,18 @@ export const deleteConsultation = async (id: number): Promise<void> => {
   } catch (error) {
     // Log the error with context for easier debugging
     console.error(`Error deleting consultation with ID ${id}:`, error);
+    throw error; // Re-throw the error so it can be caught and handled by the calling component (e.g., to show a toast notification)
+  }
+};
+
+export const removeMemberFromConsultation = async (consultation_id: number, user_id: number): Promise<void> => {
+  try {
+    await api.delete(`consultations/${consultation_id}/participants/${user_id}/`);
+    // Successful deletion (e.g., 204 No Content) will not return data.
+    // Axios delete method typically resolves for 2xx status codes and rejects for others.
+  } catch (error) {
+    // Log the error with context for easier debugging
+    console.error(`Error deleting consultation with ID ${consultation_id}:`, error);
     throw error; // Re-throw the error so it can be caught and handled by the calling component (e.g., to show a toast notification)
   }
 };

@@ -35,9 +35,9 @@ const endpoint = endpoints.fichiers.dossiers.list;
 
 export const getDossiers = async (
   page: number = 1
-): Promise<DossierResponse> => {
+): Promise<Dossier[]> => {
   try {
-    const response = await api.get(endpoint, {
+    const response = await api.get("fichiers/arborescence/", {
       params: {
         page,
       },
@@ -45,12 +45,7 @@ export const getDossiers = async (
     return response.data;
   } catch (error) {
     console.error("Error fetching dossiers", error);
-    return {
-      count: 0,
-      next: null,
-      previous: null,
-      results: [],
-    };
+    throw error;
   }
 };
 

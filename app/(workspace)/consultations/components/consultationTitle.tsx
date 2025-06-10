@@ -1,12 +1,13 @@
-export default function ConsultationTitle({
+export  function ConsultationTitle({
   title,
   barNumber,
+  
 }: {
   title: string;
   barNumber: number;
 }) {
   return (
-    <div className="w-full sm:w-[255px] bg-[#FFFFFF99] rounded-[8px] py-3 px-2 flex justify-between">
+    <div className="w-full sm:w-[255px] h-[66px] bg-[#FFFFFF99] rounded-[8px] py-3 px-2 flex justify-between cursor-pointer">
       <h6 className="font-semibold text-sm">{title}</h6>
       <div className="flex gap-[3px] mt-1">
         {Array.from({ length: 4 }).map((_, index) => (

@@ -6,7 +6,6 @@ import { useMeetingStore } from "@/store/meetings";
 import {
   CalendarDays,
   Check,
-  Download,
   Ellipsis,
   FilePenLine,
   Trash2,
@@ -64,7 +63,7 @@ export default function MeetingCard({ meeting }: MeetingCatdProps) {
               meeting.participants.map((attendee, index) => (
                 <Image
                   key={attendee.utilisateur_details?.id || index} // Use a more stable key if possible
-                  src={attendee.utilisateur_details?.photo || "/user-icon.svg"} // Fallback to a default icon
+                  src={attendee.utilisateur_details?.photo || "/userProfile-img.png"} // Fallback to a default icon
                   alt={attendee.utilisateur_details?.nom_complet || `Participant ${index + 1}`}
                   width={32}
                   height={32}
@@ -72,7 +71,7 @@ export default function MeetingCard({ meeting }: MeetingCatdProps) {
                   onError={(e) => {
                     // Fallback if the primary image fails to load
                     (e.target as HTMLImageElement).onerror = null; 
-                    (e.target as HTMLImageElement).src = "/user-icon.svg";
+                    (e.target as HTMLImageElement).src = "/userProfile-img.png";
                   }}
                 />
               ))
@@ -112,13 +111,7 @@ const PopoverContent = ({ meeting }: PopoverContentProps) => {
     (state) => state.deleteMeeting
   );
 
-  // Function to handle meeting download
-  const handleDownload = () => {
-    // This is a placeholder for download functionality
-    // You might want to implement actual download logic here
-    toast.info("Téléchargement de la réunion...");
-    console.log("Downloading meeting:", meeting.id);
-  };
+ 
 
   // Function to handle meeting deletion
   const handleDelete = async () => {

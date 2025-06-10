@@ -43,10 +43,13 @@ interface MeetingParticipant {
 }
 
 // Interface for meeting documents
+
 export interface MeetingDocument {
+  id: number;
+  reunion: number;
   fichier: string;
   nom_fichier: string;
-  type_fichier?: MessageType
+  type_document: string;
 }
 
 // Interface for agenda items

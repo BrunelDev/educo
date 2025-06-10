@@ -1,27 +1,24 @@
 import api, { endpoints } from "./api";
-const baseUrl = process.env.NEXT_PUBLIC_API_URL
+const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 export const login = async (email: string, password: string) => {
   try {
-    const response = await fetch(
-      `${baseUrl}auth/utilisateurs/connexion/`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email,
-          password,
-        }),
-      }
-    );
+    const response = await fetch(`${baseUrl}auth/utilisateurs/connexion/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email,
+        password,
+      }),
+    });
     if (response.ok) {
       const res = await response.json();
-      document.cookie = `access_token=${res.token};path=/`;
+      document.cookie = `access_token=${res.token};path=/;Max-Age=604800`;
       console.log("res", res);
-      document.cookie = `refresh_token=${res.refresh};path=/`;
-      document.cookie = `userInfo=${JSON.stringify(res.user)};path=/`;
-      
+      document.cookie = `refresh_token=${res.refresh};path=/;Max-Age=604800`;
+      document.cookie = `userInfo=${JSON.stringify(res.user)};path=/;Max-Age=604800`;
+
       return res;
     } else {
       const res = await response.json();
@@ -38,19 +35,46 @@ export const login = async (email: string, password: string) => {
 
 export const register = async (email: string, password: string) => {
   try {
-    const response = await fetch(
-      `${baseUrl}auth/utilisateurs/inscriptions/`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email,
-          password,
-        }),
-      }
-    );
+    const response = await fetch(`${baseUrl}auth/utilisateurs/inscriptions/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email,
+        password,
+      }),
+    });
+    if (response.ok) {
+      return await response.json();
+    } else {
+      throw new Error("Inscription échouée : Cet email est déja utilisé.");
+    }
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    }
+    throw new Error("An unknown error occurred during registration");
+  }
+};
+
+export const registerWithToken = async (
+  email: string,
+  password: string,
+  token: string
+) => {
+  try {
+    const response = await fetch(`${baseUrl}auth/register/invite/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email,
+        password,
+        token,
+      }),
+    });
     if (response.ok) {
       return await response.json();
     } else {

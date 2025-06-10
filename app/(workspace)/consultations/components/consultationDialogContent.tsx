@@ -2,11 +2,7 @@
 import { Select } from "@/app/_components/select";
 import { Button } from "@/components/ui/button";
 import { createConsultation } from "@/lib/api/consultation";
-import {
-  ConsultationDialog,
-  ConsultationDialogProps,
-  ConsultationType,
-} from "@/lib/types";
+import { ConsultationDialogProps, ConsultationType } from "@/lib/types";
 import { format } from "date-fns";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -14,7 +10,11 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function ConsultationDialogContent({
   consultation,
-}: ConsultationDialog) {
+  handleSubmit,
+}: {
+  consultation: ConsultationDialogProps;
+  handleSubmit: () => void;
+}) {
   const options: { value: ConsultationType }[] = [
     { value: ConsultationType.Accord },
     { value: ConsultationType.Fusion },
@@ -24,7 +24,6 @@ export default function ConsultationDialogContent({
     { value: ConsultationType.Politique },
     { value: ConsultationType.Situation },
     { value: ConsultationType.ReglementInterieur },
-    { value: ConsultationType.Accord },
     { value: ConsultationType.ActivitePartielle },
     { value: ConsultationType.DemenagementReorganisationSite },
     { value: ConsultationType.RisquesProfessionnels },
@@ -48,8 +47,9 @@ export default function ConsultationDialogContent({
       };
 
       await createConsultation(data);
+      toast.dismiss();
       toast.success("La consultation a été créée avec succès!");
-      window.location.reload();
+      handleSubmit();
     } catch (error) {
       console.error("Error creating consultation:", error);
       toast.error("Erreur lors de la création de la consultation");
@@ -336,7 +336,7 @@ Le CSE est systématiquement consulté sur les mesures liées à la sécurité, 
   ];
 
   return (
-    <ScrollArea className="h-[calc(100vh-100px)] px-5">
+    <ScrollArea className="h-[500px] px-5">
       <div className="flex flex-col gap-6">
         <div className="flex flex-col gap-5">
           <h6>Type de consultation</h6>
@@ -374,7 +374,10 @@ Le CSE est systématiquement consulté sur les mesures liées à la sécurité, 
             ))}
         </div>
         <Button
-        className="bg-gradient-to-r from-coral-400 to-crimson-400" onClick={handleCreateConsultation} disabled={isLoading}>
+          className="bg-gradient-to-r from-coral-400 to-crimson-400"
+          onClick={handleCreateConsultation}
+          disabled={isLoading}
+        >
           {isLoading ? "Création..." : "Créer"}
         </Button>
       </div>

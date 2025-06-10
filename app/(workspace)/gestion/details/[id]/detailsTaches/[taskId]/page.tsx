@@ -5,16 +5,20 @@ import { DialogComponent } from "@/app/_components/dialogComponent";
 import DocumentComponent from "@/app/_components/document";
 import EmptyState from "@/app/_components/EmptyState";
 import {
-  addDocument,
-  addParticipant,
   getTaskById,
+  removeDocumentFromTask,
+  removeMemberFromTask,
   Task,
+  updateTask,
 } from "@/lib/api/tache";
 import { MessageType } from "@/lib/types";
-import { Ellipsis, Plus, Users } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Plus, Users } from "lucide-react";
 import { use, useEffect, useState } from "react";
 import { toast } from "sonner";
 import ParticipantComponent from "../../../details_de_la_tache/components/participants";
+import Editor from "@/app/_components/editor";
+import "@/app/_components/editorPlugins/style.css";
 
 export default function DetailTache({
   params,
@@ -23,31 +27,40 @@ export default function DetailTache({
 }) {
   const { taskId } = use(params);
   const [task, setTask] = useState<Task>();
+  const [refresh, setRefresh] = useState(false);
+  const [refresh2, setRefresh2] = useState(false);
+  const [refresh3, setRefresh3] = useState(false);
+  const [compteRenduContent, setCompteRenduContent] = useState<string>(
+    '{"root":{"children":[{"children":[],"direction":null,"format":"","indent":0,"type":"paragraph","version":1}],"direction":null,"format":"","indent":0,"type":"root","version":1}}'
+  );
+  const [isEditingCompteRendu, setIsEditingCompteRendu] = useState(false);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await getTaskById(parseInt(taskId));
+        console.log("Task :", response);
         // Update the state with the fetched data
         setTask(response);
+        if (response.compte_rendu) {
+          setCompteRenduContent(response.compte_rendu);
+        }
         console.log(taskId, "Task :", response);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
     fetchData();
-  }, [taskId]);
+  }, [taskId, refresh, refresh2, refresh3]);
 
   const handleAddMembers = async (users: number[]): Promise<void> => {
     if (!task) return;
 
     try {
       // Add each participant individually using addParticipant
-      for (const userId of users) {
-        await addParticipant({
-          task_id: task.id,
-          user_id: userId,
-        });
-      }
+      await updateTask(task.id, {
+        assigned_member_ids: users,
+      });
 
       // Refresh the task data
       const updatedTask = await getTaskById(parseInt(taskId));
@@ -56,7 +69,9 @@ export default function DetailTache({
       toast.success("Participants ajoutés avec succès");
 
       // Reload the page to reflect changes
-      window.location.reload();
+      setRefresh((v: boolean) => {
+        return !v;
+      });
     } catch (error) {
       console.error("Error adding members:", error);
       toast.error("Erreur lors de l'ajout des participants");
@@ -69,10 +84,8 @@ export default function DetailTache({
 
     try {
       // Add document using addDocument function with the updated API format
-      await addDocument({
-        task_id: task.id,
-        file_url: fileUrl,
-        file_name: task.title || fileUrl.split("/").pop() || "document",
+      await updateTask(task.id, {
+        fichiers_urls: [fileUrl],
       });
 
       // Refresh the task data
@@ -80,7 +93,9 @@ export default function DetailTache({
       setTask(updatedTask);
 
       // Reload the page to reflect changes
-      window.location.reload();
+      setRefresh2((v: boolean) => {
+        return !v;
+      });
     } catch (error) {
       console.error("Error adding document:", error);
       toast.error("Erreur lors de l'ajout du document");
@@ -88,28 +103,52 @@ export default function DetailTache({
     }
   };
 
+  const handleConfirmCompteRendu = async () => {
+    if (!task) return;
+    try {
+      await updateTask(task.id, { compte_rendu: compteRenduContent });
+      toast.success("Compte rendu enregistré avec succès.");
+      setIsEditingCompteRendu(false);
+    } catch (error) {
+      console.error("Erreur lors de l'enregistrement du compte rendu:", error);
+      toast.error("Erreur lors de l'enregistrement du compte rendu.");
+    }
+  };
+
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex justify-between">
-        <div className="space-y-1">
-          <h1 className="text-lg font-bold">
-            Planifier la formation des élus sur le droit du travail
-          </h1>
+      <div className="flex justify-between w-full">
+        <div className="space-y-2 w-full">
+          <div className="flex justify-between items-center w-full">
+            <h1 className="text-lg font-bold">{task?.title}</h1>
+            <div
+              className={`${
+                task?.task_type === "a_faire" ? "bg-crimson-400" : "bg-white-50"
+              } w-fit py-1 px-2 flex justify-center items-center rounded-full place-self-end`}
+            >
+              <h6
+                className={`${
+                  task?.task_type === "a_faire" ? "text-white" : ""
+                }`}
+              >
+                {task?.task_type === "a_faire" ? "À faire" : task?.task_type === "en_cours" ? "En cours" : "Terminé"}
+              </h6>
+            </div>
+          </div>
 
           <h6>
-            Rédiger et structurer le compte rendu de la réunion du 15 mars sur
-            les sujets abordés : budget, formation des élus, actions sociales,
-            etc.
+            {task?.description
+              ? task?.description
+              : "Description non disponible"}
           </h6>
-        </div>
-        <div>
-          <Ellipsis />
         </div>
       </div>
       <div className="flex gap-3">
         <Users />
         <h6>Participants</h6>
         <DialogComponent
+          open={refresh}
+          onOpenChange={setRefresh}
           dialoTrigger={
             <div className="h-6 w-6 bg-[#FFFFFF] flex justify-center items-center rounded-[4px]">
               <Plus size={20} />
@@ -122,8 +161,8 @@ export default function DetailTache({
         />
       </div>
 
-      <div className="flex justify-between">
-        <div className="grid grid-cols-2 gap-y-3 max-w-2/3 gap-x-5">
+      <div className="flex flex-col sm:flex-row justify-between">
+        <div className="flex flex-wrap flex-row gap-4 w-full">
           {task?.assigned_members && task?.assigned_members.length > 0 ? (
             task.assigned_members.map((participant, index) => (
               <ParticipantComponent
@@ -135,6 +174,9 @@ export default function DetailTache({
                     participant.first_name + " " + participant.last_name,
                   photo: participant.email,
                 }}
+                handleDelete={async () => {
+                  await removeMemberFromTask(task.id, participant.id);
+                }}
               />
             ))
           ) : (
@@ -144,13 +186,17 @@ export default function DetailTache({
             />
           )}
         </div>
-        <div className="w-1/3">{/*<CommentInput />*/}</div>
+        <div className="w-full mt-4 sm:mt-0 sm:w-1/3">
+          {/*<CommentInput />*/}
+        </div>
       </div>
 
       <div className="flex gap-3 mt-6">
         <Users />
         <h6>Documents joints</h6>
         <DialogComponent
+          open={refresh2}
+          onOpenChange={setRefresh2}
           dialoTrigger={
             <div className="h-6 w-6 bg-[#FFFFFF] flex justify-center items-center rounded-[4px]">
               <Plus size={20} />
@@ -160,16 +206,27 @@ export default function DetailTache({
           dialogTitle={null}
         />
       </div>
-      <div className="flex justify-between">
-        <div className="grid grid-cols-2 gap-y-3 max-w-2/3 gap-x-5">
-          {task?.file_url ? (
-            <DocumentComponent
-              document={{
-                fichier: task.file_url,
-                nom_fichier: task.title,
-                type_fichier: MessageType.FILE,
-              }}
-            />
+      <div className="flex flex-col sm:flex-row justify-between">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-3 w-full sm:max-w-2/3 gap-x-5">
+          {task?.fichiers ? (
+            task?.fichiers.map((fichier) => (
+              <DocumentComponent
+                key={fichier.id}
+                document={{
+                  fichier: fichier.url,
+                  nom_fichier: task.title,
+                  type_document: MessageType.FILE,
+                  id: task.id,
+                  reunion: task.project,
+                }}
+                handleDelete={async () => {
+                  await removeDocumentFromTask(fichier.id, task.id);
+                  setRefresh3((v: boolean) => {
+                    return !v;
+                  });
+                }}
+              />
+            ))
           ) : (
             <EmptyState
               title={"Aucun document."}
@@ -177,7 +234,31 @@ export default function DetailTache({
             />
           )}
         </div>
-        <div className="w-1/3">{/*<CommentInput />*/}</div>
+        <div className="w-full mt-4 sm:mt-0 sm:w-1/3">
+          {/*<CommentInput />*/}
+        </div>
+      </div>
+
+      {/* Compte Rendu Section */}
+      <div className="mt-6">
+        <div className="flex justify-between items-center mb-3">
+          <h2 className="text-md font-semibold">Compte Rendu</h2>
+          <Button
+            onClick={() => {
+              if (isEditingCompteRendu) {
+                handleConfirmCompteRendu();
+              } else {
+                setIsEditingCompteRendu(true);
+              }
+            }}
+            variant={isEditingCompteRendu ? "default" : "outline"}
+          >
+            {isEditingCompteRendu ? "Confirmer" : "Modifier"}
+          </Button>
+        </div>
+        <div className="mt-4 w-1/2">
+          <Editor disabled={true} />
+        </div>
       </div>
     </div>
   );

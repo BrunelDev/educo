@@ -1,28 +1,24 @@
-"use client"
+"use client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+
 import { createOrganization } from "@/lib/api/organisation";
 import { uploadToS3 } from "@/lib/s3-upload";
 import { FileInputChangeEvent } from "@/lib/types";
 import { AxiosError } from "axios";
-import { ChevronRight, CirclePlus } from "lucide-react";
+import { ChevronRight, CirclePlus, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import Image from "next/image";
 
-export default function AddOrganisation() {
+interface AddOrganisationProps {
+  handleClose?: () => void;
+}
+
+export default function AddOrganisation({ handleClose }: AddOrganisationProps) {
   const [, setLogo] = useState<File>();
   const [logoUrl, setLogoUrl] = useState<string>("");
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -30,14 +26,21 @@ export default function AddOrganisation() {
   const organisationSchema = z.object({
     nom_entreprise: z.string().min(1, "Le nom de l'entreprise est requis"),
     secteur_activite: z.string().min(1, "Le secteur d'activité est requis"),
-    taille: z.string().regex(/^[1-9]\d*$/, "La taille doit être un nombre entier positif").min(1, "La taille est requise"),
+    taille: z
+      .string()
+      .regex(/^[1-9]\d*$/, "La taille doit être un nombre entier positif")
+      .min(1, "La taille est requise"),
     adresse_siege: z.string().min(1, "L'adresse est requise"),
     code_postal: z
       .string()
       .length(5, "Le code postal doit contenir 5 chiffres"),
     ville: z.string().min(1, "La ville est requise"),
-    annee_election: z.string().regex(/^\d{4}$/, "L'année d'élection doit être valide (ex: 2024)"),
-    convention_collective: z.string().min(1, "La convention collective est requise"),
+    annee_election: z
+      .string()
+      .regex(/^\d{4}$/, "L'année d'élection doit être valide (ex: 2024)"),
+    convention_collective: z
+      .string()
+      .min(1, "La convention collective est requise"),
     membres_cse_invites: z.string().optional(),
   });
 
@@ -98,10 +101,10 @@ export default function AddOrganisation() {
               ville: formData.get("ville") as string,
               annee_election: formData.get("annee_election") as string,
               collective: formData.get("convention_collective") as string,
-              invites: (formData.get("membres_cse_invites") as string || "")
-                        .split(',')
-                        .map(email => email.trim())
-                        .filter(email => email), // Process to string array, remove empty strings
+              invites: ((formData.get("membres_cse_invites") as string) || "")
+                .split(",")
+                .map((email) => email.trim())
+                .filter((email) => email), // Process to string array, remove empty strings
               logo: logoUrl,
               membre_ids: [1],
               description: "",
@@ -110,7 +113,7 @@ export default function AddOrganisation() {
             await createOrganization(organizationData);
 
             toast.success(`L'organisation a été créée avec succès`);
-            window.location.reload();
+            handleClose?.();
           } catch (error) {
             if (error instanceof z.ZodError) {
               const newErrors: Record<string, string> = {};
@@ -135,9 +138,15 @@ export default function AddOrganisation() {
       >
         <div className="flex flex-col gap-3">
           <Label htmlFor="nom_entreprise">Nom de l&apos;entreprise</Label>
-          <Input id="nom_entreprise" name="nom_entreprise" className="h-[36px]" />
+          <Input
+            id="nom_entreprise"
+            name="nom_entreprise"
+            className="h-[36px]"
+          />
           {errors.nom_entreprise && (
-            <span className="text-red-500 text-xs">{errors.nom_entreprise}</span>
+            <span className="text-red-500 text-xs">
+              {errors.nom_entreprise}
+            </span>
           )}
         </div>
         <div className="flex flex-col sm:flex-row sm:justify-between gap-5">
@@ -199,41 +208,51 @@ export default function AddOrganisation() {
         {/* Année d’élection */}
         <div className="flex flex-col gap-3">
           <Label htmlFor="annee_election">Année d’élection</Label>
-          <Input id="annee_election" name="annee_election" type="number" placeholder="YYYY" className="h-[36px]" />
+          <Input
+            id="annee_election"
+            name="annee_election"
+            type="number"
+            placeholder="YYYY"
+            className="h-[36px]"
+          />
           {errors.annee_election && (
-            <span className="text-red-500 text-xs">{errors.annee_election}</span>
+            <span className="text-red-500 text-xs">
+              {errors.annee_election}
+            </span>
           )}
         </div>
 
         {/* Convention collective */}
         <div className="flex flex-col gap-3">
           <Label htmlFor="convention_collective">Convention collective</Label>
-          <Select name="convention_collective">
-            <SelectTrigger className="w-full h-[36px]">
-              <SelectValue placeholder="Choisissez la convention collective" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectLabel>Conventions (Exemples)</SelectLabel>
-                <SelectItem value="syntec">Syntec</SelectItem>
-                <SelectItem value="metallurgie">Métallurgie</SelectItem>
-                <SelectItem value="commerce_gros">Commerce de gros</SelectItem>
-                <SelectItem value="autre">Autre</SelectItem>
-                {/* TODO: Replace with actual nomenclature from user */}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
+          <Input
+            id="convention_collective"
+            name="convention_collective"
+            className="h-[36px]"
+            placeholder="Entrez la convention collective"
+          />
           {errors.convention_collective && (
-            <span className="text-red-500 text-xs">{errors.convention_collective}</span>
+            <span className="text-red-500 text-xs">
+              {errors.convention_collective}
+            </span>
           )}
         </div>
 
         {/* Invitez les membres CSE */}
         <div className="flex flex-col gap-3">
-          <Label htmlFor="membres_cse_invites">Invitez les membres CSE (emails séparés par virgule)</Label>
-          <Input id="membres_cse_invites" name="membres_cse_invites" placeholder="membre1@email.com, membre2@email.com" className="h-[36px]" />
+          <Label htmlFor="membres_cse_invites">
+            Invitez les membres CSE (emails séparés par virgule)
+          </Label>
+          <Input
+            id="membres_cse_invites"
+            name="membres_cse_invites"
+            placeholder="membre1@email.com, membre2@email.com"
+            className="h-[36px]"
+          />
           {errors.membres_cse_invites && (
-            <span className="text-red-500 text-xs">{errors.membres_cse_invites}</span>
+            <span className="text-red-500 text-xs">
+              {errors.membres_cse_invites}
+            </span>
           )}
         </div>
 
@@ -254,11 +273,16 @@ export default function AddOrganisation() {
               <h6>Glissez et déposez ou cliquez ici pour choisir un fichier</h6>
               <div>Taille maximale 10MB</div>
             </div>
-            
           </div>
           {logoUrl && (
             <div className="mt-2 flex justify-center">
-              <Image src={logoUrl} alt="Aperçu du logo" className="h-20 w-auto rounded border object-contain" width={100} height={100}/>
+              <Image
+                src={logoUrl}
+                alt="Aperçu du logo"
+                className="h-20 w-auto rounded border object-contain"
+                width={100}
+                height={100}
+              />
             </div>
           )}
         </div>
@@ -273,12 +297,13 @@ export default function AddOrganisation() {
   );
 }
 
-
 interface AddOrganisationAfterLoginProps {
   onComplete: () => void;
 }
 
-export function AddOrganisationAfterLogin({ onComplete }: AddOrganisationAfterLoginProps) {
+export function AddOrganisationAfterLogin({
+  onComplete,
+}: AddOrganisationAfterLoginProps) {
   const [, setLogo] = useState<File>();
   const [logoUrl, setLogoUrl] = useState<string>("");
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -286,14 +311,21 @@ export function AddOrganisationAfterLogin({ onComplete }: AddOrganisationAfterLo
   const organisationSchema = z.object({
     nom_entreprise: z.string().min(1, "Le nom de l'entreprise est requis"),
     secteur_activite: z.string().min(1, "Le secteur d'activité est requis"),
-    taille: z.string().regex(/^[1-9]\d*$/, "La taille doit être un nombre entier positif").min(1, "La taille est requise"),
+    taille: z
+      .string()
+      .regex(/^[1-9]\d*$/, "La taille doit être un nombre entier positif")
+      .min(1, "La taille est requise"),
     adresse_siege: z.string().min(1, "L'adresse est requise"),
     code_postal: z
       .string()
       .length(5, "Le code postal doit contenir 5 chiffres"),
     ville: z.string().min(1, "La ville est requise"),
-    annee_election: z.string().regex(/^\d{4}$/, "L'année d'élection doit être valide (ex: 2024)"),
-    convention_collective: z.string().min(1, "La convention collective est requise"),
+    annee_election: z
+      .string()
+      .regex(/^\d{4}$/, "L'année d'élection doit être valide (ex: 2024)"),
+    convention_collective: z
+      .string()
+      .min(1, "La convention collective est requise"),
     membres_cse_invites: z.string().optional(),
   });
 
@@ -354,19 +386,21 @@ export function AddOrganisationAfterLogin({ onComplete }: AddOrganisationAfterLo
               ville: formData.get("ville") as string,
               annee_election: formData.get("annee_election") as string,
               collective: formData.get("convention_collective") as string,
-              invites: (formData.get("membres_cse_invites") as string || "")
-                        .split(',')
-                        .map(email => email.trim())
-                        .filter(email => email), // Process to string array, remove empty strings
+              invites: ((formData.get("membres_cse_invites") as string) || "")
+                .split(",")
+                .map((email) => email.trim())
+                .filter((email) => email), // Process to string array, remove empty strings
               logo: logoUrl,
               membre_ids: [1],
               description: "",
             };
+            console.log("organizationData", organizationData);
             // console.log("there", organizationData); // Kept for now, can be removed
-            await createOrganization(organizationData);
+            const res = await createOrganization(organizationData);
+            console.log("reponse", res);
 
             toast.success(`L'organisation a été créée avec succès`);
-            onComplete(); // Call onComplete on success
+            //onComplete(); // Call onComplete on success
           } catch (error) {
             if (error instanceof z.ZodError) {
               const newErrors: Record<string, string> = {};
@@ -381,20 +415,30 @@ export function AddOrganisationAfterLogin({ onComplete }: AddOrganisationAfterLo
               });
             } else if (error instanceof AxiosError) {
               toast.error("Erreur lors de la création de l'organisation", {
-                description: error?.response?.data?.detail || "Une erreur serveur est survenue.",
+                description:
+                  error?.response?.data?.detail ||
+                  "Une erreur serveur est survenue.",
               });
             } else {
-                toast.error("Une erreur inattendue est survenue lors de la création de l'organisation.");
-                console.error("Unexpected error creating organization:", error);
+              toast.error(
+                "Une erreur inattendue est survenue lors de la création de l'organisation."
+              );
+              console.error("Unexpected error creating organization:", error);
             }
           }
         }}
       >
         <div className="flex flex-col gap-3">
           <Label htmlFor="nom_entreprise">Nom de l&apos;entreprise</Label>
-          <Input id="nom_entreprise" name="nom_entreprise" className="h-[36px]" />
+          <Input
+            id="nom_entreprise"
+            name="nom_entreprise"
+            className="h-[36px]"
+          />
           {errors.nom_entreprise && (
-            <span className="text-red-500 text-xs">{errors.nom_entreprise}</span>
+            <span className="text-red-500 text-xs">
+              {errors.nom_entreprise}
+            </span>
           )}
         </div>
         <div className="flex flex-col sm:flex-row sm:justify-between gap-5">
@@ -412,13 +456,13 @@ export function AddOrganisationAfterLogin({ onComplete }: AddOrganisationAfterLo
             )}
           </div>
           <div className="flex flex-col gap-3 w-full sm:w-[48%]">
-            <Label htmlFor="taille">Taille</Label>
+            <Label htmlFor="taille">Nombre de salariés</Label>
             <Input
               type="number"
               id="taille"
               name="taille"
               className="h-[36px]"
-              placeholder="Entrez la taille"
+              placeholder="Entrez le nombre de salariés"
             />
             {errors.taille && (
               <span className="text-red-500 text-xs">{errors.taille}</span>
@@ -455,36 +499,47 @@ export function AddOrganisationAfterLogin({ onComplete }: AddOrganisationAfterLo
         </div>
         <div className="flex flex-col gap-3">
           <Label htmlFor="annee_election">Année d’élection</Label>
-          <Input id="annee_election" name="annee_election" type="number" placeholder="YYYY" className="h-[36px]" />
+          <Input
+            id="annee_election"
+            name="annee_election"
+            type="number"
+            placeholder="YYYY"
+            className="h-[36px]"
+          />
           {errors.annee_election && (
-            <span className="text-red-500 text-xs">{errors.annee_election}</span>
+            <span className="text-red-500 text-xs">
+              {errors.annee_election}
+            </span>
           )}
         </div>
         <div className="flex flex-col gap-3">
           <Label htmlFor="convention_collective">Convention collective</Label>
-          <Select name="convention_collective">
-            <SelectTrigger className="w-full h-[36px]">
-              <SelectValue placeholder="Choisissez la convention collective" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectLabel>Conventions (Exemples)</SelectLabel>
-                <SelectItem value="syntec">Syntec</SelectItem>
-                <SelectItem value="metallurgie">Métallurgie</SelectItem>
-                <SelectItem value="commerce_gros">Commerce de gros</SelectItem>
-                <SelectItem value="autre">Autre</SelectItem>
-              </SelectGroup>
-            </SelectContent>
-          </Select>
+          <Input
+            id="convention_collective"
+            name="convention_collective"
+            className="h-[36px]"
+            placeholder="Entrez la convention collective"
+          />
           {errors.convention_collective && (
-            <span className="text-red-500 text-xs">{errors.convention_collective}</span>
+            <span className="text-red-500 text-xs">
+              {errors.convention_collective}
+            </span>
           )}
         </div>
         <div className="flex flex-col gap-3">
-          <Label htmlFor="membres_cse_invites">Invitez les membres CSE (emails séparés par virgule)</Label>
-          <Input id="membres_cse_invites" name="membres_cse_invites" placeholder="membre1@email.com, membre2@email.com" className="h-[36px]" />
+          <Label htmlFor="membres_cse_invites">
+            Invitez les membres CSE (emails séparés par virgule)
+          </Label>
+          <Input
+            id="membres_cse_invites"
+            name="membres_cse_invites"
+            placeholder="membre1@email.com, membre2@email.com"
+            className="h-[36px]"
+          />
           {errors.membres_cse_invites && (
-            <span className="text-red-500 text-xs">{errors.membres_cse_invites}</span>
+            <span className="text-red-500 text-xs">
+              {errors.membres_cse_invites}
+            </span>
           )}
         </div>
         <div>
@@ -494,21 +549,36 @@ export function AddOrganisationAfterLogin({ onComplete }: AddOrganisationAfterLo
           <div className="relative rounded-[8px] overflow-hidden border border-dashed border-white-300">
             <Input
               name="logo"
-              id="logoInputAddOrgAfterLogin" 
+              id="logoInputAddOrgAfterLogin"
               onChange={handleFileInputChange}
               type="file"
               accept="image/*"
               className="w-full h-[136px] bg-white-50 cursor-pointer opacity-0 absolute top-0 left-0 z-10"
             />
-             <Label htmlFor="logoInputAddOrgAfterLogin" className="w-full h-[136px] bg-white-50 flex flex-col gap-2 justify-center items-center cursor-pointer">
+            <Label
+              htmlFor="logoInputAddOrgAfterLogin"
+              className="w-full h-[136px] bg-white-50 flex flex-col gap-2 justify-center items-center cursor-pointer"
+            >
               <CirclePlus />
               <h6>Glissez et déposez ou cliquez ici pour choisir un fichier</h6>
               <div>Taille maximale 10MB</div>
             </Label>
           </div>
-           {logoUrl && (
+          {logoUrl && (
             <div className="mt-2 flex justify-center">
-              <Image src={logoUrl} alt="Aperçu du logo" className="h-20 w-auto rounded border object-contain"/>
+              <X
+                onClick={() => {
+                  setLogoUrl("");
+                }}
+                className="cursor-pointer"
+              />
+              <Image
+                src={logoUrl}
+                alt="Aperçu du logo"
+                className="h-20 w-auto rounded border object-contain"
+                width={100}
+                height={100}
+              />
             </div>
           )}
         </div>
@@ -516,16 +586,17 @@ export function AddOrganisationAfterLogin({ onComplete }: AddOrganisationAfterLo
           <Button
             type="button"
             variant="outline"
-            onClick={onComplete} 
+            onClick={onComplete}
             className="w-full sm:w-auto"
           >
             Passer
           </Button>
           <Button
             type="submit"
-            className="bg-gradient-to-r from-[#FE6539] to-crimson-400 w-full sm:w-auto"
+            className="bg-gradient-to-r from-[#FE6539] to-crimson-400 w-full sm:w-auto flex items-center gap-2"
           >
-            Créer l&apos;organisation <ChevronRight />
+            <h6>Créer l&apos;organisation</h6>
+            <ChevronRight />
           </Button>
         </div>
       </form>

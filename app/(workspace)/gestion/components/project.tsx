@@ -8,8 +8,11 @@ import { toast } from "sonner";
 import { Popover } from "../../components/popover";
 interface ProjectCardProps {
   project: Project;
+  onSubmitProject: () => void;
 }
-export default function ProjectCard({ project }: ProjectCardProps) {
+export default function ProjectCard({ project, onSubmitProject }: ProjectCardProps) {
+  const [open, setOpen] = useState(false);
+
   return (
     <div className="relative bg-[#ffffff] w-full sm:w-[calc(50%-0.5rem)] lg:w-[calc(33.333%-0.666rem)] xl:w-[calc(25%-0.75rem)] h-[120px] rounded-[12px] py-4 px-3 flex flex-col justify-between">
       <Link
@@ -33,7 +36,13 @@ export default function ProjectCard({ project }: ProjectCardProps) {
         </div>
       </Link>
       <Popover
-        PopoverContent={<PopoverContent project={project} />}
+        open={open}
+        onOpenChange={setOpen}
+        PopoverContent={<PopoverContent project={project} onSubmit={() => {
+          setOpen(false)
+      onSubmitProject()
+          }}/>
+        }
         PopoverTrigger={
           <div className="w-6 h-6 justify-center items-center rounded-sm cursor-pointer flex hover:bg-coral-50 duration-200 absolute right-2 top-3 z-50">
             <Ellipsis className="" size={18} />
@@ -46,9 +55,10 @@ export default function ProjectCard({ project }: ProjectCardProps) {
 
 interface PopoverContentProps {
   project: Project;
+  onSubmit: () => void;
 }
 
-const PopoverContent = ({ project }: PopoverContentProps) => {
+const PopoverContent = ({ project, onSubmit }: PopoverContentProps) => {
   const [updatedName, setUpdatedName] = useState(project.title);
 
   // Function to delete the project
@@ -56,7 +66,7 @@ const PopoverContent = ({ project }: PopoverContentProps) => {
     try {
       await deleteProject(project.id);
       toast.success("Projet supprimé avec succès");
-      window.location.reload();
+      onSubmit();
     } catch (error: unknown) {
       console.error("Error deleting project:", error);
       toast.error("Erreur lors de la suppression du projet");
@@ -73,7 +83,7 @@ const PopoverContent = ({ project }: PopoverContentProps) => {
     try {
       await updateProject(project.id, { title: updatedName });
       toast.success("Projet renommé avec succès");
-      window.location.reload();
+      onSubmit();
     } catch (error: unknown) {
       console.error("Error updating project:", error);
       toast.error("Erreur lors de la mise à jour du projet");

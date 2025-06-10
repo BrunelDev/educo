@@ -13,7 +13,9 @@ import {  getOrganization, OrganizationResponse } from "@/lib/api/organisation";
 import EmptyState from "@/app/_components/EmptyState";
 
 export default function Equipe() {
-  
+  const [isAddOrgDialogOpen, setIsAddOrgDialogOpen] = useState(false);
+  const [isAddMemberDialogOpen, setIsAddMemberDialogOpen] = useState(false);
+  const [refresh, setRefresh] = useState(false);
   //const [searchValue, setSearchValue] = useState<string>("");
   const [users, setUsers] = useState<OrganizationResponse>();
        useEffect(() => {
@@ -32,7 +34,7 @@ export default function Equipe() {
             }
           };
           fun();
-       }, []);
+       }, [isAddOrgDialogOpen,isAddMemberDialogOpen,refresh]);
 
     return (
       <div className="flex relative flex-col gap-6 w-full px-4 sm:px-6">
@@ -62,6 +64,8 @@ export default function Equipe() {
             {!users?.organisation &&
             <div className="sm:absolute sm:right-6 sm:-top-11 order-first sm:order-none mb-2 sm:mb-0">
             <DialogComponent
+              open={isAddOrgDialogOpen}
+              onOpenChange={setIsAddOrgDialogOpen}
               className={"sm:max-w-[768px]"}
               dialoTrigger={
                 <Button
@@ -71,7 +75,7 @@ export default function Equipe() {
                   <Plus className="mr-1" /> <span className="whitespace-nowrap">Ajouter une organisation</span>
                 </Button>
               }
-              dialogContent={<AddOrganisation/>}
+              dialogContent={<AddOrganisation handleClose={() => setIsAddOrgDialogOpen(false)} />}
               dialogTitle={null}
             />
           </div> }
@@ -81,6 +85,8 @@ export default function Equipe() {
             <div className="w-full sm:w-auto">
               {users?.organisation?.id ?
                 <DialogComponent
+                  open={isAddMemberDialogOpen}
+                  onOpenChange={setIsAddMemberDialogOpen}
                   dialoTrigger={
                     <Button
                       variant={"default"}
@@ -89,7 +95,7 @@ export default function Equipe() {
                       <Plus className="mr-1" /> <span className="whitespace-nowrap">Ajouter un membre</span>
                     </Button>
                   }
-                  dialogContent={<TeamFormHandler orgId={users?.organisation?.id}/>}
+                  dialogContent={<TeamFormHandler orgId={users?.organisation?.id} handleClose={() => setIsAddMemberDialogOpen(false)} />}
                   dialogTitle={null}
                 /> : null
               }
@@ -101,7 +107,7 @@ export default function Equipe() {
         <div className="flex flex-wrap gap-4">
           {users
             ? users.membres?.map((user, index) => (
-                <AssociateCard key={user.id + index} associate={user} />
+                <AssociateCard refresh={() => setRefresh(!refresh)} key={user.id + index} teamId={users?.organisation?.id} associate={user} />
               ))
             : <div className="col-span-full flex justify-center items-center py-8">
                 <EmptyState 
@@ -113,7 +119,7 @@ export default function Equipe() {
         </div>
         {/*<div className="flex flex-wrap gap-6">
           {associates.map((associate, index) => (
-            <AssociateCard key={associate.id + index} associate={associate} />
+            <AssociateCard key={associate.id + index} teamId={users?.organisation?.id} associate={associate} />
           ))}
         </div>*/}
       </div>

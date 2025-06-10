@@ -40,20 +40,28 @@ export default function DossierPage({
     fetchFolder();
   }, [id]);
 
+  const fetchDossiers = async () => {
+      const response = await getOneDossiers(id);
+        setFolderContent(response);
+      
+    }
+
   return (
     <div className="p-4 flex flex-col gap-10">
-      <div className="">
-        <div className="flex justify-between items-center mb-6">
+      <div className="w-full">
+        <div className="flex w-full justify-between items-center mb-6">
           <h6>Les fichiers</h6>
-          <DialogComponent
-            dialogContent={<CreateFile folderId={id} />}
-            dialoTrigger={
-              <Button className="bg-gradient-to-r from-[#FE6539] to-crimson-400 w-fit">
-                Nouveau Fichier
-              </Button>
-            }
-            dialogTitle={null}
-          />
+          <div>
+            <DialogComponent
+              dialogContent={<CreateFile folderId={id} />}
+              dialoTrigger={
+                <Button className="bg-gradient-to-r from-[#FE6539] to-crimson-400 w-fit">
+                  Nouveau Fichier
+                </Button>
+              }
+              dialogTitle={null}
+            />
+          </div>
         </div>
         <ul className="flex gap-5 flex-wrap">
           {folderContent && folderContent?.fichiers.length > 0 ? (
@@ -75,15 +83,17 @@ export default function DossierPage({
       <div>
         <div className="w-full flex justify-between mb-6">
           <h6>Les Sous dossiers</h6>
-          <DialogComponent
-            dialogContent={<CreateFolder folderId={id} />}
-            dialoTrigger={
-              <Button className="bg-gradient-to-r from-[#FE6539] to-crimson-400 w-fit">
-                Nouveau Dossier
-              </Button>
-            }
-            dialogTitle={null}
-          />
+          <div>
+            <DialogComponent
+              dialogContent={<CreateFolder folderId={id} />}
+              dialoTrigger={
+                <Button className="bg-gradient-to-r from-[#FE6539] to-crimson-400 w-fit">
+                  Nouveau Dossier
+                </Button>
+              }
+              dialogTitle={null}
+            />
+          </div>
         </div>
 
         <ul className="flex gap-5 flex-wrap">
@@ -92,9 +102,7 @@ export default function DossierPage({
               <li key={folder.id}>
                 <Folder
                   folder={folder}
-                  fetchDossiers={function (): Promise<void> {
-                    throw new Error("Function not implemented.");
-                  }}
+                  fetchDossiers={fetchDossiers}
                 />
               </li>
             ))

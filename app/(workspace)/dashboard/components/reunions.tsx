@@ -61,19 +61,12 @@ const ReunionComponent = ({ meeting }: MeetingComponentProps) => {
             alt="calendar icon"
           />
           <h6>{formatDateToFrench(meeting.date_heure.toLocaleString())}</h6>
-          
         </div>
       </div>
       <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center gap-1 sm:gap-0">
-        <h6 className="font-extrabold text-[14px] text-wrap">{meeting.titre}</h6>
-        <div className="cursor-pointer">
-          <Image
-            src={"/dots-icon.svg"}
-            width={13.5}
-            height={1.5}
-            alt="calendar icon"
-          />
-        </div>
+        <h6 className="font-extrabold text-[14px] text-wrap">
+          {meeting.titre}
+        </h6>
       </div>
       <p className="text-sm break-all">{meeting.objet}</p>
       <div className="flex flex-wrap gap-2">

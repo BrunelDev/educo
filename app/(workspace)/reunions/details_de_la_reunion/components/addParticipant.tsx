@@ -1,13 +1,11 @@
 "use cleint";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   getOrganisationMembers,
   OrganizationMember,
 } from "@/lib/api/organisation";
-import { Link } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 export default function AddMemberDialog({
@@ -15,7 +13,6 @@ export default function AddMemberDialog({
 }: {
   handleSubmission: (users: number[]) => Promise<void>;
 }) {
-  const invitationToken = "XYZ123ABC";
 
   const [users, setUsers] = useState<OrganizationMember[] | null>(null);
   const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
@@ -38,32 +35,8 @@ export default function AddMemberDialog({
       <h6 className="text-[20px] font-bold text-white-800">
         Ajouter un membre
       </h6>
-      <div className="flex gap-2 items-center">
-        <Input
-          disabled
-          value={"https://bonjourcse.com/invitation?token=" + invitationToken}
-        />
-        <Button
-          variant={"default"}
-          className="w-fit bg-white-100 text-white-800 hover:bg-coral-50"
-        >
-          {" "}
-          <Link />
-          Copier
-        </Button>
-      </div>
-      <div className=" flex gap-2 items-center">
-        <Input
-          type="email"
-          placeholder="Invitez des gens par nom ou par email"
-        />
-        <Button
-          variant="default"
-          className="rounded-[8px] bg-gradient-to-r from-[#FE6539] to-crimson-400"
-        >
-          Inviter
-        </Button>
-      </div>
+      
+   
       <div>
         <h6 className="font-medium text-[10px]">Invitation en attente</h6>
         <ScrollArea className=" mt-3 flex flex-col px-3">
@@ -97,7 +70,7 @@ export default function AddMemberDialog({
                   </div>
                 </div>
               ))
-            : null}
+            : <h6 className="font-medium text-[10px]">Aucun membre</h6>}
         </ScrollArea>
       </div>
       <Button

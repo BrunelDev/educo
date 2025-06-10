@@ -4,7 +4,7 @@ import { Notification, NotificationApiResponse } from "@/lib/api/notifications";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
-export default function Notifications() {
+export function Notifications() {
   const [displayNotifications, setDisplayNotifications] =
     useState<boolean>(false);
   const [notifications, setNotifications] = useState<NotificationApiResponse>();
@@ -80,14 +80,20 @@ const NotificationComponent = ({
             />
           </div>
         </div>
-        <div className="flex flex-col gap-4">
-          {notifications.map((notification, index) => (
-            <NotificationItem
-              notification={notification}
-              key={index + notification.id}
-            />
-          ))}
-        </div>
+        {notifications.length === 0 ? (
+          <div className="flex flex-col gap-4">
+            <p className="text-sm text-white-800">Aucune notification</p>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-4">
+            {notifications.map((notification, index) => (
+              <NotificationItem
+                notification={notification}
+                key={index + notification.id}
+              />
+            ))}
+          </div>
+        )}
       </div>
     );
   }

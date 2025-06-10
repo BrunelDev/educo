@@ -1,9 +1,11 @@
+"use client";
 import { DialogComponent } from "@/app/_components/dialogComponent";
 import { Button } from "@/components/ui/button";
 import { ConsultationDialogProps, ConsultationType } from "@/lib/types";
 import ConsultationDialogContent from "./components/consultationDialogContent";
 import History from "./components/consultationHistory";
-import ConsultationTitle from "./components/consultationTitle";
+import { ConsultationTitle } from "./components/consultationTitle";
+import { useState } from "react";
 
 export default function Consultation() {
   const consultationTiltes = [
@@ -96,8 +98,7 @@ Cette réunion a lieu une fois par an. L’employeur présente la vision straté
         `📄 Documents à demander à l’employeur
 - Plan stratégique (présentation ou rapport).
 - Projets d’investissement, de réorganisation, d’innovation.
-- Données économiques, prévisions d’emploi, politique RH.
-`,
+- Données économiques, prévisions d’emploi, politique RH.`,
         `
 🧠 Attitude à adopter
 - Lire les documents en amont, préparer des questions.
@@ -360,25 +361,44 @@ Le CSE est systématiquement consulté sur les mesures liées à la sécurité, 
     },
   ];
 
+  const [isNewConsultationDialogOpen, setIsNewConsultationDialogOpen] =
+    useState(false);
+  const [currentIndex, setCurrentIndex] = useState<number | null>(null);
+  const [refresh, setRefresh] = useState(false);
+
   return (
     <div className="relative">
       <h6>Consultations obligatoires</h6>
       <div className="flex flex-wrap gap-2 mb-8">
         {consultationTiltes.map((consultationTitle, index) => (
           <DialogComponent
+            open={currentIndex === index}
+            onOpenChange={(open: boolean) => {
+              if (open) {
+                setCurrentIndex(index);
+              } else {
+                setCurrentIndex(null);
+              }
+            }}
             className={
               "sm:max-w-[980px] flex items-center justify-center py-10 px-20"
             }
             key={consultationTitle.title + index}
             dialoTrigger={
-              <ConsultationTitle
-                title={consultationTitle.title}
-                barNumber={consultationTitle.barNumber}
-              />
+              <div onClick={() => setCurrentIndex(index)}>
+                <ConsultationTitle
+                  title={consultationTitle.title}
+                  barNumber={consultationTitle.barNumber}
+                />
+              </div>
             }
             dialogContent={
               <ConsultationDialogContent
                 consultation={consultationList[index]}
+                handleSubmit={() => {
+                  setCurrentIndex(null);
+                  setRefresh(!refresh);
+                }}
               />
             }
             dialogTitle={null}
@@ -386,9 +406,12 @@ Le CSE est systématiquement consulté sur les mesures liées à la sécurité, 
         ))}
       </div>
       <div>
-        <History />
+        <History refresh={refresh} />
       </div>
       <DialogComponent
+        dialogTitle={null}
+        open={isNewConsultationDialogOpen}
+        onOpenChange={setIsNewConsultationDialogOpen}
         className={
           "sm:max-w-[980px] flex items-center justify-center py-10 px-20"
         }
@@ -401,9 +424,14 @@ Le CSE est systématiquement consulté sur les mesures liées à la sécurité, 
           </Button>
         }
         dialogContent={
-          <ConsultationDialogContent consultation={defaultConsultation} />
+          <ConsultationDialogContent
+            consultation={defaultConsultation}
+            handleSubmit={() => {
+              setIsNewConsultationDialogOpen(false);
+              setRefresh(!refresh);
+            }}
+          />
         }
-        dialogTitle={""}
       />
     </div>
   );

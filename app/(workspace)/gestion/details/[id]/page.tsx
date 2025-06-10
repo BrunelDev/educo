@@ -6,6 +6,7 @@ import ProjectsTodo from "../components/projectsTodo";
 export default function Detail({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const [projectDetails, setProjectDetails] = useState<Project>(); // Renamed for clarity
+  const [refresh, setRefresh] = useState(false)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -20,7 +21,8 @@ export default function Detail({ params }: { params: Promise<{ id: string }> }) 
     if (id) { // Ensure id is available before fetching
       fetchData();
     }
-  }, [id]); // Removed tasks from dependency array as it causes re-fetch on tasks update by child
+  }, [id,refresh]); // Removed tasks from dependency array as it causes re-fetch on tasks update by child
+
 
   return (
     <div className="flex flex-col gap-5 p-4 md:p-6"> {/* Added padding */}
@@ -32,9 +34,9 @@ export default function Detail({ params }: { params: Promise<{ id: string }> }) 
       </h6>
       {projectDetails ? (
         <div className="flex flex-col lg:flex-row gap-6"> {/* Responsive flex and adjusted gap */}
-          <ProjectsTodo tasks={projectDetails} filterBy="a_faire" />
-          <ProjectsTodo tasks={projectDetails} filterBy="termine" />
-          <ProjectsTodo tasks={projectDetails} filterBy="en_cours" />
+          <ProjectsTodo tasks={projectDetails} filterBy="a_faire" setRefresh={()=>setRefresh((v:boolean)=>{return !v})}/>
+          <ProjectsTodo tasks={projectDetails} filterBy="en_cours" setRefresh={()=>setRefresh((v:boolean)=>{return !v})}/>
+          <ProjectsTodo tasks={projectDetails} filterBy="termine" setRefresh={()=>setRefresh((v:boolean)=>{return !v})}/>
         </div>
       ) : (
         <div className="text-center py-10">Chargement des tâches...</div> // Loading state for tasks

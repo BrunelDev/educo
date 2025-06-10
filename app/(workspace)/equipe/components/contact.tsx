@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { getOrganization, OrganizationResponse } from "@/lib/api/organisation";
 import { Mail, MapPin, Phone } from "lucide-react";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import UpdateOrganisationForm from "./updateOrganisation";
 export default function Contact() {
   const contact = {
@@ -14,14 +14,26 @@ export default function Contact() {
     email: "contact@acme-solutions.com",
     address: "10 Rue des Startups, 75000 Paris, France",
   };
-  const [organisation, setOrganisation] = useState<OrganizationResponse>()
-  useEffect(() => {
-    const fetchOrganisation = async () => {
-      const response = await getOrganization()
-      setOrganisation(response)
+  const [organisation, setOrganisation] = useState<OrganizationResponse>();
+  const [isUpdateOrgFormOpen, setIsUpdateOrgFormOpen] = useState(false);
+
+  const fetchOrganisation = useCallback(async () => {
+    try {
+      const response = await getOrganization();
+      setOrganisation(response);
+    } catch (error) {
+      console.error("Error fetching organisation:", error);
     }
-      fetchOrganisation()
-  }, [])
+  }, []);
+
+  useEffect(() => {
+    fetchOrganisation();
+  }, [fetchOrganisation]);
+
+  const handleFormClose = async () => {
+    setIsUpdateOrgFormOpen(false);
+    await fetchOrganisation();
+  };
   if(organisation)
   {return (
     <div className="w-full bg-[#FFFFFF99] flex flex-col gap-3 rounded-[8px] p-3 sm:p-4">
@@ -43,14 +55,16 @@ export default function Contact() {
           </div>
         </div>
         <div className="self-start sm:self-center">
-          <DialogComponent 
+          <DialogComponent
+            open={isUpdateOrgFormOpen}
+            onOpenChange={setIsUpdateOrgFormOpen}
             className="sm:max-w-[768px] flex justify-center items-center"
             dialoTrigger={
               <Button className="bg-white-100 hover:bg-white-200 text-white-800 text-xs h-8">
                 Modifier
               </Button>
             } 
-            dialogContent={<UpdateOrganisationForm orgId={organisation?.organisation.id} />} 
+            dialogContent={<UpdateOrganisationForm orgId={organisation?.organisation.id} handleClose={handleFormClose} />} 
             dialogTitle={null}
           />
         </div>
