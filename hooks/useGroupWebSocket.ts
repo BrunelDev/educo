@@ -3,35 +3,7 @@
 import { getCookies } from "@/lib/utils/cookies";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-
-export interface MessageSender {
-  id: number;
-  email: string;
-  first_name: string;
-  last_name: string;
-}
-
-export interface WebSocketMessage {
-  id: number; // Assuming group messages also have a unique ID
-  content: string;
-  type_message: "text" | "file" | "image" | "audio"; // Kept for consistency, but group might be text-only via WS
-  sender: MessageSender;
-  timestamp: string;
-  is_read?: boolean; // May not be applicable or handled differently for groups
-  fichier?: string | null;
-  image?: string | null;
-  audio?: string | null;
-  status?: "sent" | "received" | "stale";
-}
-
-// WebSocket connection states
-export enum ConnectionState {
-  CONNECTING = "connecting",
-  CONNECTED = "connected",
-  DISCONNECTED = "disconnected",
-  RECONNECTING = "reconnecting",
-  ERROR = "error",
-}
+import { WebSocketMessage, ConnectionState } from "@/lib/types/websocket";
 
 export const useGroupWebSocket = (groupId: string | number | null) => {
   const [messages, setMessages] = useState<WebSocketMessage[]>([]);
@@ -45,6 +17,7 @@ export const useGroupWebSocket = (groupId: string | number | null) => {
   const socketRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const connectionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const isConnectedRef = useRef(false);
   const maxReconnectAttempts = 5;
   const connectionTimeoutMs = 10000; // 10 seconds
 
@@ -70,7 +43,7 @@ export const useGroupWebSocket = (groupId: string | number | null) => {
 
     try {
       // IMPORTANT: URL changed for group WebSockets
-      const wsUrl = `${process.env.NEXT_PUBLIC_WEBSOCKET_URL}groupes-fermes/${groupId}/?token=${token}`;
+      const wsUrl = `${process.env.NEXT_PUBLIC_GROUP_WEBSOCKET_URL}${groupId}/?token=${token}`;
       console.log("Connecting to Group WebSocket:", wsUrl);
       const ws = new WebSocket(wsUrl);
 
@@ -86,6 +59,7 @@ export const useGroupWebSocket = (groupId: string | number | null) => {
       ws.onopen = () => {
         console.log("Group WebSocket Connected");
         setIsConnected(true);
+        isConnectedRef.current = true;
         setConnectionState(ConnectionState.CONNECTED);
         setReconnectAttempts(0);
 
@@ -98,55 +72,43 @@ export const useGroupWebSocket = (groupId: string | number | null) => {
       ws.onmessage = (event) => {
         try {
           const data = JSON.parse(event.data);
-          console.log("Received group message:", data);
+          console.log("Received group message from consumer:", data);
 
-          // TODO: CRITICAL - Confirm the structure of incoming group messages from the backend.
-          // The current parsing assumes a structure like: data.message.content, data.message.sender, etc.
-          // This might be different for group messages (e.g., data.content, data.sender directly).
-          
-          // Assuming the message content is nested under a 'message' key, similar to individual chats but potentially simpler.
-          // If the structure is flat (e.g. data.content, data.sender), this needs adjustment.
-          if (data.message && data.message.content && data.message.sender) { 
+          // Based on ClosedGroupConsumer, the structure is flat: { auteur, message, timestamp }
+          if (data.message && data.auteur && data.timestamp) {
             const receivedMessage: WebSocketMessage = {
-              id: data.message.id, // Ensure group messages have an ID
-              content: data.message.content,
-              type_message: "text", // Assuming group WS messages are text for now
+              // WS messages from group consumer don't have an ID. Use timestamp + content as a temporary key.
+              id: Date.parse(data.timestamp) + Math.random(), // Or generate a more robust client-side ID
+              content: data.message,
+              type_message: "text",
               sender: {
-                id: data.message.sender.id,
-                email: data.message.sender.email,
-                first_name: data.message.sender.first_name || "",
-                last_name: data.message.sender.last_name || "",
+                id: 0, // Placeholder ID, real ID might be found by matching email to a user list
+                email: data.auteur,
+                first_name: data.auteur.split('@')[0], // Best effort display name
+                last_name: "",
               },
-              timestamp: data.message.timestamp, // Ensure timestamp is provided
-              // is_read might not be directly applicable or handled differently
+              timestamp: data.timestamp,
+              is_read: true, // For groups, read status is complex. Default to true for incoming.
               status: "received",
+              // Add fields from shared WebSocketMessage, defaulting them as they are not in group WS messages
+              room: `group_${groupId}`, // Can add a room identifier for context if needed
+              is_deleted: false,
+              fichier: null,
+              image: null,
+              audio: null,
             };
 
             setMessages((prevMessages) => {
               if (!Array.isArray(prevMessages)) return [receivedMessage];
-              // Prevent duplicate messages by ID if messages can be re-fetched or resent
-              if (prevMessages.some(msg => msg.id === receivedMessage.id)) return prevMessages;
+              // Avoid duplicates based on timestamp and content, as ID is not reliable
+              if (prevMessages.some(msg => msg.timestamp === receivedMessage.timestamp && msg.content === receivedMessage.content)) {
+                return prevMessages;
+              }
               return [...prevMessages, receivedMessage];
             });
-          } else if (data.content && data.sender) { // Fallback for a flatter structure
-            const receivedMessage: WebSocketMessage = {
-              id: data.id, 
-              content: data.content,
-              type_message: "text", 
-              sender: {
-                id: data.sender.id,
-                email: data.sender.email,
-                first_name: data.sender.first_name || "",
-                last_name: data.sender.last_name || "",
-              },
-              timestamp: data.timestamp, 
-              status: "received",
-            };
-            setMessages((prevMessages) => {
-              if (!Array.isArray(prevMessages)) return [receivedMessage];
-              if (prevMessages.some(msg => msg.id === receivedMessage.id)) return prevMessages;
-              return [...prevMessages, receivedMessage];
-            });
+          } else if (data.error) {
+            console.error(`Error from group websocket: ${data.error}`);
+            toast.error(`Erreur: ${data.error}`);
           } else {
             console.warn("Received unknown group message format:", data);
           }
@@ -156,29 +118,49 @@ export const useGroupWebSocket = (groupId: string | number | null) => {
       };
 
       ws.onerror = (error) => {
-        console.error("Group WebSocket Error:", error);
+        console.error(`Group WebSocket Error for URL: ${ws.url}`, error);
         setConnectionError("Connection error. Please try again later.");
         setConnectionState(ConnectionState.ERROR);
       };
 
       ws.onclose = (event) => {
-        console.log("Group WebSocket Disconnected", event);
+        console.log(
+          `Group WebSocket Disconnected: Code=${event.code}, Reason=${event.reason}`,
+          event
+        );
+        const wasConnected = isConnectedRef.current;
+        isConnectedRef.current = false;
         setIsConnected(false);
         setMessages((prevMessages) =>
           prevMessages.map((msg) => ({ ...msg, status: "stale" }))
         );
 
-        if (!event.wasClean && reconnectAttempts < maxReconnectAttempts && groupId) { // Added groupId check
+        // Only attempt to reconnect if the connection was previously established
+        if (
+          wasConnected &&
+          !event.wasClean &&
+          reconnectAttempts < maxReconnectAttempts &&
+          groupId
+        ) {
           setConnectionState(ConnectionState.RECONNECTING);
-          const timeout = Math.min(1000 * Math.pow(2, reconnectAttempts), 30000);
+          const timeout = Math.min(
+            1000 * Math.pow(2, reconnectAttempts),
+            30000
+          );
           console.log(
-            `Attempting to reconnect group WS in ${timeout}ms... (Attempt ${reconnectAttempts + 1}/${maxReconnectAttempts})`
+            `Attempting to reconnect group WS in ${timeout}ms... (Attempt ${
+              reconnectAttempts + 1
+            }/${maxReconnectAttempts})`
           );
           reconnectTimeoutRef.current = setTimeout(() => {
             setReconnectAttempts((prev) => prev + 1);
             connectWebSocket();
           }, timeout);
-        } else if (event.wasClean || reconnectAttempts >= maxReconnectAttempts) {
+        } else if (
+          !wasConnected ||
+          event.wasClean ||
+          reconnectAttempts >= maxReconnectAttempts
+        ) {
           setConnectionState(ConnectionState.DISCONNECTED);
         }
       };
@@ -193,7 +175,7 @@ export const useGroupWebSocket = (groupId: string | number | null) => {
 
   // Effect to connect and disconnect WebSocket
   useEffect(() => {
-    if (groupId && connectionState === ConnectionState.DISCONNECTED && reconnectAttempts === 0) {
+    if (groupId) {
       connectWebSocket();
     }
 
@@ -212,7 +194,7 @@ export const useGroupWebSocket = (groupId: string | number | null) => {
         setConnectionState(ConnectionState.DISCONNECTED);
       }
     };
-  }, [groupId, connectWebSocket, connectionState, reconnectAttempts]);
+  }, [groupId, connectWebSocket]);
 
   // Function to send a message
   const sendMessage = (text: string) => {
@@ -226,16 +208,17 @@ export const useGroupWebSocket = (groupId: string | number | null) => {
         // This requires knowing the sender's details (current user) and generating a temporary ID
       } catch (error) {
         console.error("Error sending group message:", error);
-        toast.error("Failed to send message.");
+        toast.error("Erreur lors de l'envoi du message.");
       }
     } else {
       console.error("Group WebSocket is not connected. Message not sent.");
-      toast.error("Not connected. Message not sent.");
+      toast.error("Non connecté. Message non envoyé.");
     }
   };
 
   return {
     messages,
+    setMessages, // Exporting setMessages to be used in components
     isConnected,
     connectionState,
     connectionError,

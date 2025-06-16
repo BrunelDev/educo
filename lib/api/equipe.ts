@@ -46,28 +46,15 @@ export const addMembersToTeam = async (
     return response.data;
   } catch (error) {
     console.error("Error adding members to team", (error as Error).message);
-    return {
-      id: 0,
-      nom: "",
-      description: "",
-      createur: {
-        id: 0,
-        email: "",
-        first_name: "",
-        last_name: "",
-        image: null,
-      },
-      membres: [],
-      date_creation: "",
-      date_modification: "",
-    };
+    throw error;
   }
 };
 
 export const removeFromTeam = async (teamId: number, membersId: number) => {
   try {
     const response = await api.delete(
-      endpoints.equipes.base + `${teamId}/membres/`, {data: {membre_ids: [membersId]}}
+      endpoints.equipes.base + `${teamId}/membres/`,
+      { data: { membre_ids: [membersId] } }
     );
     return response.data;
   } catch (error: unknown) {
@@ -106,12 +93,31 @@ export const grantAccess = async (
       email: memberEmail,
       ...role,
     });
-    const response = await api.post("fichiers/permissions/modifier-fichier/", {
-      email: memberEmail,
-      ...role,
-    });
-
-    return response.data;
+    if (role && "peut_modifier_fichier" in role && role.peut_modifier_fichier) {
+      const response = await api.post(
+        "fichiers/permissions/modifier-fichier/",
+        {
+          email: memberEmail,
+          ...role,
+        }
+      );
+      return response.data;
+    }
+    if (role && "peut_creer_reunion" in role && role.peut_creer_reunion) {
+      const response = await api.post("fichiers/permissions/creer-reunion/", {
+        email: memberEmail,
+        ...role,
+      });
+      return response.data;
+    }
+    if (role && "peut_utiliser_ia" in role && role.peut_utiliser_ia) {
+      const response = await api.post("fichiers/permissions/utiliser-ia/", {
+        email: memberEmail,
+        ...role,
+      });
+      return response.data;
+    }
+    return null;
   } catch (error) {
     console.error("Error granting access", error);
     throw error;

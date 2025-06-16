@@ -7,6 +7,7 @@ import { uploadToS3 } from "@/lib/s3-upload";
 import { FileInputChangeEvent } from "@/lib/types";
 import { AxiosError } from "axios";
 import { ChevronRight, CirclePlus } from "lucide-react";
+import Image from "next/image";
 import { useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -59,7 +60,7 @@ export default function UpdateOrganisationForm({ orgId, handleClose }: { orgId: 
     <ScrollArea className="h-[calc(100vh-10rem)] w-full">
 
     <form
-      className="flex flex-col gap-5 px-20 py-4 w-[762px]"
+      className="flex flex-col gap-5 px-4 sm:px-8 md:px-12 lg:px-16 py-4 w-full max-w-3xl mx-auto"
       onSubmit={async (e) => {
         e.preventDefault();
         const formData = new FormData(e.currentTarget);
@@ -159,125 +160,163 @@ export default function UpdateOrganisationForm({ orgId, handleClose }: { orgId: 
         }
       }}
     >
-      <div className="flex flex-col gap-3">
-        <Label htmlFor="nom_entreprise">Nom de l&apos;entreprise</Label>
-        <Input id="nom_entreprise" name="nom_entreprise" className="h-[36px]" />
-        {errors.nom_entreprise && (
-          <span className="text-red-500 text-xs">{errors.nom_entreprise}</span>
-        )}
-      </div>
-      <div className="flex justify-between">
-        <div className="flex flex-col gap-3 w-[48%]">
-          <Label htmlFor="secteur_activite">Secteur d&apos;activité</Label>
+        <div className="flex flex-col gap-3">
+          <Label htmlFor="nom_entreprise">Nom de l&apos;entreprise</Label>
           <Input
-            id="secteur_activite"
-            name="secteur_activite"
+            id="nom_entreprise"
+            name="nom_entreprise"
             className="h-[36px]"
           />
-          {errors.secteur_activite && (
+          {errors.nom_entreprise && (
             <span className="text-red-500 text-xs">
-              {errors.secteur_activite}
+              {errors.nom_entreprise}
             </span>
           )}
         </div>
-        <div className="flex flex-col gap-3 w-[48%]">
-          <Label htmlFor="taille">Nombre de salariés</Label>
-          <Input
-            type="number"
-            id="taille"
-            name="taille"
-            className="h-[36px]"
-            placeholder="Entrez le nombre de salariés"
-          />
-          {errors.taille && (
-            <span className="text-red-500 text-xs">{errors.taille}</span>
-          )}
-        </div>
-      </div>
-      <div className="flex flex-col gap-3">
-        <Label htmlFor="adresse_siege">Addresse du siège</Label>
-        <Input
-          id="adresse_siege"
-          name="adresse_siege"
-          type="text"
-          className="h-[36px]"
-        />
-        {errors.adresse_siege && (
-          <span className="text-red-500 text-xs">{errors.adresse_siege}</span>
-        )}
-      </div>
-      <div className="flex justify-between">
-        <div className="flex flex-col gap-3 w-[48%]">
-          <Label htmlFor="code_postal">Code postal</Label>
-          <Input id="code_postal" name="code_postal" className="h-[36px]" />
-          {errors.code_postal && (
-            <span className="text-red-500 text-xs">{errors.code_postal}</span>
-          )}
-        </div>
-        <div className="flex flex-col gap-3 w-[48%]">
-          <Label htmlFor="ville">Ville</Label>
-          <Input id="ville" name="ville" className="h-[36px]" />
-          {errors.ville && (
-            <span className="text-red-500 text-xs">{errors.ville}</span>
-          )}
-        </div>
-      </div>
-      {/* Année d’élection */}
-      <div className="flex flex-col gap-3">
-        <Label htmlFor="annee_election">Année d’élection</Label>
-        <Input id="annee_election" name="annee_election" type="number" placeholder="YYYY" className="h-[36px]" />
-        {errors.annee_election && (
-          <span className="text-red-500 text-xs">{errors.annee_election}</span>
-        )}
-      </div>
-
-      {/* Convention collective */}
-      <div className="flex flex-col gap-3">
-        <Label htmlFor="convention_collective">Convention collective</Label>
-        <Input
-          id="convention_collective"
-          name="convention_collective"
-          className="h-[36px]"
-          placeholder="Entrez la convention collective"
-        />
-        {errors.convention_collective && (
-          <span className="text-red-500 text-xs">{errors.convention_collective}</span>
-        )}
-      </div>
-
-      {/* Invitez les membres CSE */}
-      <div className="flex flex-col gap-3">
-        <Label htmlFor="membres_cse_invites">Invitez les membres CSE (emails séparés par virgule)</Label>
-        <Input id="membres_cse_invites" name="membres_cse_invites" placeholder="membre1@email.com, membre2@email.com" className="h-[36px]" />
-        {errors.membres_cse_invites && (
-          <span className="text-red-500 text-xs">{errors.membres_cse_invites}</span>
-        )}
-      </div>
-      <div>
-        <label className="font-medium text-white-800 text-xs">
-          Logo de l&apos;entreprise
-        </label>
-        <div className="relative rounded-[8px] overflow-hidden border border-dashed border-white-300">
-          <Input
-            name="logo"
-            onChange={handleFileInputChange}
-            type="file"
-            accept="image/*"
-            className="w-full h-[136px] bg-white-50 cursor-pointer"
-          />
-          <div className="absolute top-0 left-0 w-full h-[135px] bg-white-50 flex flex-col gap-2 justify-center items-center pointer-events-none">
-            <CirclePlus />
-            <h6>Glissez et déposez ou cliquez ici pour choisir un fichier</h6>
-            <div>Taille maximale 10MB</div>
+        <div className="flex flex-col sm:flex-row sm:justify-between gap-5">
+          <div className="flex flex-col gap-3 w-full sm:w-[48%]">
+            <Label htmlFor="secteur_activite">Secteur d&apos;activité</Label>
+            <Input
+              id="secteur_activite"
+              name="secteur_activite"
+              className="h-[36px]"
+            />
+            {errors.secteur_activite && (
+              <span className="text-red-500 text-xs">
+                {errors.secteur_activite}
+              </span>
+            )}
+          </div>
+          <div className="flex flex-col gap-3 w-full sm:w-[48%]">
+            <Label htmlFor="taille">Nombre de salariés</Label>
+            <Input
+              type="number"
+              id="taille"
+              name="taille"
+              className="h-[36px]"
+              placeholder="Entrez le nombre de salariés"
+            />
+            {errors.taille && (
+              <span className="text-red-500 text-xs">{errors.taille}</span>
+            )}
           </div>
         </div>
-      </div>
-      <Button
-        type="submit"
-        className="self-end bg-gradient-to-r from-[#FE6539] to-crimson-400"
-      >
-        Enregistrer <ChevronRight />
-      </Button>
+        <div className="flex flex-col gap-3">
+          <Label htmlFor="adresse_siege">Addresse du siège</Label>
+          <Input
+            id="adresse_siege"
+            name="adresse_siege"
+            type="text"
+            className="h-[36px]"
+          />
+          {errors.adresse_siege && (
+            <span className="text-red-500 text-xs">{errors.adresse_siege}</span>
+          )}
+        </div>
+        <div className="flex flex-col sm:flex-row sm:justify-between gap-5">
+          <div className="flex flex-col gap-3 w-full sm:w-[48%]">
+            <Label htmlFor="code_postal">Code postal</Label>
+            <Input id="code_postal" name="code_postal" className="h-[36px]" />
+            {errors.code_postal && (
+              <span className="text-red-500 text-xs">{errors.code_postal}</span>
+            )}
+          </div>
+          <div className="flex flex-col gap-3 w-full sm:w-[48%]">
+            <Label htmlFor="ville">Ville</Label>
+            <Input id="ville" name="ville" className="h-[36px]" />
+            {errors.ville && (
+              <span className="text-red-500 text-xs">{errors.ville}</span>
+            )}
+          </div>
+        </div>
+        <div className="flex flex-col gap-3">
+          <Label htmlFor="annee_election">Année d’élection</Label>
+          <Input
+            id="annee_election"
+            name="annee_election"
+            type="number"
+            placeholder="YYYY"
+            className="h-[36px]"
+          />
+          {errors.annee_election && (
+            <span className="text-red-500 text-xs">
+              {errors.annee_election}
+            </span>
+          )}
+        </div>
+        <div className="flex flex-col gap-3">
+          <Label htmlFor="convention_collective">Convention collective</Label>
+          <Input
+            id="convention_collective"
+            name="convention_collective"
+            className="h-[36px]"
+            placeholder="Entrez la convention collective"
+          />
+          {errors.convention_collective && (
+            <span className="text-red-500 text-xs">
+              {errors.convention_collective}
+            </span>
+          )}
+        </div>
+        <div className="flex flex-col gap-3">
+          <Label htmlFor="membres_cse_invites">
+            Invitez les membres CSE (emails séparés par virgule)
+          </Label>
+          <Input
+            id="membres_cse_invites"
+            name="membres_cse_invites"
+            placeholder="membre1@email.com, membre2@email.com"
+            className="h-[36px]"
+          />
+          {errors.membres_cse_invites && (
+            <span className="text-red-500 text-xs">
+              {errors.membres_cse_invites}
+            </span>
+          )}
+        </div>
+        <div>
+          <label className="font-medium text-white-800 text-xs">
+            Logo de l&apos;entreprise
+          </label>
+          <div className="relative rounded-[8px] overflow-hidden border border-dashed border-white-300">
+            <Input
+              name="logo"
+              id="logoInputAddOrgAfterLogin"
+              onChange={handleFileInputChange}
+              type="file"
+              accept="image/*"
+              className="w-full h-[136px] bg-white-50 cursor-pointer opacity-0 absolute top-0 left-0 z-10"
+            />
+            <Label
+              htmlFor="logoInputAddOrgAfterLogin"
+              className="w-full h-[136px] bg-white-50 flex flex-col gap-2 justify-center items-center cursor-pointer"
+            >
+              <CirclePlus />
+              <h6>Glissez et déposez ou cliquez ici pour choisir un fichier</h6>
+              <div>Taille maximale 10MB</div>
+            </Label>
+          </div>
+          {logoUrl && (
+            <div className="mt-2 flex justify-center">
+              <Image
+                src={logoUrl}
+                alt="Aperçu du logo"
+                className="h-20 w-auto rounded border object-contain"
+                width={100}
+                height={100}
+              />
+            </div>
+          )}
+        </div>
+        <div className="flex flex-col sm:flex-row justify-end gap-4 mt-6">
+          <Button
+            type="submit"
+            className="bg-gradient-to-r from-[#FE6539] to-crimson-400 w-full sm:w-auto flex items-center gap-2"
+          >
+            <h6>Enregistrer les modifications</h6>
+            <ChevronRight />
+          </Button>
+        </div>
     </form>
     </ScrollArea>
   );

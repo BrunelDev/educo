@@ -69,7 +69,7 @@ export interface SendMessagePayload {
 }
 
 
-import { WebSocketMessage } from '@/hooks/useWebSocket'; 
+import { WebSocketMessage } from '@/lib/types/websocket'; 
 
 
 export const sendGroupMessageREST = async (groupId: number, payload: SendMessagePayload): Promise<WebSocketMessage> => {

@@ -3,40 +3,13 @@
 import { getCookies } from "@/lib/utils/cookies";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import { WebSocketMessage, ConnectionState } from "@/lib/types/websocket";
 
-export interface MessageSender {
-  id: number;
-  email: string;
-  first_name: string;
-  last_name: string;
-}
-
-export interface WebSocketMessage {
-  id: number;
-  content: string;
-  type_message: "text" | "file" | "image" | "audio";
-  sender: MessageSender;
-  timestamp: string;
-  is_read: boolean;
-  fichier?: string | null;
-  image?: string | null;
-  audio?: string | null;
-  status?: "sent" | "received" | "stale";
-}
-
-interface WebSocketSendMessage {
+export interface WebSocketSendMessage {
   type: string;
   message: string;
   messageType?: string;
-}
-
-// WebSocket connection states
-export enum ConnectionState {
-  CONNECTING = "connecting",
-  CONNECTED = "connected",
-  DISCONNECTED = "disconnected",
-  RECONNECTING = "reconnecting",
-  ERROR = "error",
+  room?: string;
 }
 
 export const useWebSocket = (conversationId: string) => {
@@ -46,11 +19,11 @@ export const useWebSocket = (conversationId: string) => {
     ConnectionState.DISCONNECTED
   );
   const [connectionError, setConnectionError] = useState<string | null>(null);
-  const [reconnectAttempts, setReconnectAttempts] = useState(0);
 
   const socketRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const connectionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const reconnectAttemptsRef = useRef(0);
   const maxReconnectAttempts = 5;
   const connectionTimeoutMs = 10000; // 10 seconds
 
@@ -96,7 +69,7 @@ export const useWebSocket = (conversationId: string) => {
         console.log("WebSocket Connected");
         setIsConnected(true);
         setConnectionState(ConnectionState.CONNECTED);
-        setReconnectAttempts(0); // Reset reconnect attempts on successful connection
+        reconnectAttemptsRef.current = 0; // Reset reconnect attempts on successful connection
 
         // Clear connection timeout
         if (connectionTimeoutRef.current) {
@@ -111,53 +84,28 @@ export const useWebSocket = (conversationId: string) => {
           console.log("Received message:", data);
 
           if (data.type === "message") {
-            // Determine message type and content
-            let type_message: "text" | "file" | "image" | "audio" = "text";
-            let fichier: string | null = null;
-            let image: string | null = null;
-            let audio: string | null = null;
-
-            // If messageType is provided, use it to set the correct type and content
-            if (data.message.messageType) {
-              switch (data.message.messageType) {
-                case "image":
-                  type_message = "image";
-                  image = data.message.content;
-                  break;
-                case "audio":
-                  type_message = "audio";
-                  audio = data.message.content;
-                  break;
-                case "file":
-                  type_message = "file";
-                  fichier = data.message.content;
-                  break;
-                default:
-                  type_message = "text";
-              }
-            }
-
             const receivedMessage: WebSocketMessage = {
               id: data.message.id,
               content: data.message.content,
-              type_message: type_message,
-              sender: {
-                id: data.message.sender.id,
-                email: data.message.sender.email,
-                first_name: data.message.sender.first_name || "",
-                last_name: data.message.sender.last_name || "",
-              },
+              type_message: data.message.type_message,
+              sender: data.message.sender,
               timestamp: data.message.timestamp,
               is_read: data.message.is_read,
-              fichier: fichier,
-              image: image,
-              audio: audio,
-              status: "received",
+              fichier: data.message.fichier,
+              image: data.message.image,
+              audio: data.message.audio,
+              status: "received", // Mark incoming messages as received
+              room: data.message.room, // Include room from direct messages
+              is_deleted: data.message.is_deleted || false, // Add is_deleted, default to false
             };
 
             setMessages((prevMessages) => {
               if (!Array.isArray(prevMessages)) {
                 return [receivedMessage];
+              }
+              // Prevent duplicates
+              if (prevMessages.some((msg) => msg.id === receivedMessage.id)) {
+                return prevMessages;
               }
               return [...prevMessages, receivedMessage];
             });
@@ -183,32 +131,35 @@ export const useWebSocket = (conversationId: string) => {
         );
 
         // Attempt to reconnect if not closed cleanly and we haven't exceeded max attempts
-        if (!event.wasClean && reconnectAttempts < maxReconnectAttempts) {
+        if (
+          !event.wasClean &&
+          reconnectAttemptsRef.current < maxReconnectAttempts
+        ) {
           setConnectionState(ConnectionState.RECONNECTING);
 
           // Exponential backoff for reconnection (1s, 2s, 4s, 8s, 16s)
           const timeout = Math.min(
-            1000 * Math.pow(2, reconnectAttempts),
+            1000 * Math.pow(2, reconnectAttemptsRef.current),
             30000
           );
           console.log(
             `Attempting to reconnect in ${timeout}ms... (Attempt ${
-              reconnectAttempts + 1
+              reconnectAttemptsRef.current + 1
             }/${maxReconnectAttempts})`
           );
 
           reconnectTimeoutRef.current = setTimeout(() => {
-            setReconnectAttempts((prev) => prev + 1);
+            reconnectAttemptsRef.current += 1;
             connectWebSocket();
           }, timeout);
         } else {
           setConnectionState(ConnectionState.DISCONNECTED);
-          if (reconnectAttempts >= maxReconnectAttempts) {
+          if (reconnectAttemptsRef.current >= maxReconnectAttempts) {
             setConnectionError(
               "Maximum reconnection attempts reached. Please refresh the page."
             );
             toast.error(
-              "Connection lost. Please refresh the page to reconnect."
+              "Connexion perdue. Veuillez rafraîchir la page pour vous reconnecter."
             );
           }
         }
@@ -220,7 +171,7 @@ export const useWebSocket = (conversationId: string) => {
       setConnectionError("Failed to create WebSocket connection");
       setConnectionState(ConnectionState.ERROR);
     }
-  }, [conversationId, reconnectAttempts]);
+  }, [conversationId]);
 
   // Function to gracefully close the WebSocket connection
   const closeWebSocket = useCallback(() => {
@@ -291,15 +242,15 @@ export const useWebSocket = (conversationId: string) => {
           // This depends on your server's behavior - if it echoes back messages, you might not need this
         } catch (error) {
           console.error("Failed to send message:", error);
-          toast.error("Failed to send message. Please try again.");
+          toast.error("Erreur lors de l'envoi du message. Veuillez réessayer.");
         }
       } else {
         console.warn("WebSocket is not connected");
-        toast.error("You are currently offline. Please wait for reconnection.");
+        toast.error("Non connecté. Message non envoyé.");
 
         // Attempt to reconnect if disconnected
         if (connectionState === ConnectionState.DISCONNECTED) {
-          setReconnectAttempts(0);
+          reconnectAttemptsRef.current = 0;
           connectWebSocket();
         }
       }
@@ -310,7 +261,7 @@ export const useWebSocket = (conversationId: string) => {
   // Function to manually reconnect
   const reconnect = useCallback(() => {
     closeWebSocket();
-    setReconnectAttempts(0);
+    reconnectAttemptsRef.current = 0;
     setConnectionError(null);
     connectWebSocket();
   }, [closeWebSocket, connectWebSocket]);

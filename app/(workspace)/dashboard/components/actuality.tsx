@@ -3,6 +3,7 @@ import Image from "next/image";
 import api from "@/lib/api";
 import { useEffect, useState } from "react";
 import EmptyState from "@/app/_components/EmptyState";
+import Link from "next/link";
 
 interface Actuality {
   id: number;
@@ -75,31 +76,34 @@ const ActualityComponent = ({
   date,
 }: ActualityComponentProps) => {
   return (
-    <div
+    <Link
+    href={sourceUrl}
+    target="blank"
       className="flex w-full gap-2 cursor-pointer"
-      onClick={() => window.open(sourceUrl, "_blank")}
     >{
       imageUrl ? (
+        <div className="h-[40px] w-[60px] rounded-lg overflow-hidden">
         <Image
           src={imageUrl}
           width={60}
-          height={60}
+          height={40}
           alt="actuality image"
-          className="h-[60px] w-[60px]"
+          className="h-[40px] w-[60px]"
         />
-      ) : (
-        <div className="h-[60px] w-[60px] rounded-lg bg-gray-100"></div>
+        </div>
+       ) : (
+        <div className="h-[40px] w-[40px] rounded-lg bg-gray-100"></div>
       )
     }
       <div className="flex flex-col justify-around text-white-800 w-full">
         <h6 className="font-semibold w-full text-sm">{title}</h6>
         <div className="flex flex-col sm:flex-row sm:justify-between w-full">
           <h6 className="font-medium text-[12px]">
-            Source : <span className="text-coral-400">{source}</span>
+            Source : <span className="text-coral-400 hover:">{source}</span>
           </h6>
           <h6 className="font-medium text-[12px]">{date}</h6>
         </div>
       </div>
-    </div>
+    </Link>
   );
 };

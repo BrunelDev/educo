@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { addToOrganization } from "@/lib/api/organisation";
-import { getAllusers, User } from "@/lib/api/users";
+import { getMembersWithNoTeam, User } from "@/lib/api/users";
 import { getCookies } from "@/lib/utils/cookies";
 import { AxiosError } from "axios";
 import Image from "next/image";
@@ -21,9 +21,11 @@ export default function TeamFormHandler({ orgId, handleClose }: { orgId: number;
         }
 
         console.log("token", storedData);
-        const response = await getAllusers();
+        const response = await getMembersWithNoTeam();
         console.log("res", response);
-        setUsers(response.results);
+        if (response) {
+          setUsers(response);
+        }
       } catch (error) {
         console.error("error geting users", error);
       }

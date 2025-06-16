@@ -53,7 +53,7 @@ export interface CreateOrganizationDto {
   ville: string;
   logo?: string | null;
   description?: string;
-  membre_ids: number[];
+  membre_ids?: number[];
 }
 interface CreateOrganization extends OrganizationResponse {
   date_creation: Date;
@@ -65,12 +65,7 @@ export const createOrganization = async (
   try {
     const response = await api.post<CreateOrganization>(
       endpoints.organisation.base,
-      data,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
+      data
     );
 
     return response.data;
@@ -85,6 +80,7 @@ export const getOrganisationMembers = async (): Promise<
 > => {
   try {
     const response = await getOrganization();
+    console.log("----------------payload", response);
     return response.membres;
   } catch (error) {
     console.error("Error fetching organization members:", error);
@@ -119,6 +115,7 @@ export interface UpdateOrganizationDto {
   logo?: string | null;
   description?: string;
   membre_ids?: number[];
+  invites?: string[];
 }
 
 export const updateOrganisation = async (
@@ -128,12 +125,7 @@ export const updateOrganisation = async (
   try {
     const response = await api.patch<CreateOrganization>(
       `${endpoints.organisation.base}${OrgId}/`,
-      data,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
+      data
     );
 
     return response.data;

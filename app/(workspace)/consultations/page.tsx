@@ -385,7 +385,7 @@ Le CSE est systématiquement consulté sur les mesures liées à la sécurité, 
             }
             key={consultationTitle.title + index}
             dialoTrigger={
-              <div onClick={() => setCurrentIndex(index)}>
+              <div className="w-full sm:w-[300px]" onClick={() => setCurrentIndex(index)}>
                 <ConsultationTitle
                   title={consultationTitle.title}
                   barNumber={consultationTitle.barNumber}

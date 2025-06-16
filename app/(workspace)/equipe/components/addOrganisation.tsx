@@ -106,7 +106,7 @@ export default function AddOrganisation({ handleClose }: AddOrganisationProps) {
                 .map((email) => email.trim())
                 .filter((email) => email), // Process to string array, remove empty strings
               logo: logoUrl,
-              membre_ids: [1],
+              membre_ids: [],
               description: "",
             };
             console.log("there", organizationData);
@@ -391,7 +391,7 @@ export function AddOrganisationAfterLogin({
                 .map((email) => email.trim())
                 .filter((email) => email), // Process to string array, remove empty strings
               logo: logoUrl,
-              membre_ids: [1],
+              membre_ids: [],
               description: "",
             };
             console.log("organizationData", organizationData);
@@ -400,6 +400,7 @@ export function AddOrganisationAfterLogin({
             console.log("reponse", res);
 
             toast.success(`L'organisation a été créée avec succès`);
+            onComplete();
             //onComplete(); // Call onComplete on success
           } catch (error) {
             if (error instanceof z.ZodError) {

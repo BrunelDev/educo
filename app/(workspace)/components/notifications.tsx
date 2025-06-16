@@ -85,7 +85,7 @@ const NotificationComponent = ({
             <p className="text-sm text-white-800">Aucune notification</p>
           </div>
         ) : (
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col py-2 w-full overflow-scroll no-scrollbar">
             {notifications.map((notification, index) => (
               <NotificationItem
                 notification={notification}
@@ -108,7 +108,7 @@ const NotificationItem = ({ notification }: { notification: Notification }) => {
       <div className="flex w-full gap-2">
         <div className="rounded-full bg-gradient-to-r from-[#FE6539] to-crimson-400 w-[24px] h-[24px] flex justify-center items-center">
           <Image
-            src={"/userProfile-img.png"}
+            src={"/bell.svg"}
             width={13}
             height={11.5}
             alt="notification icon"

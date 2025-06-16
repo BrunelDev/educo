@@ -250,7 +250,7 @@ const StepOne = ({
     }
 
     // Meeting link validation
-    if (localLocation.includes("enligne")) {
+    if (localLocation.includes("EN_LIGNE")) {
       if (!localMeetingLink) {
         newErrors.link = "Le lien est requis pour une réunion en ligne";
       } else if (!isValidUrl(localMeetingLink)) {
@@ -376,14 +376,14 @@ const StepOne = ({
           <label className="flex items-center">
             <Input
               type="checkbox"
-              value="enligne"
-              checked={localLocation.includes("enligne")}
+              value="EN_LIGNE"
+              checked={localLocation.includes("EN_LIGNE")}
               onChange={(e) => {
                 if (e.target.checked) {
-                  setLocalLocation((prev) => [...prev, "enligne"]);
+                  setLocalLocation((prev) => [...prev, "EN_LIGNE"]);
                 } else {
                   setLocalLocation((prev) =>
-                    prev.filter((item) => item !== "enligne")
+                    prev.filter((item) => item !== "EN_LIGNE")
                   );
                 }
               }}
@@ -646,6 +646,7 @@ const StepThree = () => {
           variant="default"
           className="rounded-[8px] bg-gradient-to-r from-[#FE6539] to-crimson-400 mt-2 sm:mt-0 whitespace-nowrap"
           onClick={() => {
+            console.log("localEmail", localEmail);
             const tempEmail: string = localEmail.replace(" ", "");
             const emails = tempEmail.split(",");
             emails.forEach((email) => {
@@ -657,6 +658,10 @@ const StepThree = () => {
               return emailRegex.test(email);
             });
             if (validEmails.length < emails.length) {
+              console.log("emails", emails);
+              console.log("validEmails", validEmails);
+              console.log("emails.length", emails.length);
+              console.log("validEmails.length", validEmails.length);
               toast.error(
                 "Veuillez entrer des adresses email valides et les séparés d'une virgule"
               );

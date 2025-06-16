@@ -197,7 +197,8 @@ export default function Editor({disabled = false}: {disabled?: boolean}) {
             contentEditable={
               <ContentEditable
               disabled={disabled}
-                className="editor-input w-full h-[300px] border rounded-[8px] pt-4 pl-2"
+              // hide scrollbar with tailwind
+                className="editor-input w-full h-[300px] border rounded-[8px] pt-4 px-2 overflow-scroll no-scrollbar"
                 aria-placeholder={placeholder}
                 placeholder={
                   <div className="editor-placeholder">{placeholder}</div>

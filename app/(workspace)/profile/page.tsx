@@ -2,18 +2,33 @@
 import React from 'react'
 import { FirstBox, SecondBox, ThirdBox } from './components/box'
 import { Button } from '@/components/ui/button'
-import { logout } from '@/lib/api/users'
+import { logout, User, getUser } from '@/lib/api/users'
 import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
+import { getCookies } from '@/lib/utils/cookies'
 
 export default function Profile() {
+  const userInfo: User = JSON.parse(getCookies("userInfo") || "{}");
+   const [user, setUser] = useState<User>(userInfo);
+    useEffect(() => {
+      const fetchUser = async () => {
+        try {
+          const res = await getUser();
+          setUser(res);
+        } catch (error) {
+          console.error(error);
+        }
+      };
+      fetchUser();
+    }, []);
   const router = useRouter()
   return (
     <div className='flex flex-col gap-4 sm:gap-6 w-full px-3 sm:px-6 relative pt-16 sm:pt-6 pb-6 max-w-6xl mx-auto'>
       {/* Profile sections */}
       <div className='space-y-4 sm:space-y-6'>
-        <FirstBox />
-        <SecondBox />
-        <ThirdBox />
+        <FirstBox user={user} />
+        <SecondBox user={user} />
+        <ThirdBox user={user} />
       </div>
       
       {/* Logout button */}

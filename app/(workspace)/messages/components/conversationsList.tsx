@@ -1,130 +1,91 @@
 "use client";
-import Image from "next/image";
-import { useEffect, useState } from "react";
-//import SearchBar from "../../components/searchBar";
-import { useMessageStore } from "@/store/message";
-import { Conversation, ConversationResponse, getConversationList } from "@/lib/api/message";
+
+import { Conversation, Group } from "@/lib/api/message";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { cn } from "@/lib/utils";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { getCookies } from "@/lib/utils/cookies";
 import { User } from "@/lib/api/users";
-import { getGroups, Group } from "@/lib/api/messagerie";
+interface ConversationsListProps {
+  conversations: Conversation[];
+  groups: Group[];
+  selectedItem: Conversation | Group | null;
+  onSelectConversation: (conversation: Conversation) => void;
+  onSelectGroup: (group: Group) => void;
+  view: 'conversations' | 'groups';
+  setView: (view: 'conversations' | 'groups') => void;
+}
 
-
-const userInfo : User = JSON.parse(getCookies("userInfo") || "{}")
-
-export default function ConversationsList() {
-  //const [serachValue, setSearchValue] = useState<string>("");
-  const [conversations, setConversations] = useState<ConversationResponse>();
-  const [groups, setGroups] = useState<Group[] | null>();
-  useEffect(() => {
-    const fetchData = async () => {
-      const response = await getConversationList();
-      setConversations(response);
-      const groupsResponse = await getGroups();
-      setGroups(groupsResponse?.results);
-      console.log(groupsResponse);
-    };
-    fetchData();
-  }, []);
+export default function ConversationsList({
+  conversations,
+  groups,
+  selectedItem,
+  onSelectConversation,
+  onSelectGroup,
+  setView,
+  view,
+}: ConversationsListProps) {
+  const user: User = JSON.parse(getCookies("userInfo") || "{}");
   return (
-    <div className="h-[calc(100vh-93px)] w-[280px] flex flex-col gap-3 pt-4 px-2 text-xs">
-      <h6 className="text-lg font-semibold">Messages</h6>
-      {/*<SearchBar
-        value={serachValue}
-        handleChange={setSearchValue}
-        placeholder={"Rechercher"}
-        className="w-full"
-      />*/}
-      {/*<div className="flex flex-col gap-3">
-        <h6 className="font-semibold">Equipe</h6>
-        <TeamGroup
-          groupName={"ACME Solutions"}
-          groupImageUrl={"/group-img.png"}
-          lastSpeakerImageUrl={"/userProfile-img.png"}
-          lastMessage={
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum tristique. Duis cursus, mi quis viverra ornare, eros dolor interdum nulla, ut commodo diam libero vitae erat."
-          }
-          lastMessageHour={"10:45"}
-          lastSpeakerName={"John"}
-        />
-      </div>*/}
-      <div className="flex flex-col gap-3">
-        <h6 className="font-semibold">Groupes</h6>
+    <ScrollArea className="h-[calc(100vh-12rem)]">
+      <div className="flex flex-col gap-2 p-2">
+        <h6>Groupes</h6>
+      {(groups?.length > 0 && groups) ? groups?.map((group) => (
+          <div
+            key={`group-${group.id}`}
+            className={cn(
+              "flex items-center gap-3 p-2 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800",
+              (selectedItem?.id === group.id) && view === 'groups' && "bg-gray-200 dark:bg-gray-700"
+            )}
+            onClick={() => {
+              onSelectGroup(group);
+              setView('groups');
+            }}
+          >
+            <Avatar>
+              {/* Assuming groups don't have images for now */}
+              <AvatarFallback>{group.nom.charAt(0)}</AvatarFallback>
+            </Avatar>
+            <div className="flex-1">
+              <p className="font-semibold text-sm">{group.nom}</p>
+              <p className="text-xs text-gray-500 truncate">{group.dernier_message?.contenu || ""}</p>
+            </div>
+          </div>
+        )) : (
+          <p className="text-center text-gray-500">Aucun groupe</p>
+        )}
+        <h6>Conversations</h6>
+        {(conversations?.length > 0 && conversations) ? conversations?.map((conversation) => (
+          <div
+            key={`conv-${conversation.id}`}
+            className={cn(
+              "flex items-center gap-3 p-2 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800",
+              selectedItem?.id === conversation.id && view === 'conversations' && "bg-gray-200 dark:bg-gray-700"
+            )}
+            onClick={() => {
+              onSelectConversation(conversation);
+              setView('conversations');
+            }}
+          >
+            <Avatar>
+              <AvatarImage src={conversation.participants?.[0]?.avatar || undefined} alt={conversation.participants?.[0]?.name} />
+              <AvatarFallback>{conversation.participants?.filter((participant) => participant._id !== user.id)[0]?.name.charAt(0)}</AvatarFallback>
+            </Avatar>
+            <div className="flex-1">
+              <p className="font-semibold text-sm">{conversation.participants?.filter((participant) => participant._id !== user.id)[0]?.name}</p>
+              <p className="text-xs text-gray-500 truncate">{conversation.messages?.[0]?.content}</p>
+            </div>
+          </div>
+        )) : (
+          <p className="text-center text-gray-500">Aucune conversation</p>
+        )}
+
+        
+       
       </div>
-      {groups ? groups.map((group) => (
-        <GroupDiscussion
-          {...group}
-          key={group.id}
-        />
-      )) : null}
-      <div className="flex flex-col gap-3">
-        <h6 className="font-semibold">Discussion</h6>
-        <div className="flex flex-col gap-3">
-          {conversations ? conversations.results.map((discussion) => (
-            <Discussion
-             {...discussion}
-            key={JSON.stringify(discussion.participants) + discussion.id}            />
-          )) : null}
-        </div>
-      </div>
-    </div>
+    </ScrollArea>
   );
 }
 
 
-
-
-const Discussion = ({ ...props }: Conversation ) => {
-  const { 
-    setActiveConversation,  
-  } = useMessageStore();
-  
-  return (
-    <div className="flex flex-col gap-3 bg-gray-50 cursor-pointer hover:bg-gray-100 p-2 rounded-[8px]" onClick={() => {
-      setActiveConversation(props)
-    }}>
-      <div className="w-full flex justify-between items-center ">
-        <div className="flex w-2/3 gap-2 items-center">
-          <Image
-            src={props.participants.filter((participant)=>participant._id !== userInfo.id)[0].avatar || "/userProfile-img.png"}
-            width={28}
-            height={28}
-            alt="group icon"
-            className="rounded-full"
-          />
-          <h6 className="gap-2 truncate">{props.participants.filter((participant)=>participant._id !== userInfo.id)[0].name || "Anonyme"}</h6>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const GroupDiscussion = ({ ...props }: Group ) => {
-  /*const { 
-    setActiveConversation,  
-  } = useMessageStore();*/
-  
-  return (
-    <div className="flex flex-col gap-3 hover:bg-[#ffffffd4] p-2 rounded-[8px]" onClick={() => {
-      /*setActiveConversation({
-        id: props.id,
-        //name: props.nom,
-        description: props.description,
-        members: props.membres,
-      })*/
-    }}>
-      <div className="w-full flex justify-between items-center ">
-        <div className="flex w-2/3 gap-2 items-center">
-          <Image
-            src={"/group-img.png"}
-            width={28}
-            height={28}
-            alt="group icon"
-            className="rounded-full"
-          />
-          <h6 className="gap-2 truncate">{props.nom || "Group Name"}</h6>
-        </div>
-      </div>
-    </div>
-  );
-};
 

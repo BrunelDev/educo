@@ -121,7 +121,7 @@ export default function ConsultationDetail({
                     } w-fit py-1 px-2 flex justify-center items-center rounded-full place-self-end`}
                   >
                     <h6
-                      className={`${
+                      className={`text-xs text-nowrap sm:text-lg ${
                         consultation.statut === "En attente" ? "text-white" : ""
                       }`}
                     >
@@ -137,6 +137,9 @@ export default function ConsultationDetail({
               <Users />
               <h6>Participants</h6>
               <DialogComponent
+                className={
+                  "min-w-0 px-1 sm:px-3"
+                }
                 open={openDialog}
                 onOpenChange={setOpenDialog}
                 dialoTrigger={

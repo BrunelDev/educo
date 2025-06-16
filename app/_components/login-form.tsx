@@ -93,7 +93,7 @@ export function LoginForm() {
       <form
         className="flex flex-col gap-6 w-full"
         method="post"
-        onSubmit={handleSubmit}
+        onSubmit={async (e) => await handleSubmit(e)}
       >
         <div className="gap-2 w-full">
           <h1 className="text-2xl font-bold">Connectez vous</h1>

@@ -64,7 +64,7 @@ export const registerWithToken = async (
   token: string
 ) => {
   try {
-    const response = await fetch(`${baseUrl}auth/register/invite/`, {
+    const response = await fetch(`${baseUrl}equipe/accept-invitation/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

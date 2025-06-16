@@ -106,7 +106,7 @@ export function AccessForm({ handleClose }: { handleClose: () => void }) {
       await grantAccess(values.memberEmail, role);
 
       // Mock API call success
-      handleClose()
+      handleClose();
       toast.success("Accès mis à jour avec succès");
     } catch (error) {
       toast.error("Échec de la mise à jour des accès");
@@ -179,10 +179,15 @@ export function AccessForm({ handleClose }: { handleClose: () => void }) {
                           </div>
                           <span
                             className="text-sm truncate"
-                            title={`${member.first_name} ${member.last_name} (${member.email})`}
+                            title={`${
+                              member.first_name
+                                ? `${member.first_name} ${member.last_name}`
+                                : member.email
+                            }`}
                           >
-                            {member.first_name} {member.last_name} (
-                            {member.email})
+                            {member.first_name
+                              ? `${member.first_name} ${member.last_name}`
+                              : `(${member.email})`}
                           </span>
                         </div>
                         <div className="flex items-center space-x-3 w-full sm:w-auto">

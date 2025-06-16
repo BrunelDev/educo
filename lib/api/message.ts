@@ -1,4 +1,3 @@
-import { WebSocketMessage } from "@/hooks/useWebSocket";
 import api, { endpoints } from "../api";
 
 export interface Sender {
@@ -42,12 +41,55 @@ export interface Conversation {
   participants: Participant[];
 }
 
+export interface Group {
+  id: number;
+  nom: string;
+  description: string | null;
+  membres: Sender[];
+  dernier_message: GroupMessage | null;
+}
+
+export interface GroupMessage {
+  id: number;
+  contenu: string;
+  auteur: Sender;
+  timestamp: string;
+}
+
 export interface ConversationResponse {
   count: number;
   next: string | null;
   previous: string | null;
   results: Conversation[];
 }
+
+export interface GroupResponse {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: Group[];
+}
+
+export const getGroups = async (): Promise<GroupResponse> => {
+  const response = await api.get<GroupResponse>(endpoints.messagerie.groupes);
+  return response.data;
+};
+
+interface GroupMessageResponse {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: GroupMessage[];
+}
+
+export const getGroupMessages = async (
+  groupId: number
+): Promise<GroupMessageResponse> => {
+  const response = await api.get<GroupMessageResponse>(
+    `${endpoints.messagerie.groupes}${groupId}/messages/`
+  );
+  return response.data;
+};
 
 export const getConversationList = async (): Promise<ConversationResponse> => {
   try {
@@ -91,12 +133,12 @@ export interface MessageApiResponse {
   count: number;
   next: string | null;
   previous: string | null;
-  results: WebSocketMessage[];
+  results: Message[];
 }
 
 export const getMessages = async (
   roomId: number,
-  page: number = 1,
+  page: number = 1
 ): Promise<MessageApiResponse> => {
   try {
     const response = await api.get<MessageApiResponse>(

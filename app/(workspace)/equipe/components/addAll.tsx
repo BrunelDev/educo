@@ -28,66 +28,75 @@ export default function AddMemberDialog({ teamId }: { teamId?: number }) {
         Ajouter un membre
       </DialogTitle>
 
-      {<div className=" flex gap-2 items-center">
-        <Input
-          type="email"
-          placeholder="Invitez des gens par nom ou par email"
-        />
-        <Button
-          variant="default"
-          className="rounded-[8px] bg-gradient-to-r from-[#FE6539] to-crimson-400"
-          onClick={async () => {
-            if (selectedUsers?.length >= 1) {
-              try {
-                const response = await addMembersToTeam(selectedUsers, teamId);
-                console.log("succes", response);
-              } catch (error: unknown) {
-                console.error(
-                  "Error adding members to team:",
-                  (error as Error).message
-                );
+      {
+        <div className=" flex gap-2 items-center">
+          <Input
+            type="email"
+            placeholder="Invitez des gens par nom ou par email"
+          />
+          <Button
+            variant="default"
+            className="rounded-[8px] bg-gradient-to-r from-[#FE6539] to-crimson-400"
+            onClick={async () => {
+              if (selectedUsers?.length >= 1) {
+                try {
+                  const response = await addMembersToTeam(
+                    selectedUsers,
+                    teamId
+                  );
+                  console.log("succes", response);
+                } catch (error: unknown) {
+                  console.error(
+                    "Error adding members to team:",
+                    (error as Error).message
+                  );
+                }
               }
-            }
-          }}
-        >
-          Inviter
-        </Button>
-      </div>}
+            }}
+          >
+            Inviter
+          </Button>
+        </div>
+      }
       <div>
         <h6 className="font-medium text-[10px]">Invitation en attente</h6>
         <ScrollArea className=" mt-3 flex flex-col gap-3">
-          {users
-            ? users.map((user, index) => (
-                <div key={index} className="flex justify-between">
-                  <div className="flex gap-3">
-                    <div className="h-[28px] w-[28px] flex items-center justify-center border border-dashed rounded-full">
-                      <Image
-                        src={"user-icon.svg"}
-                        width={16}
-                        height={19}
-                        alt="user icon"
-                      />
-                    </div>
-
-                    {user.email}
-                  </div>
-                  <div className="h-5 w-5 rounded-sm flex justify-center items-center hover:bg-coral-50 cursor-pointer">
-                    <Input
-                      type="checkbox"
-                      value={user.id}
-                      checked={selectedUsers?.includes(user.id)}
-                      onChange={() => {
-                        setSelectedUsers(
-                          selectedUsers.includes(user.id)
-                            ? selectedUsers.filter((id) => id !== user.id)
-                            : [...selectedUsers, user.id]
-                        );
-                      }}
+          {users ? (
+            users.map((user, index) => (
+              <div key={index} className="flex justify-between">
+                <div className="flex gap-3">
+                  <div className="h-[28px] w-[28px] flex items-center justify-center border border-dashed rounded-full">
+                    <Image
+                      src={"user-icon.svg"}
+                      width={16}
+                      height={19}
+                      alt="user icon"
                     />
                   </div>
+
+                  {user.email}
                 </div>
-              ))
-            : null}
+                <div className="h-5 w-5 rounded-sm flex justify-center items-center hover:bg-coral-50 cursor-pointer">
+                  <Input
+                    type="checkbox"
+                    value={user.id}
+                    checked={selectedUsers?.includes(user.id)}
+                    onChange={() => {
+                      setSelectedUsers(
+                        selectedUsers.includes(user.id)
+                          ? selectedUsers.filter((id) => id !== user.id)
+                          : [...selectedUsers, user.id]
+                      );
+                    }}
+                  />
+                </div>
+              </div>
+            ))
+          ) : (
+            <h6 className="py-2 text-center text-gray-500">
+              Aucun utilisateur disponible
+            </h6>
+          )}
         </ScrollArea>
       </div>
     </div>

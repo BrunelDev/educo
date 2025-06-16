@@ -18,21 +18,17 @@ export interface File {
   nom: string;
   url: string;
   type_fichier: string;
-  dossier: number;
-  utilisateur: number;
-  reunion: number;
 }
 
 export interface Task {
   id: number;
   project: number;
   project_details: ProjectDetails;
-  fichiers: File[];
+  fichiers_urls: File[];
   title: string;
   description: string;
   task_type: TaskType;
   task_type_display: string;
-  file_url: string | null;
   assigned_members: TaskUser[];
   creator: TaskUser;
   date_creation: string;
@@ -72,15 +68,13 @@ export interface CreateTaskDto {
   title: string;
   description: string;
   task_type: TaskType;
-  file_url?: string;
+  fichiers_urls?: string[];
   assigned_member_ids: number[];
 }
 
 export const createTask = async (data: CreateTaskDto): Promise<Task> => {
   try {
-    console.error(data);
     const response = await api.post<Task>(endpoints.taches.base, data);
-
     return response.data;
   } catch (error) {
     console.error("Error creating task:", error);
@@ -169,7 +163,7 @@ export const addParticipant = async (
       title: taskData.title,
       description: taskData.description,
       task_type: taskData.task_type,
-      file_url: taskData.file_url || "",
+      fichiers_urls: taskData.fichiers_urls,
       assigned_member_ids: currentMemberIds,
     };
 

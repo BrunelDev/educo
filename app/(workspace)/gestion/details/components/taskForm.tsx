@@ -64,7 +64,7 @@ export default function TaskForm({
     try {
       if (file) {
         const file_url = await uploadToS3([file]);
-        data.file_url = file_url[0];
+        data.fichiers_urls = [file_url[0]];
       }
 
       data.project = projectId;

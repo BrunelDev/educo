@@ -79,7 +79,7 @@ export default function CreateGroupForm({ onGroupCreated, currentUserId }: Creat
       form.reset(); 
     } catch (error) {
       console.error("Error creating group:", error);
-      toast.error(error instanceof Error ? error.message : "Échec de la création du groupe.");
+      toast.error("Échec de la création du groupe.");
     } finally {
       setIsLoading(false);
     }

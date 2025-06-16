@@ -38,6 +38,25 @@ export const getAllusers = async (): Promise<UserApiResponse> => {
     };
   }
 };
+
+export const getMembersWithNoTeam = async (): Promise<User[] | undefined> => {
+  try {
+    const response = await api.get<User[]>(
+      "equipe/users-without-organisation/"
+    );
+    console.log(response.data); // Replace with your desired action after fetching data.
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching users", error);
+    if (error instanceof AxiosError) {
+      console.error(
+        "error fetching users",
+        JSON.stringify(error.response?.data?.error)
+      );
+      throw error;
+    }
+  }
+};
 interface UserToPatch {
   id?: number;
   email?: string;
@@ -145,20 +164,22 @@ export const confirmPasswordReset = async (
   token: string,
   password: string
 ): Promise<{ message: string }> => {
-    // Use fetch instead of axios to avoid sending the authorization header
-    const baseURL =
-      process.env.NEXT_PUBLIC_API_URL || "http://192.168.100.2:8000/api/";
+  // Use fetch instead of axios to avoid sending the authorization header
+  const baseURL =
+    process.env.NEXT_PUBLIC_API_URL || "http://192.168.100.2:8000/api/";
 
-    const response = await fetch(`${baseURL}auth/reset-password/`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ uid, token, new_password : password }),
-    }).then((response) => response.json()).catch((error) => {
+  const response = await fetch(`${baseURL}auth/reset-password/`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ uid, token, new_password: password }),
+  })
+    .then((response) => response.json())
+    .catch((error) => {
       console.error("Error confirming password reset", error);
       throw error;
     });
 
-    return response;
+  return response;
 };

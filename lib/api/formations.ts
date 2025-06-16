@@ -101,3 +101,14 @@ export const updateRessource = async (
     throw error;
   }
 };
+
+// s'inscrire a webinaire
+export const subscribeToWebinaire = async (webinaireId: number): Promise<void> => {
+  try {
+    await api.post("formations/webinaires/inscription/", { webinaire: webinaireId });
+  } catch (error) {
+    console.error("Error subscribing to webinaire:", error);
+    throw error;
+  }
+};
+

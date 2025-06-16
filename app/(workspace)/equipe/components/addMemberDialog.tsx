@@ -1,7 +1,7 @@
 "use cleint";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { getAllusers, User } from "@/lib/api/users";
+import { getMembersWithNoTeam, User } from "@/lib/api/users";
 import { DialogTitle } from "@radix-ui/react-dialog";
 
 import Image from "next/image";
@@ -14,8 +14,10 @@ export default function AddMemberDialog({ teamId }: { teamId?: number }) {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await getAllusers();
-        setUsers(response.results);
+        const response = await getMembersWithNoTeam();
+        if (response) {
+          setUsers(response);
+        }
       } catch (error: unknown) {
         console.error("Error fetching users:", (error as Error).message);
       }

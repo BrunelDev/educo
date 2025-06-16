@@ -40,6 +40,8 @@ interface MessageBoxProps {
   message: Message;
   isOwnMessage?: boolean;
   className?: string;
+  isGroup?: boolean;
+  isLast?: boolean;
 }
 
 export default function MessageBox({ message, className }: MessageBoxProps) {
@@ -391,7 +393,7 @@ export default function MessageBox({ message, className }: MessageBoxProps) {
           <p
             className={`text-gray-800 bg-white-50 p-2 w-fit ${
               message.sender.id == JSON.parse(getCookies("userInfo") || "")?.id
-                ? ""
+                ? "rounded-b-[8px] rounded-tl-[8px]"
                 : "rounded-b-[8px] rounded-tr-[8px]"
             } min-w-[100px] break-all max-w-[280px] xs:max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg`}
           >
@@ -410,7 +412,9 @@ export default function MessageBox({ message, className }: MessageBoxProps) {
       }`}
     >
       <Image
-        src={message.sender.id === user?.id ? user.image! : "/userProfile-img.png"}
+        src={
+          (message.sender.id === user?.id && user.image) ? user.image : "/userProfile-img.png"
+        }
         alt={message.sender.first_name}
         width={30}
         height={30}

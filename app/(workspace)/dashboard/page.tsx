@@ -15,7 +15,7 @@ export default function DashboardPage() {
       <h6 className="text-sm">
         Bienvenu,{" "}
         <span className="font-bold text-[16px] text-coral-500">
-          {user.first_name} {user.last_name}
+          {user.first_name ? `${user.first_name} ${user.last_name}` : user.email}
         </span>
       </h6>
       <div className="flex flex-col md:flex-row md:justify-between gap-6">

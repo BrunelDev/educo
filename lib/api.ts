@@ -1,15 +1,26 @@
 import axios from "axios";
 import { getCookies } from "./utils/cookies";
 
-const access_token = getCookies("access_token");
-
 export const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || "http://192.168.100.2:8000/api/",
   headers: {
     "Content-Type": "application/json",
-    Authorization: "Bearer " + access_token,
   },
 });
+
+// Request interceptor to add the auth token to headers
+api.interceptors.request.use(
+  (config) => {
+    const token = getCookies("access_token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
 // API endpoints
 export const endpoints = {
@@ -63,6 +74,7 @@ export const endpoints = {
   },
   messagerie: {
     base: "messagerie/",
+    groupes: "messagerie/groupes-fermes/",
   },
 
   projets: {

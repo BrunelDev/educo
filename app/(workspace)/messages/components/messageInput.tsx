@@ -165,7 +165,7 @@ export function MessageInput({
   };
 
   return (
-    <div className="flex flex-col">
+    <div className="w-full flex flex-col">
       {fileError && (
         <div className="bg-red-100 text-red-600 p-2 mx-4 rounded-md mb-2">
           {fileError}

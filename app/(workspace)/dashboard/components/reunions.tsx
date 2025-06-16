@@ -46,7 +46,7 @@ export default function Reunions() {
 
 const ReunionComponent = ({ meeting }: MeetingComponentProps) => {
   return (
-    <div className="bg-[#FFFFFF99] flex flex-col gap-3 h-[142px] w-full rounded-[12px] p-3 text-white-800 truncate">
+    <div className="bg-[#FFFFFF99] flex flex-col gap-3 min-h-[142px] h-auto w-full rounded-[12px] p-3 text-white-800 truncate">
       <div className="flex flex-col sm:flex-row sm:justify-between">
         <div className="flex gap-2 items-center">
           <div className="bg-crimson-100 w-2 h-2 rounded-full"></div>

@@ -39,13 +39,12 @@ export default function DetailTache({
     const fetchData = async () => {
       try {
         const response = await getTaskById(parseInt(taskId));
-        console.log("Task :", response);
+        console.log("------Task :", response);
         // Update the state with the fetched data
         setTask(response);
         if (response.compte_rendu) {
           setCompteRenduContent(response.compte_rendu);
         }
-        console.log(taskId, "Task :", response);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -55,6 +54,7 @@ export default function DetailTache({
 
   const handleAddMembers = async (users: number[]): Promise<void> => {
     if (!task) return;
+    toast.loading("Ajout des participants...");
 
     try {
       // Add each participant individually using addParticipant
@@ -65,7 +65,7 @@ export default function DetailTache({
       // Refresh the task data
       const updatedTask = await getTaskById(parseInt(taskId));
       setTask(updatedTask);
-
+      toast.dismiss();
       toast.success("Participants ajoutés avec succès");
 
       // Reload the page to reflect changes
@@ -74,6 +74,7 @@ export default function DetailTache({
       });
     } catch (error) {
       console.error("Error adding members:", error);
+      toast.dismiss();
       toast.error("Erreur lors de l'ajout des participants");
       throw error;
     }
@@ -81,6 +82,7 @@ export default function DetailTache({
 
   const handleAddDocument = async (fileUrl: string): Promise<void> => {
     if (!task) return;
+    toast.loading("Ajout du document...");
 
     try {
       // Add document using addDocument function with the updated API format
@@ -93,11 +95,14 @@ export default function DetailTache({
       setTask(updatedTask);
 
       // Reload the page to reflect changes
-      setRefresh2((v: boolean) => {
+      setRefresh3((v: boolean) => {
         return !v;
       });
+      toast.dismiss();
+      toast.success("Document ajouté avec succès");
     } catch (error) {
       console.error("Error adding document:", error);
+      toast.dismiss();
       toast.error("Erreur lors de l'ajout du document");
       throw error;
     }
@@ -105,12 +110,15 @@ export default function DetailTache({
 
   const handleConfirmCompteRendu = async () => {
     if (!task) return;
+    toast.loading("Enregistrement du compte rendu...");
     try {
       await updateTask(task.id, { compte_rendu: compteRenduContent });
+      toast.dismiss();
       toast.success("Compte rendu enregistré avec succès.");
       setIsEditingCompteRendu(false);
     } catch (error) {
       console.error("Erreur lors de l'enregistrement du compte rendu:", error);
+      toast.dismiss();
       toast.error("Erreur lors de l'enregistrement du compte rendu.");
     }
   };
@@ -131,7 +139,11 @@ export default function DetailTache({
                   task?.task_type === "a_faire" ? "text-white" : ""
                 }`}
               >
-                {task?.task_type === "a_faire" ? "À faire" : task?.task_type === "en_cours" ? "En cours" : "Terminé"}
+                {task?.task_type === "a_faire"
+                  ? "À faire"
+                  : task?.task_type === "en_cours"
+                  ? "En cours"
+                  : "Terminé"}
               </h6>
             </div>
           </div>
@@ -175,7 +187,19 @@ export default function DetailTache({
                   photo: participant.email,
                 }}
                 handleDelete={async () => {
-                  await removeMemberFromTask(task.id, participant.id);
+                  try {
+                    await removeMemberFromTask(task.id, participant.id);
+                    setRefresh3((v: boolean) => {
+                      return !v;
+                    });
+                    toast.dismiss();
+                    toast.success("Participant supprimé avec succès");
+                  } catch (error) {
+                    console.error("Error removing member:", error);
+                    toast.dismiss();
+                    toast.error("Erreur lors de la suppression du participant");
+                    throw error;
+                  }
                 }}
               />
             ))
@@ -208,22 +232,31 @@ export default function DetailTache({
       </div>
       <div className="flex flex-col sm:flex-row justify-between">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-3 w-full sm:max-w-2/3 gap-x-5">
-          {task?.fichiers ? (
-            task?.fichiers.map((fichier) => (
+          {task?.fichiers_urls ? (
+            task?.fichiers_urls.map((fichier) => (
               <DocumentComponent
                 key={fichier.id}
                 document={{
-                  fichier: fichier.url,
-                  nom_fichier: task.title,
+                  fichier: fichier.url  ,
+                  nom_fichier: fichier.nom,
                   type_document: MessageType.FILE,
                   id: task.id,
                   reunion: task.project,
                 }}
                 handleDelete={async () => {
-                  await removeDocumentFromTask(fichier.id, task.id);
-                  setRefresh3((v: boolean) => {
-                    return !v;
-                  });
+                  try {
+                    await removeDocumentFromTask(fichier.id, task.id);
+                    setRefresh3((v: boolean) => {
+                      return !v;
+                    });
+                    toast.dismiss();
+                    toast.success("Document supprimé avec succès");
+                  } catch (error) {
+                    console.error("Error removing document:", error);
+                    toast.dismiss();
+                    toast.error("Erreur lors de la suppression du document");
+                    throw error;
+                  }
                 }}
               />
             ))
