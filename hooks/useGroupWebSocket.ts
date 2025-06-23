@@ -84,7 +84,7 @@ export const useGroupWebSocket = (groupId: string | number | null) => {
               sender: {
                 id: 0, // Placeholder ID, real ID might be found by matching email to a user list
                 email: data.auteur,
-                first_name: data.auteur.split('@')[0], // Best effort display name
+                first_name: data.auteur.split("@")[0], // Best effort display name
                 last_name: "",
               },
               timestamp: data.timestamp,
@@ -101,7 +101,13 @@ export const useGroupWebSocket = (groupId: string | number | null) => {
             setMessages((prevMessages) => {
               if (!Array.isArray(prevMessages)) return [receivedMessage];
               // Avoid duplicates based on timestamp and content, as ID is not reliable
-              if (prevMessages.some(msg => msg.timestamp === receivedMessage.timestamp && msg.content === receivedMessage.content)) {
+              if (
+                prevMessages.some(
+                  (msg) =>
+                    msg.timestamp === receivedMessage.timestamp &&
+                    msg.content === receivedMessage.content
+                )
+              ) {
                 return prevMessages;
               }
               return [...prevMessages, receivedMessage];
@@ -195,13 +201,34 @@ export const useGroupWebSocket = (groupId: string | number | null) => {
       }
     };
   }, [groupId, connectWebSocket]);
-
+  /**
+ * 
+ * type: string;
+    message: string;
+    type_message?: string;
+    file_url?: string;
+ */
   // Function to send a message
-  const sendMessage = (text: string) => {
+  const sendMessage = ({
+    type,
+    message,
+    type_message,
+    file_url,
+  }: {
+    type: string;
+    message: string;
+    type_message?: string;
+    file_url?: string;
+  }) => {
     if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
       try {
         // Format for group message sending as per API docs
-        const messagePayload = JSON.stringify({ message: text });
+        const messagePayload = JSON.stringify({
+          message: message,
+          type_message: type_message,
+          file_url: file_url,
+          type: type,
+        });
         socketRef.current.send(messagePayload);
         console.log("Sent group message:", messagePayload);
         // Optionally, add the sent message to local state immediately with 'sent' status

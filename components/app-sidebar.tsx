@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 
-import { User } from "@/app/types/auth";
+import { User } from "@/lib/api/users";
 import {
   Sidebar,
   SidebarContent,
@@ -24,9 +24,9 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { getCookies } from "@/lib/utils/cookies";
 import Link from "next/link";
-
+import { useEffect, useState } from "react";
+import { getUser } from "@/lib/api/users";
 // Menu items.
 const items = [
   {
@@ -77,14 +77,21 @@ const items = [
 ];
 
 export function AppSidebar() {
-  const userInfo: User = JSON.parse(getCookies("userInfo") || "{}");
+  const [userInfo, setUserInfo] = useState<User | null>(null);
+  useEffect(() => {
+    const fun = async () => {
+      const userInfoResponse: User = await getUser()
+      setUserInfo(userInfoResponse)
+    }
+    fun()
+  }, []);
   return (
     <Sidebar className="w-[210px]">
       <SidebarContent>
         <SidebarGroup>
           <div className="flex justify-center">
             <Image
-              src={"/logo.svg"}
+              src={"/original-logo.svg"}
               width={169}
               height={59.3}
               alt="The logo"
@@ -122,18 +129,18 @@ export function AppSidebar() {
             <Image
               width={32}
               height={32}
-              src={userInfo.image ? userInfo.image : "/userProfile-img.png"}
+              src={userInfo?.image ? userInfo.image : "/userProfile-img.png"}
               alt={"user profile image"}
             />
             </div>
             
             <h6
               className={`text-white-800 font-semibold text-sm ${
-                userInfo.first_name ? "" : "truncate w-[100px]"
+                userInfo?.first_name ? "" : "truncate w-[100px]"
               }`}
             >
-              {userInfo.first_name ? userInfo.first_name : userInfo.email}{" "}
-              {userInfo.last_name ? userInfo.last_name : ""}
+              {userInfo?.first_name ? userInfo.first_name : userInfo?.email}{" "}
+              {userInfo?.last_name ? userInfo.last_name : ""}
             </h6>
           </div>
           <ChevronRight />

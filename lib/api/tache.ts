@@ -237,3 +237,60 @@ export const removeDocumentFromTask = async (
     throw error;
   }
 };
+
+export interface CompteRendu {
+    id: number;
+    project: number;
+    project_details: ProjectDetails;
+    title: string;
+    description: string;
+    compte_rendu: string | null;
+    task_type: string;
+    task_type_display: string;
+    file_url: string | null;
+    fichiers_urls: string[];
+    assigned_members: TaskUser[];
+    creator: TaskUser;
+    date_creation: string;
+    date_modification: string;
+}
+
+/**
+ * Fetches tasks that are considered "compte-rendus"
+ * @returns A promise that resolves to an array of CompteRendu tasks
+ */
+export const getCompteRendus = async (): Promise<CompteRendu[]> => {
+  try {
+    const response = await api.get<CompteRendu[]>(`${endpoints.taches.base}compte-rendu/`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching compte rendus", (error as Error).message);
+    throw error;
+  }
+};
+
+/**
+ * Updates the compte rendu of a task
+ * @param taskId - The ID of the task to update
+ * @param compteRendu - The new compte rendu content
+ * @returns The updated task data
+ */
+export const updateCompteRendu = async (
+  taskId: number,
+  compteRendu: string
+): Promise<Task> => {
+  try {
+    const response = await api.patch<Task>(
+      `${endpoints.taches.base}${taskId}/`,
+      { compte_rendu: compteRendu }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error updating compte rendu:", error);
+    throw error;
+  }
+};
+
+
+
+

@@ -141,6 +141,7 @@ export const getMessages = async (
   page: number = 1
 ): Promise<MessageApiResponse> => {
   try {
+    //messagerie/room_id/messages/
     const response = await api.get<MessageApiResponse>(
       `${endpoints.messagerie.base}${roomId}/messages/?page=${page}`
     );

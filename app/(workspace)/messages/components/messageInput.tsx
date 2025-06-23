@@ -11,7 +11,8 @@ interface MessageInputProps {
   onSendMessage: (message: {
     type: string;
     message: string;
-    messageType?: string;
+    type_message?: string;
+    file_url?: string;
   }) => void;
   isConnected: boolean;
   isLoading?: boolean;
@@ -40,16 +41,23 @@ export function MessageInput({
 
     // If there's an image to send
     if (fileToSend && imagePreview && isConnected) {
+      console.log("--------1", fileToSend, imagePreview, isConnected);
       sendFile();
       return;
     }
-
+    //automactically detect message type to send
+    if (fileToSend && isConnected) {
+      console.log("--------2", fileToSend, isConnected);
+      sendFile();
+      return;
+    }
     // Otherwise send text message
     if (message.trim() && isConnected) {
+      console.log("--------3", message.trim(), isConnected);
       onSendMessage({
         type: "message",
         message: message.trim(),
-        messageType: MessageType.TEXT,
+        type_message: MessageType.TEXT,
       });
       setMessage("");
     }
@@ -88,10 +96,24 @@ export function MessageInput({
           const fileUrl = uploadedUrls[0];
 
           // Send the message with the S3 URL
+          console.log({
+            type: "_____________------------message",
+            message: "fichier", // Use the S3 URL directly
+            type_message: messageType,
+            file_url: fileUrl,
+          });
           onSendMessage({
             type: "message",
-            message: fileUrl, // Use the S3 URL directly
-            messageType: messageType,
+            message:
+              messageType === MessageType.FILE
+                ? "fichier"
+                : messageType === MessageType.IMAGE
+                ? "image"
+                : messageType === MessageType.AUDIO
+                ? "audio"
+                : "", // Use the S3 URL directly
+            type_message: messageType,
+            file_url: fileUrl,
           });
 
           // Show success toast
@@ -171,99 +193,100 @@ export function MessageInput({
           {fileError}
         </div>
       )}
-<div className="relative h-fit">
-      {imagePreview && (
-        <div className="mx-4 mb-2 absolute top-0 -translate-y-[100%]">
-          <div className="flex items-start gap-2 p-2 border rounded-md">
-            {fileToSend?.type.startsWith("image/") ? (
-              <div className="relative w-24 h-24 sm:w-32 sm:h-32 overflow-hidden">
-                <Image
-                  src={imagePreview || "/placeholder-image.png"}
-                  alt="Preview"
-                  width={128}
-                  height={128}
-                  className={`object-contain w-full h-full rounded-md ${
+      <div className="relative h-fit">
+        {imagePreview && (
+          <div className="mx-4 mb-2 absolute top-0 -translate-y-[100%]">
+            <div className="flex items-start gap-2 p-2 border rounded-md">
+              {fileToSend?.type.startsWith("image/") ? (
+                <div className="relative w-24 h-24 sm:w-32 sm:h-32 overflow-hidden">
+                  <Image
+                    src={imagePreview || "/placeholder-image.png"}
+                    alt="Preview"
+                    width={128}
+                    height={128}
+                    className={`object-contain w-full h-full rounded-md ${
+                      isUploading ? "opacity-50" : ""
+                    }`}
+                    onError={(e) => {
+                      // If image fails to load, show a placeholder or fallback
+                      const target = e.target as HTMLImageElement;
+                      target.src = "/placeholder-image.png";
+                    }}
+                  />
+                  {isUploading && (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-coral-500"></div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div
+                  className={`p-2 bg-gray-100 rounded-md max-w-[80%] break-words ${
                     isUploading ? "opacity-50" : ""
                   }`}
-                  onError={(e) => {
-                    // If image fails to load, show a placeholder or fallback
-                    const target = e.target as HTMLImageElement;
-                    target.src = "/placeholder-image.png";
-                  }}
-                />
-                {isUploading && (
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-coral-500"></div>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div
-                className={`p-2 bg-gray-100 rounded-md max-w-[80%] break-words ${
-                  isUploading ? "opacity-50" : ""
-                }`}
+                >
+                  {imagePreview}
+                  {isUploading && (
+                    <div className="ml-2 inline-block">
+                      <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-coral-500"></div>
+                    </div>
+                  )}
+                </div>
+              )}
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="absolute top-1 right-1 bg-white rounded-full"
+                onClick={clearFileSelection}
+                disabled={isUploading}
               >
-                {imagePreview}
-                {isUploading && (
-                  <div className="ml-2 inline-block">
-                    <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-coral-500"></div>
-                  </div>
-                )}
-              </div>
-            )}
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              className="absolute top-1 right-1 bg-white rounded-full"
-              onClick={clearFileSelection}
-              disabled={isUploading}
-            >
-              <X className="h-4 w-4" />
-            </Button>
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      <form onSubmit={handleSubmit} className="p-4 border-t flex gap-2">
-        <input
-          type="file"
-          ref={fileInputRef}
-          onChange={handleFileUpload}
-          className="hidden"
-          accept="image/*,audio/*,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        />
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          onClick={() => fileInputRef.current?.click()}
-          disabled={!isConnected || isLoading}
-        >
-          <Paperclip className="h-5 w-5" />
-        </Button>
+        <form onSubmit={handleSubmit} className="p-4 border-t flex gap-2">
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileUpload}
+            className="hidden"
+            accept="image/*,audio/*,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+          />
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={!isConnected || isLoading}
+          >
+            <Paperclip className="h-5 w-5" />
+          </Button>
 
-        <Input
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          placeholder={!isConnected ? "Déconnecté..." : "Votre message..."}
-          disabled={!isConnected || isLoading || !!fileToSend}
-          className="flex-1"
-        />
+          <Input
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            placeholder={!isConnected ? "Déconnecté..." : "Votre message..."}
+            disabled={!isConnected || isLoading || !!fileToSend}
+            className="flex-1"
+          />
 
-        <Button
-          type="submit"
-          disabled={
-            (!message.trim() && !fileToSend) || !isConnected || isLoading
-          }
-        >
-          {isUploading ? (
-            <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div>
-          ) : (
-            <Send className="h-5 w-5" />
-          )}
-        </Button>
-      </form></div>
+          <Button
+            type="submit"
+            disabled={
+              (!message.trim() && !fileToSend) || !isConnected || isLoading
+            }
+          >
+            {isUploading ? (
+              <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div>
+            ) : (
+              <Send className="h-5 w-5" />
+            )}
+          </Button>
+        </form>
+      </div>
     </div>
   );
 }

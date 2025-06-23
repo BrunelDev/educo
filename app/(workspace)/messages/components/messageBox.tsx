@@ -16,6 +16,8 @@ import {
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { getUser, User } from "@/lib/api/users";
+import AudioPlayer from "react-h5-audio-player";
+import "react-h5-audio-player/lib/styles.css";
 
 export interface MessageSender {
   id: number;
@@ -23,17 +25,51 @@ export interface MessageSender {
   first_name: string;
   last_name: string;
 }
-
+/**
+ * content
+: 
+"audio"
+file_name
+: 
+"1750613415448-WhatsApp Audio 2025-06-19 à 23.31.17_1087db7d.waptt.opus"
+file_type
+: 
+"audio/ogg"
+file_url
+: 
+"https://cse-impact.s3.eu-north-1.amazonaws.com/public/1750613415448-WhatsApp Audio 2025-06-19 à 23.31.17_1087db7d.waptt.opus"
+id
+: 
+19
+is_read
+: 
+false
+sender
+: 
+{id: 4, email: 'ahokpossibrunel@gmail.com'}
+sender_id
+: 
+4
+timestamp
+: 
+"2025-06-22T17:30:17.081680+00:00"
+type_message
+: 
+"audio"
+ */
 export interface Message {
   id: number;
   content: string;
+  file_name?: string;
+  file_type?: string;
+  file_url?: string;
   type_message: "text" | "file" | "image" | "audio";
   sender: MessageSender;
   timestamp: string;
   is_read: boolean;
-  fichier?: string | null;
-  image?: string | null;
-  audio?: string | null;
+  fichier?: { url: string; name: string };
+  image?: { url: string; name: string };
+  audio?: { url: string; name: string };
 }
 
 interface MessageBoxProps {
@@ -64,7 +100,7 @@ export default function MessageBox({ message, className }: MessageBoxProps) {
   const renderContent = () => {
     switch (message.type_message) {
       case MessageType.IMAGE:
-        const imageSource = message.image || message.content;
+        const imageSource = message.image?.url || message.file_url;
 
         // Function to handle image loading errors
         const handleImageError = () => {
@@ -127,16 +163,22 @@ export default function MessageBox({ message, className }: MessageBoxProps) {
           )
         );
       case MessageType.AUDIO:
-        const audioSource = message.audio || message.content;
+        const audioSource = message.audio?.url || message.file_url;
+        console.log(audioSource);
         return (
           audioSource && (
-            <audio controls className="max-w-full">
+            <audio controls src={audioSource} className="max-w-full">
               <source src={audioSource} type="audio/mpeg" />
+              <source src={audioSource} type="audio/ogg" />
+              <source src={audioSource} type="audio/wav" />
+              <source src={audioSource} type="audio/mp3" />
+              <source src={audioSource} type="audio/opus" />
+              <source src={audioSource} type="audio/webm" />
             </audio>
           )
         );
       case MessageType.FILE:
-        const fileSource = message.fichier || message.content;
+        const fileSource = message.fichier?.url || message.file_url;
 
         // Check if this is actually an image that was misclassified
         const isActuallyImage =
@@ -413,7 +455,9 @@ export default function MessageBox({ message, className }: MessageBoxProps) {
     >
       <Image
         src={
-          (message.sender.id === user?.id && user.image) ? user.image : "/userProfile-img.png"
+          message.sender.id === user?.id && user.image
+            ? user.image
+            : "/userProfile-img.png"
         }
         alt={message.sender.first_name}
         width={30}
@@ -422,7 +466,11 @@ export default function MessageBox({ message, className }: MessageBoxProps) {
       />
       <div className="flex-1">
         <div className="flex items-center gap-2 mb-1">
-          <span className="font-medium">{message.sender.first_name}</span>
+          <span className="font-medium">
+            {message.sender.first_name
+              ? message.sender.first_name
+              : message.sender.email}
+          </span>
         </div>
         <div className="relative w-fit">
           {renderContent()}

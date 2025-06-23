@@ -48,26 +48,31 @@ export default function MessageList() {
     isGroup && activeGroup?.id ? activeGroup.id.toString() : "";
   const groupWs = useGroupWebSocket(groupConversationId);
 
-  const {
-    isConnected,
-    messages: messagesFromHook,
-  } = isGroup ? groupWs : directWs;
+  const { isConnected, messages: messagesFromHook } = isGroup
+    ? groupWs
+    : directWs;
 
   const setMessages = isGroup ? groupWs.setMessages : directWs.setMessages;
+  /**
+   * 
+   * @param messageData {
+  "recipient_id": "123",
+  "content": "Voici une image",
+  "type_message": "image",
+  "file_url": "https://example.com/image.jpg"
+}
+   */
 
   const handleSendMessage = (messageData: {
     type: string;
     message: string;
-    messageType?: string;
+    type_message?: string;
+    file_url?: string;
   }) => {
     if (isGroup) {
-      groupWs.sendMessage(messageData.message);
+      groupWs.sendMessage(messageData);
     } else {
-      directWs.sendMessage({
-        type: "message",
-        message: messageData.message,
-        messageType: messageData.messageType || "text",
-      });
+      directWs.sendMessage(messageData);
     }
   };
 
@@ -215,23 +220,41 @@ export default function MessageList() {
             </div>
           )}
           <div className="p-4">
-            {messages.map((message, index) => (
-              <MessageBox
-                key={`${message.id}-${index}`}
-                message={message}
-                isLast={index === messages.length - 1}
-                isGroup={!!isGroup}
-              />
-            ))}
+            {messages.map((message, index) => {
+              console.log("message-------------", message);
+              return (
+                <MessageBox
+                  key={`${message.id}-${index}`}
+                  /**
+                   *  id: number;
+                     content: string;
+                     file_name?: string;
+                     file_type?: string;
+                     file_url?: string;
+                     type_message: "text" | "file" | "image" | "audio";
+                     sender: MessageSender;
+                     timestamp: string;
+                     is_read: boolean;
+                     fichier?: { url: string; name: string };
+                     image?: { url: string; name: string };
+                     audio?: { url: string; name: string };
+                   }
+                   */
+                  message={message}
+                  isLast={index === messages.length - 1}
+                  isGroup={!!isGroup}
+                />
+              );
+            })}
           </div>
           <div ref={messagesEndRef} />
         </ScrollArea>
       </div>
       <div className="flex w-full items-center place-items-end">
-      <MessageInput
-        onSendMessage={handleSendMessage}
-        isConnected={isConnected}
-      />
+        <MessageInput
+          onSendMessage={handleSendMessage}
+          isConnected={isConnected}
+        />
       </div>
     </div>
   );

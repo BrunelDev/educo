@@ -35,7 +35,9 @@ export default function AddMemberDialog({
         Ajouter un membre
       </h6>
       <div>
-        <h6 className="font-medium text-[10px] sm:w-full w-2/3 pl-5">Invitation en attente</h6>
+        <h6 className="font-medium text-[10px] sm:w-full w-2/3 pl-5">
+          Invitation en attente
+        </h6>
         <ScrollArea className=" mt-3 flex flex-col px-3">
           {users ? (
             users.map((user, index) => (
@@ -52,10 +54,13 @@ export default function AddMemberDialog({
                       alt="user icon"
                     />
                   </div>
-                  <span className="w-2/3 sm:w-full truncate font-medium">{user.email}</span>
+                  <span className="w-2/3 sm:w-full truncate font-medium">
+                    {user.email}
+                  </span>
                 </div>
                 <div className="flex-shrink-0 h-5 w-5 rounded-sm flex justify-center items-center hover:bg-coral-50 cursor-pointer">
                   <Checkbox
+                    color="black"
                     id={`user-${user.id}`}
                     checked={selectedUsers.includes(user.id)}
                     onCheckedChange={(checked) => {

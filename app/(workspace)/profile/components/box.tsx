@@ -84,7 +84,7 @@ export function SecondBox({ user }: { user: User }) {
             <div className="flex flex-col gap-1">
               <Label className="text-gray-500">Téléphone</Label>
               <h6 className="font-medium truncate">
-                {user.telephone ? user.telephone : "33 012 123 123"}
+                {user.telephone ? user.telephone : "-"}
               </h6>
             </div>
           </div>

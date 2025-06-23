@@ -51,6 +51,34 @@ module.exports = {
     },
   },
 };
-const nextConfig: NextConfig = {};
+const nextConfig: NextConfig = {
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: [
+          {
+            key: "Content-Security-Policy",
+            // Allow media from S3 and images from any source to match the images config
+            value:
+              "default-src 'self'; media-src 'self' https://cse-impact.s3.eu-north-1.amazonaws.com; img-src 'self' data: http: https:;",
+          },
+        ],
+      },
+    ];
+  },
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "**",
+      },
+      {
+        protocol: "http",
+        hostname: "**",
+      },
+    ],
+  },
+};
 
 export default nextConfig;

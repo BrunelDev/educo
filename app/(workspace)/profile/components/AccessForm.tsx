@@ -213,6 +213,7 @@ export function AccessForm({ handleClose }: { handleClose: () => void }) {
                             </SelectContent>
                           </Select>
                           <Checkbox
+                            color="black"
                             checked={field.value === member.email} // field.value is form.getValues("memberEmail")
                             onCheckedChange={(isChecked) =>
                               handleCheckboxChange(

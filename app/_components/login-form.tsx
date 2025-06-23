@@ -142,7 +142,7 @@ export function LoginForm() {
           <Button
             type="submit"
             disabled={isLoading}
-            className="cursor-pointer bg-gradient-to-r from-[#FE6539] to-crimson-400 w-full"
+            className="cursor-pointer h-11 bg-gradient-to-r from-[#FE6539] to-crimson-400 w-full"
           >
             {isLoading ? (
               <div className="flex items-center gap-2 justify-center">

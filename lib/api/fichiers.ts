@@ -21,7 +21,7 @@ export interface Dossier {
   fichiers: Fichier[];
   date_creation: string;
   date_modification: string;
-  type_dossier: string
+  type_dossier: string;
 }
 
 export interface DossierResponse {
@@ -33,9 +33,7 @@ export interface DossierResponse {
 
 const endpoint = endpoints.fichiers.dossiers.list;
 
-export const getDossiers = async (
-  page: number = 1
-): Promise<Dossier[]> => {
+export const getDossiers = async (page: number = 1): Promise<Dossier[]> => {
   try {
     const response = await api.get("fichiers/arborescence/", {
       params: {
@@ -184,6 +182,69 @@ export const deleteFile = async (id: number): Promise<void> => {
     await api.delete(`${fileEndpoint}${id}/`);
   } catch (error: unknown) {
     console.error("Error deleting file:", error);
+    throw error;
+  }
+};
+
+export interface FoldersList {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: Dossier[];
+}
+
+export const getFoldersList = async (page: number = 1): Promise<FoldersList> => {
+  try {
+    const response = await api.get("fichiers/dossiers/", {
+      params: {
+        page,
+        page_size: 50, // Set a reasonable page size
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching folders list:", error);
+    throw error;
+  }
+};
+
+export interface FilesList {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: Fichier[];
+}
+
+export const getFilesList = async (): Promise<FilesList> => {
+  try {
+    const response = await api.get("fichiers/fichiers/?page_size=1000");
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching files list:", error);
+    throw error;
+  }
+};
+
+export const moveFolderToFolder = async (
+  id: number,
+  parent: number
+): Promise<void> => {
+  try {
+    await api.patch(`fichiers/dossiers/${id}/`, { parent });
+  } catch (error: unknown) {
+    console.error("Error moving folder:", error);
+    throw error;
+  }
+};
+
+export const moveFileToFolder = async (
+  id: number,
+  dossier: number
+): Promise<void> => {
+  try {
+    await api.patch(`fichiers/fichiers/${id}/`, { dossier });
+  } catch (error: unknown) {
+    console.error("Error moving file:", error);
     throw error;
   }
 };

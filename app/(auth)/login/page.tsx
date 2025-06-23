@@ -1,25 +1,30 @@
 "use client";
 import { LoginForm } from "@/app/_components/login-form";
-import TempLogo from "@/app/_components/temLogo";
 import Image from "next/image";
 
 export default function LoginPage() {
   return (
-    <div className="grid min-h-svh md:grid-cols-2 bg-coral-500">
+    <div className="grid min-h-svh md:grid-cols-2 bg-gradient-to-r from-[#FE6539] to-crimson-400">
       <div className="relative hidden md:flex px-20 py-8  md:flex-col md:justify-around">
-        <div className="flex gap-1">
-          <TempLogo color="bg-white-50" />{" "}
-          <h6 className="text-white-50">Impact CSE</h6>
+        <div className="justify-self-start">
+          <Image
+            width={230}
+            height={100}
+            src="/logo.svg"
+            alt="impact cse"
+            className="self-center"
+          />
         </div>
-        <p className=" font-extrabold text-3xl text-white-50">
+
+        <p className="text-2xl font-bold text-white-50">
           Retrouvez votre espace dédié aux élus : réunions, formations,
           documents et assistance en un seul endroit.
         </p>
         <Image
-          width={366}
-          height={366}
-          src="/logo.svg"
-          alt="impact cse"
+          width={230}
+          height={230}
+          src="/ellipse16.svg"
+          alt="elllipse"
           className="self-center"
         />
       </div>

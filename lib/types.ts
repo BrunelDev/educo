@@ -37,9 +37,9 @@ interface MeetingParticipant {
   utilisateur_details: {
     id: number;
     email: string;
-				nom_complet: string,
-				photo: string
-			}
+    nom_complet: string;
+    photo: string;
+  };
 }
 
 // Interface for meeting documents
@@ -267,7 +267,7 @@ interface ConversationListProps {
 
 // Enum for message types
 enum MessageType {
-  TEXT = "texte",
+  TEXT = "text",
   IMAGE = "image",
   AUDIO = "audio",
   FILE = "file",

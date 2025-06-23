@@ -20,7 +20,13 @@ interface CreateProjectParams {
   team: number;
 }
 
-export default function ProjectForm({ teamId, onSubmit }: { teamId :number, onSubmit: () => void}) {
+export default function ProjectForm({
+  teamId,
+  onSubmit,
+}: {
+  teamId: number;
+  onSubmit: () => void;
+}) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [members, setMembers] = useState<OrganizationMember[]>([]);
@@ -65,7 +71,7 @@ export default function ProjectForm({ teamId, onSubmit }: { teamId :number, onSu
         participants: selectedMembers,
         team: teamId,
       };
-      console.log(projectData)
+      console.log(projectData);
 
       await createProject(projectData);
       toast.success("Projet créé avec succès");
@@ -75,11 +81,11 @@ export default function ProjectForm({ teamId, onSubmit }: { teamId :number, onSu
       setDescription("");
       setSelectedMembers([]);
       onSubmit();
-    } catch (error : unknown) {
+    } catch (error: unknown) {
       if (error instanceof AxiosError) {
         toast.error(error.response?.data.detail);
       }
-      
+
       console.error("Error creating project:", error);
     }
   };
@@ -109,6 +115,7 @@ export default function ProjectForm({ teamId, onSubmit }: { teamId :number, onSu
                 {member.last_name}
               </h6>{" "}
               <Checkbox
+                color="black"
                 checked={selectedMembers.includes(member.id)}
                 value={member.id}
                 onCheckedChange={(checked) => {
@@ -125,7 +132,10 @@ export default function ProjectForm({ teamId, onSubmit }: { teamId :number, onSu
           ))}
         </ScrollArea>
       </div>
-      <Button type="submit" className="w-fit ml-auto self-end bg-linear-to-r from-coral-400 to-crimson-400">
+      <Button
+        type="submit"
+        className="w-fit ml-auto self-end bg-linear-to-r from-coral-400 to-crimson-400"
+      >
         Terminé
       </Button>
     </form>

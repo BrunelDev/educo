@@ -53,6 +53,7 @@ export default function Actuality() {
             sourceUrl={actuality.source_url}
             imageUrl={actuality.image_url}
             date={formatDateToFrench(actuality.publication_date)}
+            id={actuality.id}
           />
         ))
       )}
@@ -66,35 +67,35 @@ interface ActualityComponentProps {
   sourceUrl: string;
   imageUrl: string;
   date: string;
+  id: number;
 }
 
 const ActualityComponent = ({
   title,
   source,
-  sourceUrl,
   imageUrl,
   date,
+  id,
 }: ActualityComponentProps) => {
   return (
     <Link
-    href={sourceUrl}
-    target="blank"
+      href={`/dashboard/actualites/${id}`}
+      target="blank"
       className="flex w-full gap-2 cursor-pointer"
-    >{
-      imageUrl ? (
+    >
+      {imageUrl ? (
         <div className="h-[40px] w-[60px] rounded-lg overflow-hidden">
-        <Image
-          src={imageUrl}
-          width={60}
-          height={40}
-          alt="actuality image"
-          className="h-[40px] w-[60px]"
-        />
+          <Image
+            src={imageUrl}
+            width={60}
+            height={40}
+            alt="actuality image"
+            className="h-[40px] w-[60px]"
+          />
         </div>
-       ) : (
+      ) : (
         <div className="h-[40px] w-[40px] rounded-lg bg-gray-100"></div>
-      )
-    }
+      )}
       <div className="flex flex-col justify-around text-white-800 w-full">
         <h6 className="font-semibold w-full text-sm">{title}</h6>
         <div className="flex flex-col sm:flex-row sm:justify-between w-full">

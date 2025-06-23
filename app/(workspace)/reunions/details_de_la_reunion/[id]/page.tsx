@@ -18,6 +18,7 @@ import { use, useEffect, useState } from "react";
 import AddDocument from "../components/addDocument";
 import AddMemberDialog from "../components/addParticipant";
 import { toast } from "sonner";
+import Editor from "@/app/_components/editor";
 export default function Detail({
   params,
 }: {
@@ -227,8 +228,11 @@ export default function Detail({
           </div>
           <div className="h-[450px] w-[350px] bg-[#FFFFFF99] p-3 flex flex-col gap-4 rounded-[8px]">
             <div className="pb-2 border-b border-white-200">
-              <h1 className="font-bold text-lg">Résumé de la reunion</h1>
+              <h1 className="font-bold text-lg">Ordre du jour</h1>
             </div>
+            <Editor
+              _editorStateJSON={meeting.ordre_du_jour[0]?.description}
+            />
 
             {meeting.ordre_du_jour[0]?.description ? (
               <LexicalView

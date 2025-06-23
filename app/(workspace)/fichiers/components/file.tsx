@@ -1,5 +1,11 @@
 import { Input } from "@/components/ui/input";
-import { Fichier, deleteFile, updateFile } from "@/lib/api/fichiers";
+import {
+  Dossier,
+  Fichier,
+  FoldersList,
+  deleteFile,
+  updateFile,
+} from "@/lib/api/fichiers";
 import {
   Download,
   EllipsisVertical,
@@ -11,13 +17,22 @@ import {
   FileSpreadsheet,
   FileText,
   FileVideo,
+  Folder,
   Trash2,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Popover } from "../../components/popover";
+import { getFoldersList, moveFileToFolder } from "@/lib/api/fichiers";
+import {
+  Select,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+} from "@/components/ui/select";
 
 interface FileCardProps {
   file: Fichier;
@@ -109,6 +124,29 @@ export default function FileCard({
       window.location.reload();
     }
   };
+  const handleDownload = async () => {
+    const imageUrl = file.url; 
+  
+    const response = await fetch(imageUrl, {
+      mode: 'cors',
+    });
+  
+    if (!response.ok) {
+      alert("Échec du téléchargement");
+      return;
+    }
+  
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+  
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = file.nom; 
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
 
   return (
     <div className="py-3 px-2 w-[233px] bg-[#FFFFFF99] rounded-[8px] flex flex-col gap-2 overflow-hidden">
@@ -170,14 +208,15 @@ export default function FileCard({
             >
               <ExternalLink size={16} />
             </Link>
-            <Link
-              href={file.url}
-              download={file.nom}
-              className="p-2 rounded-md hover:bg-white text-gray-600 transition-colors"
+            <button
+              onClick={async () => {
+                await handleDownload();
+              }}
+              className="p-2 rounded-md hover:bg-white text-gray-600 transition-colors cursor-pointer"
               title="Télécharger"
             >
               <Download size={16} />
-            </Link>
+            </button>
           </div>
         </div>
       )}
@@ -191,18 +230,50 @@ interface FilePopoverContentProps {
   onUpdate: () => void;
 }
 
-const FilePopoverContent = ({
-  file,
-  
-}: FilePopoverContentProps) => {
+const FilePopoverContent = ({ file }: FilePopoverContentProps) => {
   const [updatedName, setUpdatedName] = useState(file.nom);
+  const [folders, setFolders] = useState<FoldersList | null>(null);
+
+  useEffect(() => {
+    const fetchAllFolders = async () => {
+      try {
+        let allFolders: Dossier[] = [];
+        let page = 1;
+        let hasMore = true;
+
+        while (hasMore) {
+          const response = await getFoldersList(page);
+          if (response?.results) {
+            allFolders = allFolders.concat(response.results);
+          }
+          if (response?.next) {
+            page++;
+          } else {
+            hasMore = false;
+          }
+        }
+
+        setFolders({
+          count: allFolders.length,
+          next: null,
+          previous: null,
+          results: allFolders,
+        });
+      } catch (error) {
+        console.error("Error fetching all folders:", error);
+        toast.error("Erreur lors de la récupération des dossiers");
+      }
+    };
+
+    fetchAllFolders();
+  }, []);
 
   // Function to delete the file
   const handleDeleteFile = async () => {
     try {
       await deleteFile(file.id);
       toast.success("Fichier supprimé avec succès");
-      window.location.reload()
+      window.location.reload();
     } catch (error: unknown) {
       console.error("Error deleting file:", error);
       toast.error("Erreur lors de la suppression du fichier");
@@ -219,11 +290,20 @@ const FilePopoverContent = ({
     try {
       await updateFile(file.id, { nom: updatedName });
       toast.success("Fichier renommé avec succès");
-      window.location.reload()
-
+      window.location.reload();
     } catch (error: unknown) {
       console.error("Error updating file:", error);
       toast.error("Erreur lors de la mise à jour du fichier");
+    }
+  };
+  const handleMoveFileToFolder = async (folderId: number) => {
+    try {
+      await moveFileToFolder(file.id, folderId);
+      toast.success("Fichier déplacé avec succès");
+      window.location.reload();
+    } catch (error: unknown) {
+      console.error("Error moving file:", error);
+      toast.error("Erreur lors du déplacement du fichier");
     }
   };
 
@@ -258,6 +338,37 @@ const FilePopoverContent = ({
         <Trash2 size={18} />
         <h6>Supprimer</h6>
       </div>
+      <Popover
+        PopoverContent={
+          <div>
+            {/* List of folders getFoldersList */}
+
+            <Select
+              value={file.dossier.toString()}
+              onValueChange={(value) => {
+                handleMoveFileToFolder(Number(value));
+              }}
+            >
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Select a folder" />
+              </SelectTrigger>
+              <SelectContent>
+                {folders?.results.map((folder) => (
+                  <SelectItem key={folder.id} value={folder.id.toString()}>
+                    {folder.nom}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        }
+        PopoverTrigger={
+          <div className="hover:bg-gray-100 cursor-pointer rounded-[4px] px-2 flex items-center justify-around py-1 text-red-600">
+            <Folder size={18} />
+            <h6>Deplacer</h6>
+          </div>
+        }
+      />
     </div>
   );
 };

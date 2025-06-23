@@ -37,7 +37,7 @@ export default function AddOrganisation({ handleClose }: AddOrganisationProps) {
     ville: z.string().min(1, "La ville est requise"),
     annee_election: z
       .string()
-      .regex(/^\d{4}$/, "L'année d'élection doit être valide (ex: 2024)"),
+      .regex(/^\d{4}$/, "La dernière année d'élection doit être valide (ex: 2024)"),
     convention_collective: z
       .string()
       .min(1, "La convention collective est requise"),
@@ -207,7 +207,7 @@ export default function AddOrganisation({ handleClose }: AddOrganisationProps) {
         </div>
         {/* Année d’élection */}
         <div className="flex flex-col gap-3">
-          <Label htmlFor="annee_election">Année d’élection</Label>
+          <Label htmlFor="annee_election">Dernière année d’élection</Label>
           <Input
             id="annee_election"
             name="annee_election"
@@ -322,7 +322,7 @@ export function AddOrganisationAfterLogin({
     ville: z.string().min(1, "La ville est requise"),
     annee_election: z
       .string()
-      .regex(/^\d{4}$/, "L'année d'élection doit être valide (ex: 2024)"),
+      .regex(/^\d{4}$/, "La dernière année d'élection doit être valide (ex: 2024)"),
     convention_collective: z
       .string()
       .min(1, "La convention collective est requise"),

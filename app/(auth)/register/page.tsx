@@ -1,15 +1,19 @@
 "use client";
 import { RegisterForm } from "@/app/_components/register-form";
-import TempLogo from "@/app/_components/temLogo";
 import Image from "next/image";
 
 export default function RegisterPage() {
   return (
-    <div className="grid min-h-svh md:grid-cols-2 bg-coral-500 h-screen overflow-hidden">
+    <div className="grid min-h-svh md:grid-cols-2 bg-gradient-to-r from-[#FE6539] to-crimson-400 h-screen overflow-hidden">
       <div className="relative hidden md:flex pl-20 pr-5 pt-8  md:flex-col md:gap-5">
-        <div className="flex gap-1">
-          <TempLogo color="bg-white-50" />{" "}
-          <h6 className="text-white-50">Bonjour CSE</h6>
+        <div className="justify-self-start">
+          <Image
+            width={230}
+            height={100}
+            src="/logo.svg"
+            alt="impact cse"
+            className="self-center"
+          />
         </div>
         <p className=" font-extrabold text-3xl text-white-50">
           Votre CSE, plus simple, plus efficace !
@@ -21,7 +25,7 @@ export default function RegisterPage() {
         <Image
           width={1429.123515884542}
           height={870.1743657071188}
-          src="/logo.svg"
+          src="/macBook.svg"
           alt="impact cse"
         />
       </div>

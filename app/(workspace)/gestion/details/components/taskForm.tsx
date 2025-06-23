@@ -44,7 +44,7 @@ export default function TaskForm({
     setValue,
     formState: { errors },
   } = useForm<CreateTaskDto>();
-  setValue("task_type", defaultCategory)
+  setValue("task_type", defaultCategory);
   const [members, setMembers] = useState<OrganizationMember[]>([]);
   const [selectedMembers, setSelectedMembers] = useState<number[]>([]);
   useEffect(() => {
@@ -70,11 +70,11 @@ export default function TaskForm({
       data.project = projectId;
       // Set the selected members to assigned_member_ids
       data.assigned_member_ids = selectedMembers;
-      
+
       console.log(data);
       await createTask(data);
       toast("La tâche a été créée");
-      onSubmitTask()
+      onSubmitTask();
       //window.location.reload();
     } catch (error: unknown) {
       toast("La création de la tâche a échoué");
@@ -143,6 +143,7 @@ export default function TaskForm({
                 {member.last_name}
               </h6>{" "}
               <Checkbox
+                color="black"
                 checked={selectedMembers.includes(member.id)}
                 value={member.id}
                 onCheckedChange={(checked) => {

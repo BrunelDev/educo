@@ -10,6 +10,7 @@ import {
   removeMemberFromTask,
   Task,
   updateTask,
+  updateCompteRendu,
 } from "@/lib/api/tache";
 import { MessageType } from "@/lib/types";
 import { Button } from "@/components/ui/button";
@@ -17,8 +18,6 @@ import { Plus, Users } from "lucide-react";
 import { use, useEffect, useState } from "react";
 import { toast } from "sonner";
 import ParticipantComponent from "../../../details_de_la_tache/components/participants";
-import Editor from "@/app/_components/editor";
-import "@/app/_components/editorPlugins/style.css";
 
 export default function DetailTache({
   params,
@@ -30,21 +29,15 @@ export default function DetailTache({
   const [refresh, setRefresh] = useState(false);
   const [refresh2, setRefresh2] = useState(false);
   const [refresh3, setRefresh3] = useState(false);
-  const [compteRenduContent, setCompteRenduContent] = useState<string>(
-    '{"root":{"children":[{"children":[],"direction":null,"format":"","indent":0,"type":"paragraph","version":1}],"direction":null,"format":"","indent":0,"type":"root","version":1}}'
-  );
+  const [compteRenduText, setCompteRenduText] = useState<string>("");
   const [isEditingCompteRendu, setIsEditingCompteRendu] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await getTaskById(parseInt(taskId));
-        console.log("------Task :", response);
-        // Update the state with the fetched data
         setTask(response);
-        if (response.compte_rendu) {
-          setCompteRenduContent(response.compte_rendu);
-        }
+        setCompteRenduText(response.compte_rendu || "");
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -57,21 +50,14 @@ export default function DetailTache({
     toast.loading("Ajout des participants...");
 
     try {
-      // Add each participant individually using addParticipant
       await updateTask(task.id, {
         assigned_member_ids: users,
       });
-
-      // Refresh the task data
       const updatedTask = await getTaskById(parseInt(taskId));
       setTask(updatedTask);
       toast.dismiss();
       toast.success("Participants ajoutés avec succès");
-
-      // Reload the page to reflect changes
-      setRefresh((v: boolean) => {
-        return !v;
-      });
+      setRefresh((v) => !v);
     } catch (error) {
       console.error("Error adding members:", error);
       toast.dismiss();
@@ -85,19 +71,12 @@ export default function DetailTache({
     toast.loading("Ajout du document...");
 
     try {
-      // Add document using addDocument function with the updated API format
       await updateTask(task.id, {
         fichiers_urls: [fileUrl],
       });
-
-      // Refresh the task data
       const updatedTask = await getTaskById(parseInt(taskId));
       setTask(updatedTask);
-
-      // Reload the page to reflect changes
-      setRefresh3((v: boolean) => {
-        return !v;
-      });
+      setRefresh3((v) => !v);
       toast.dismiss();
       toast.success("Document ajouté avec succès");
     } catch (error) {
@@ -112,7 +91,10 @@ export default function DetailTache({
     if (!task) return;
     toast.loading("Enregistrement du compte rendu...");
     try {
-      await updateTask(task.id, { compte_rendu: compteRenduContent });
+      await updateCompteRendu(task.id, compteRenduText);
+      setTask((prevTask) =>
+        prevTask ? { ...prevTask, compte_rendu: compteRenduText } : undefined
+      );
       toast.dismiss();
       toast.success("Compte rendu enregistré avec succès.");
       setIsEditingCompteRendu(false);
@@ -189,9 +171,7 @@ export default function DetailTache({
                 handleDelete={async () => {
                   try {
                     await removeMemberFromTask(task.id, participant.id);
-                    setRefresh3((v: boolean) => {
-                      return !v;
-                    });
+                    setRefresh3((v) => !v);
                     toast.dismiss();
                     toast.success("Participant supprimé avec succès");
                   } catch (error) {
@@ -237,7 +217,7 @@ export default function DetailTache({
               <DocumentComponent
                 key={fichier.id}
                 document={{
-                  fichier: fichier.url  ,
+                  fichier: fichier.url,
                   nom_fichier: fichier.nom,
                   type_document: MessageType.FILE,
                   id: task.id,
@@ -246,9 +226,7 @@ export default function DetailTache({
                 handleDelete={async () => {
                   try {
                     await removeDocumentFromTask(fichier.id, task.id);
-                    setRefresh3((v: boolean) => {
-                      return !v;
-                    });
+                    setRefresh3((v) => !v);
                     toast.dismiss();
                     toast.success("Document supprimé avec succès");
                   } catch (error) {
@@ -289,8 +267,19 @@ export default function DetailTache({
             {isEditingCompteRendu ? "Confirmer" : "Modifier"}
           </Button>
         </div>
-        <div className="mt-4 w-1/2">
-          <Editor disabled={true} />
+        <div className="mt-4 w-full">
+          {isEditingCompteRendu ? (
+            <textarea
+              value={compteRenduText}
+              onChange={(e) => setCompteRenduText(e.target.value)}
+              className="w-full p-2 border rounded-md min-h-[200px] bg-transparent"
+              placeholder="Rédigez votre compte rendu ici..."
+            />
+          ) : (
+            <div className="p-2 border rounded-md min-h-[200px] bg-gray-50 whitespace-pre-wrap">
+              {compteRenduText || "Aucun compte rendu pour le moment."}
+            </div>
+          )}
         </div>
       </div>
     </div>

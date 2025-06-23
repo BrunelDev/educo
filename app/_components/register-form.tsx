@@ -144,7 +144,7 @@ export function RegisterForm({ token }: { token?: string }) {
         <Button
           type="submit"
           disabled={isLoading}
-          className="w-full h-11 bg-coral-500 hover:bg-coral-700"
+          className="w-full h-11 bg-gradient-to-r from-[#FE6539] to-crimson-400 hover:bg-coral-700"
         >
           {isLoading ? (
             <div className="flex items-center gap-2">

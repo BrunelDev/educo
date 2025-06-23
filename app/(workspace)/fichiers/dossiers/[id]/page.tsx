@@ -12,10 +12,19 @@ import {
 } from "@/lib/api/fichiers";
 import { uploadToS3 } from "@/lib/s3-upload";
 import { CirclePlus } from "lucide-react";
-import { use, useEffect, useState } from "react";
+import { use, useEffect, useState, Fragment } from "react";
 import { toast } from "sonner";
 import FileCard from "../../components/file";
 import Folder from "../../components/folder";
+import Image from "next/image";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 
 export default function DossierPage({
   params,
@@ -24,30 +33,95 @@ export default function DossierPage({
 }) {
   const { id } = use(params);
   const [folderContent, setFolderContent] = useState<Dossier>();
+  const [breadcrumbPath, setBreadcrumbPath] = useState<Dossier[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchFolder = async () => {
+    const fetchDossier = async () => {
+      if (!id) return;
+      setLoading(true);
       try {
-        const response = await getOneDossiers(id);
-        setFolderContent(response);
-        console.log(response);
-      } catch (error: unknown) {
-        console.error("Error fetching dossier", error);
-        throw error;
+        const dossierData = await getOneDossiers(id);
+        setFolderContent(dossierData);
+      } catch (error) {
+        console.error("Erreur lors de la récupération du dossier:", error);
+        setError("Impossible de charger le dossier.");
+      } finally {
+        setLoading(false);
       }
     };
-
-    fetchFolder();
+    fetchDossier();
   }, [id]);
 
-  const fetchDossiers = async () => {
-      const response = await getOneDossiers(id);
-        setFolderContent(response);
-      
+  useEffect(() => {
+    const buildBreadcrumbPath = async (currentFolder: Dossier | null) => {
+      if (!currentFolder) return [];
+
+      const path: Dossier[] = [];
+      let parentIdToFetch: number | null = currentFolder.parent;
+
+      path.unshift(currentFolder); // Add current folder first
+
+      while (parentIdToFetch) {
+        try {
+          const parentFolder = await getOneDossiers(parentIdToFetch.toString());
+          path.unshift(parentFolder); // Add parent to the beginning of the path
+          parentIdToFetch = parentFolder.parent;
+        } catch (err) {
+          console.error("Error fetching parent folder for breadcrumb:", err);
+          toast.error("Erreur lors de la construction du fil d'Ariane.");
+          parentIdToFetch = null; // Stop if there's an error
+        }
+      }
+      return path;
+    };
+
+    if (folderContent) {
+      buildBreadcrumbPath(folderContent).then(setBreadcrumbPath);
     }
+  }, [folderContent]);
+
+  const fetchDossiers = async () => {
+    const response = await getOneDossiers(id);
+    setFolderContent(response);
+  };
+
+  if (loading) {
+    return <div className="p-4">Chargement du dossier...</div>;
+  }
+
+  if (error) {
+    return <div className="p-4 text-red-500">{error}</div>;
+  }
+
+  if (!folderContent) {
+    return <div className="p-4">Dossier non trouvé.</div>;
+  }
 
   return (
     <div className="p-4 flex flex-col gap-10">
+      <Breadcrumb className="mb-4">
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/fichiers">Fichiers</BreadcrumbLink>
+          </BreadcrumbItem>
+          {breadcrumbPath.map((folder, index) => (
+            <Fragment key={folder.id}>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                {index === breadcrumbPath.length - 1 ? (
+                  <BreadcrumbPage>{folder.nom}</BreadcrumbPage>
+                ) : (
+                  <BreadcrumbLink href={`/fichiers/dossiers/${folder.id}`}>
+                    {folder.nom}
+                  </BreadcrumbLink>
+                )}
+              </BreadcrumbItem>
+            </Fragment>
+          ))}
+        </BreadcrumbList>
+      </Breadcrumb>
       <div className="w-full">
         <div className="flex w-full justify-between items-center mb-6">
           <h6>Les fichiers</h6>
@@ -100,10 +174,7 @@ export default function DossierPage({
           {folderContent && folderContent?.sous_dossiers.length > 0 ? (
             folderContent?.sous_dossiers.map((folder) => (
               <li key={folder.id}>
-                <Folder
-                  folder={folder}
-                  fetchDossiers={fetchDossiers}
-                />
+                <Folder folder={folder} fetchDossiers={fetchDossiers} />
               </li>
             ))
           ) : (
@@ -144,6 +215,8 @@ const CreateFolder = ({ folderId }: { folderId: string }) => {
 };
 
 const CreateFile = ({ folderId }: { folderId: string }) => {
+  const [fileUrl, setFileUrl] = useState<string | null>(null);
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
@@ -185,6 +258,19 @@ const CreateFile = ({ folderId }: { folderId: string }) => {
             name="media"
             type="file"
             className="w-full h-[136px] bg-white-50 cursor-pointer"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                  const result = event.target?.result;
+                  if (result) {
+                    setFileUrl(result as string);
+                  }
+                };
+                reader.readAsDataURL(file);
+              }
+            }}
           />
           <div className="absolute top-0 left-0 w-full h-[135px] bg-white-50 flex flex-col gap-2 justify-center items-center pointer-events-none">
             <CirclePlus />
@@ -193,8 +279,20 @@ const CreateFile = ({ folderId }: { folderId: string }) => {
           </div>
         </div>
       </div>
+      <div className="flex justify-center items-center">
+        {fileUrl && (
+          <div className="flex justify-center w-1/2 items-center">
+            <Image src={fileUrl} alt="File Preview" width={100} height={100} />
+          </div>
+        )}
+      </div>
 
-      <Button type="submit">Créer</Button>
+      <Button
+        type="submit"
+        className="bg-gradient-to-r from-[#FE6539] to-crimson-400"
+      >
+        Créer
+      </Button>
     </form>
   );
 };

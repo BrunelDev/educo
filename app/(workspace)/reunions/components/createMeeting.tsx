@@ -198,8 +198,7 @@ const StepOne = ({
   // Meeting type state
   const [localMeetingType, setLocalMeetingType] =
     useState<MeetingType>(type_reunion);
-  const [localMeetingTitle, setLocalMeetingTitle] =
-    useState<string>(localMeetingType);
+  const [localMeetingTitle, setLocalMeetingTitle] = useState<string>("-");
   const [localMeetingPurpose, setLocalMeetingPurpose] = useState<string>(objet);
   const [localLocation, setLocalLocation] = useState<string[]>(emplacement);
   const [localMeetingLink, setLocalMeetingLink] = useState<string>(
@@ -288,7 +287,12 @@ const StepOne = ({
         <RadioGroup
           value={localMeetingType}
           defaultValue={MeetingType.Ordinary}
-          onValueChange={(value: MeetingType) => setLocalMeetingType(value)}
+          onValueChange={(value: MeetingType) => {
+            setLocalMeetingType(value);
+            if (value === MeetingType.Others) {
+              setLocalMeetingTitle("");
+            }
+          }}
           className="flex flex-wrap gap-x-6 gap-y-3"
         >
           <div className="flex items-center space-x-2">
@@ -319,7 +323,9 @@ const StepOne = ({
             <Input
               type="text"
               value={localMeetingTitle}
-              onChange={(e) => setLocalMeetingTitle(e.target.value)}
+              onChange={(e) => {
+                setLocalMeetingTitle(e.target.value);
+              }}
               placeholder="Titre de la réunion"
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
             />
@@ -711,14 +717,13 @@ const StepThree = () => {
                     {user.email}
                   </span>
                 </div>
-                <div className="h-5 w-5 rounded-sm flex justify-center items-center hover:bg-coral-50 cursor-pointer">
-                  <Checkbox
-                    checked={localParticipants.some((p) => p === user.email)}
-                    onCheckedChange={(checked) =>
-                      handleParticipantChange(user.email, checked as boolean)
-                    }
-                  />
-                </div>
+                <Checkbox
+                  color="black"
+                  checked={localParticipants.some((p) => p === user.email)}
+                  onCheckedChange={(checked) =>
+                    handleParticipantChange(user.email, checked as boolean)
+                  }
+                />
               </div>
             ))}
           </div>

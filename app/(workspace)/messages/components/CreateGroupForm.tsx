@@ -17,7 +17,10 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { getOrganisationMembers, OrganizationMember } from "@/lib/api/organisation";
+import {
+  getOrganisationMembers,
+  OrganizationMember,
+} from "@/lib/api/organisation";
 import { createGroup } from "@/lib/api/messagerie";
 import { toast } from "sonner";
 import Image from "next/image";
@@ -30,10 +33,15 @@ interface CreateGroupFormProps {
 const formSchema = z.object({
   nom: z.string().min(1, { message: "Le nom du groupe est requis." }),
   description: z.string().optional(),
-  selectedMemberIds: z.array(z.number()).min(1, { message: "Veuillez sélectionner au moins un membre." }),
+  selectedMemberIds: z
+    .array(z.number())
+    .min(1, { message: "Veuillez sélectionner au moins un membre." }),
 });
 
-export default function CreateGroupForm({ onGroupCreated, currentUserId }: CreateGroupFormProps) {
+export default function CreateGroupForm({
+  onGroupCreated,
+  currentUserId,
+}: CreateGroupFormProps) {
   const [members, setMembers] = useState<OrganizationMember[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isFetchingMembers, setIsFetchingMembers] = useState(true);
@@ -53,10 +61,12 @@ export default function CreateGroupForm({ onGroupCreated, currentUserId }: Creat
       try {
         const response = await getOrganisationMembers();
         // Filter out the current user
-        setMembers(response.filter(member => member.id !== currentUserId));
+        setMembers(response.filter((member) => member.id !== currentUserId));
       } catch (error) {
         console.error("Error fetching organization members:", error);
-        toast.error("Erreur lors de la récupération des membres de l'organisation");
+        toast.error(
+          "Erreur lors de la récupération des membres de l'organisation"
+        );
       } finally {
         setIsFetchingMembers(false);
       }
@@ -76,7 +86,7 @@ export default function CreateGroupForm({ onGroupCreated, currentUserId }: Creat
       const newGroup = await createGroup(payload);
       toast.success(`Groupe "${newGroup.nom}" créé avec succès !`);
       onGroupCreated(); // Close the dialog and potentially refresh group list
-      form.reset(); 
+      form.reset();
     } catch (error) {
       console.error("Error creating group:", error);
       toast.error("Échec de la création du groupe.");
@@ -88,33 +98,36 @@ export default function CreateGroupForm({ onGroupCreated, currentUserId }: Creat
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          <FormField
-            control={form.control}
-            name="nom"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Nom du groupe</FormLabel>
-                <FormControl>
-                  <Input placeholder="Ex: Équipe Marketing" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+        <FormField
+          control={form.control}
+          name="nom"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Nom du groupe</FormLabel>
+              <FormControl>
+                <Input placeholder="Ex: Commission SSCT" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-          <FormField
-            control={form.control}
-            name="description"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Description (Optionnel)</FormLabel>
-                <FormControl>
-                  <Textarea placeholder="Ex: Discussions sur les campagnes à venir" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+        <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Description (Optionnel)</FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder="Ex: Discussions sur les campagnes à venir"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <FormField
           control={form.control}
           name="selectedMemberIds"
@@ -124,7 +137,9 @@ export default function CreateGroupForm({ onGroupCreated, currentUserId }: Creat
               <FormControl>
                 <ScrollArea className="h-[250px] border rounded-md p-2">
                   {isFetchingMembers ? (
-                    <p className="text-center text-gray-500">Chargement des membres...</p>
+                    <p className="text-center text-gray-500">
+                      Chargement des membres...
+                    </p>
                   ) : members.length > 0 ? (
                     members.map((member) => (
                       <FormField
@@ -139,10 +154,14 @@ export default function CreateGroupForm({ onGroupCreated, currentUserId }: Creat
                             >
                               <FormControl>
                                 <Checkbox
+                                  color="black"
                                   checked={field.value?.includes(member.id)}
                                   onCheckedChange={(checked) => {
                                     return checked
-                                      ? field.onChange([...(field.value || []), member.id])
+                                      ? field.onChange([
+                                          ...(field.value || []),
+                                          member.id,
+                                        ])
                                       : field.onChange(
                                           (field.value || []).filter(
                                             (value) => value !== member.id
@@ -151,14 +170,26 @@ export default function CreateGroupForm({ onGroupCreated, currentUserId }: Creat
                                   }}
                                 />
                               </FormControl>
-                              <div className="flex items-center gap-2 cursor-pointer flex-grow" onClick={() => {
-                                const isChecked = field.value?.includes(member.id);
-                                if (isChecked) {
-                                  field.onChange((field.value || []).filter(value => value !== member.id));
-                                } else {
-                                  field.onChange([...(field.value || []), member.id]);
-                                }
-                              }}>
+                              <div
+                                className="flex items-center gap-2 cursor-pointer flex-grow"
+                                onClick={() => {
+                                  const isChecked = field.value?.includes(
+                                    member.id
+                                  );
+                                  if (isChecked) {
+                                    field.onChange(
+                                      (field.value || []).filter(
+                                        (value) => value !== member.id
+                                      )
+                                    );
+                                  } else {
+                                    field.onChange([
+                                      ...(field.value || []),
+                                      member.id,
+                                    ]);
+                                  }
+                                }}
+                              >
                                 <div className="h-[28px] w-[28px] flex items-center justify-center border border-dashed rounded-full overflow-hidden flex-shrink-0">
                                   {member.image ? (
                                     <Image
@@ -178,7 +209,8 @@ export default function CreateGroupForm({ onGroupCreated, currentUserId }: Creat
                                   )}
                                 </div>
                                 <FormLabel className="text-sm font-normal cursor-pointer">
-                                  {member.first_name} {member.last_name} ({member.email})
+                                  {member.first_name} {member.last_name} (
+                                  {member.email})
                                 </FormLabel>
                               </div>
                             </FormItem>
@@ -187,7 +219,9 @@ export default function CreateGroupForm({ onGroupCreated, currentUserId }: Creat
                       />
                     ))
                   ) : (
-                    <p className="text-center text-gray-500">Aucun autre membre trouvé.</p>
+                    <p className="text-center text-gray-500">
+                      Aucun autre membre trouvé.
+                    </p>
                   )}
                 </ScrollArea>
               </FormControl>
@@ -195,7 +229,11 @@ export default function CreateGroupForm({ onGroupCreated, currentUserId }: Creat
             </FormItem>
           )}
         />
-        <Button type="submit" className="w-full" disabled={isLoading || isFetchingMembers}>
+        <Button
+          type="submit"
+          className="w-full"
+          disabled={isLoading || isFetchingMembers}
+        >
           {isLoading ? "Création du groupe..." : "Confirmer et Créer le Groupe"}
         </Button>
       </form>

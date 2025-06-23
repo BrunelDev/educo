@@ -21,6 +21,8 @@ export interface Organization {
   date_creation: string;
   date_modification: string;
   createur: OrganizationMember;
+  collective: string | null;
+  annee_election: number;
 }
 
 export interface OrganizationResponse {

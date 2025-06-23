@@ -1,10 +1,21 @@
 import { Popover } from "@/app/(workspace)/components/popover";
 import { Input } from "@/components/ui/input";
-import { deleteTask, TaskUser, updateTask } from "@/lib/api/tache";
+import { deleteTask, TaskType, TaskUser, updateTask } from "@/lib/api/tache";
 import { Ellipsis, FilePenLine, Trash2 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useDraggable } from "@dnd-kit/core";
+import { CSS } from "@dnd-kit/utilities";
+
+interface TaskCardProps {
+  title: string;
+  description: string;
+  id: number;
+  participant: TaskUser[];
+  onTaskUpdate: () => void;
+  task_type: TaskType;
+}
 
 export default function TaskCard({
   title,
@@ -12,32 +23,64 @@ export default function TaskCard({
   id,
   participant,
   onTaskUpdate,
-}: {
-  title: string;
-  description: string;
-  id: number;
-  participant: TaskUser[];
-  onTaskUpdate: () => void;
-}) {
+  task_type,
+}: TaskCardProps) {
   const router = useRouter();
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+
+  const { attributes, listeners, setNodeRef, transform } = useDraggable({
+    id: `task-${id}`,
+    data: { id, title, description, participant, task_type },
+  });
+
+  const style = {
+    transform: CSS.Translate.toString(transform),
+    touchAction: "none",
+  };
+
   return (
     <div
-      className="py-2 px-3 rounded-[8px] flex flex-col gap-3 bg-[#FFFFFF99] cursor-pointer hover:bg-gray-100"
-      onClick={() => router.push(pathname + `/detailsTaches/${id}`)}
+      ref={setNodeRef}
+      style={style}
+      {...listeners}
+      {...attributes}
+      className="py-2 px-3 rounded-[8px] flex flex-col gap-3 bg-[#FFFFFF99] cursor-grab hover:bg-gray-100 active:cursor-grabbing"
+      onDoubleClick={() => {
+        router.push(pathname + `/detailsTaches/${id}`);
+      }}
     >
       <div className="flex justify-between items-center">
-        <h6>{title}</h6>
+        <h6
+          className={
+            task_type === "a_faire"
+              ? "text-red-600"
+              : task_type === "en_cours"
+              ? "text-yellow-600"
+              : "text-green-600"
+          }
+        >
+          {title}
+        </h6>
 
-        <div onClick={(e) => e.stopPropagation()}>
+        <div
+          className="cursor-pointer"
+          onPointerDown={(e) => e.stopPropagation()}
+        >
           <Popover
             open={open}
             onOpenChange={setOpen}
             PopoverTrigger={<Ellipsis />}
-            PopoverContent={<PopoverContent taskId={id} taskTitle={title} onSubmit={() => {onTaskUpdate()
-              setOpen(false)
-            }}/>}
+            PopoverContent={
+              <PopoverContent
+                taskId={id}
+                taskTitle={title}
+                onSubmit={() => {
+                  onTaskUpdate();
+                  setOpen(false);
+                }}
+              />
+            }
           />
         </div>
       </div>
@@ -59,7 +102,11 @@ interface PopoverContentProps {
   onSubmit: () => void;
 }
 
-const PopoverContent = ({ taskId, taskTitle, onSubmit }: PopoverContentProps) => {
+const PopoverContent = ({
+  taskId,
+  taskTitle,
+  onSubmit,
+}: PopoverContentProps) => {
   const [updatedName, setUpdatedName] = useState(taskTitle);
 
   // Function to delete the task
@@ -67,7 +114,7 @@ const PopoverContent = ({ taskId, taskTitle, onSubmit }: PopoverContentProps) =>
     try {
       await deleteTask(taskId);
       toast.success("Tâche supprimée avec succès");
-      onSubmit()
+      onSubmit();
     } catch (error: unknown) {
       console.error("Error deleting task:", error);
       toast.error("Erreur lors de la suppression de la tâche");
@@ -84,7 +131,7 @@ const PopoverContent = ({ taskId, taskTitle, onSubmit }: PopoverContentProps) =>
     try {
       await updateTask(taskId, { title: updatedName });
       toast.success("Tâche renommée avec succès");
-      onSubmit()
+      onSubmit();
     } catch (error: unknown) {
       console.error("Error updating task:", error);
       toast.error("Erreur lors de la mise à jour de la tâche");

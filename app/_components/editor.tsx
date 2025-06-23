@@ -157,9 +157,9 @@ const editorConfig = {
   theme: ExampleTheme,
 };
 
-export default function Editor({disabled = false}: {disabled?: boolean}) {
+export default function Editor({disabled = false, _editorStateJSON}: {disabled?: boolean, _editorStateJSON?: string}) {
   const { updateStep4 } = useMeetingForm();
-  const [editorStateJSON, setEditorStateJSON] = useState("");
+  const [editorStateJSON, setEditorStateJSON] = useState(_editorStateJSON || "");
   
   // Utilisez useCallback pour éviter la recréation de cette fonction à chaque rendu
   const onChange = useCallback((editorState: EditorState) => {

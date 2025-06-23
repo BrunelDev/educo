@@ -4,12 +4,17 @@ import { getCookies } from "@/lib/utils/cookies";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { WebSocketMessage, ConnectionState } from "@/lib/types/websocket";
-
+/**
+ * type: string;
+    message: string;
+    type_message?: string;
+    file_url?: string;
+ */
 export interface WebSocketSendMessage {
   type: string;
   message: string;
-  messageType?: string;
-  room?: string;
+  type_message?: string;
+  file_url?: string;
 }
 
 export const useWebSocket = (conversationId: string) => {
@@ -229,11 +234,7 @@ export const useWebSocket = (conversationId: string) => {
       if (socketRef.current?.readyState === WebSocket.OPEN) {
         try {
           // Format message to match server expectations
-          const formattedMessage = {
-            type: messageData.type,
-            message: messageData.message,
-            messageType: messageData.messageType || "text", // Include messageType if provided
-          };
+          const formattedMessage = messageData;
 
           console.log("Sending message:", formattedMessage);
           socketRef.current.send(JSON.stringify(formattedMessage));

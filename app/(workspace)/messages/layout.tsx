@@ -73,7 +73,7 @@ export default function MessageLayout({
         className={`w-full md:w-[350px]  dark:border-gray-700 flex flex-col ${
           isMobileView && selectedItem ? "hidden" : "block"
         }
-          ${isMobileView ? "w-full" : "w-[calc(100%-350px)]"}`}
+          ${isMobileView ? "w-full" : "w-[calc(100%-150px)]"}`}
       >
         <div className="p-7 pb-[30px] border-b dark:border-gray-700">
           <h1 className="text-xl font-bold">Messages</h1>

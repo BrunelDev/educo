@@ -7,9 +7,9 @@ import { useEffect, useState } from "react";
 import AssociateCard from "./components/associateCard";
 import Contact from "./components/contact";
 import AddOrganisation from "./components/addOrganisation";
-import TeamFormHandler from "../components/teamFormHandler";
+import {TeamFormHandlerWithMail} from "../components/teamFormHandler";
 import { getCookies } from "@/lib/utils/cookies";
-import {  getOrganization, OrganizationResponse } from "@/lib/api/organisation";
+import { getOrganization, OrganizationResponse } from "@/lib/api/organisation";
 import EmptyState from "@/app/_components/EmptyState";
 
 export default function Equipe() {
@@ -18,111 +18,133 @@ export default function Equipe() {
   const [refresh, setRefresh] = useState(false);
   //const [searchValue, setSearchValue] = useState<string>("");
   const [users, setUsers] = useState<OrganizationResponse>();
-       useEffect(() => {
-          const fun = async () => {
-            try {
-              let storedData = "";
-              if (typeof window !== "undefined") {
-                storedData = JSON.parse(getCookies("userInfo") || "{}");
-              }
-      
-              console.log("token", storedData);
-              const response = await getOrganization();
-              setUsers(response);
-            } catch (error) {
-              console.error(error);
-            }
-          };
-          fun();
-       }, [isAddOrgDialogOpen,isAddMemberDialogOpen,refresh]);
+  useEffect(() => {
+    const fun = async () => {
+      try {
+        let storedData = "";
+        if (typeof window !== "undefined") {
+          storedData = JSON.parse(getCookies("userInfo") || "{}");
+        }
 
-    return (
-      <div className="flex relative flex-col gap-6 w-full px-4 sm:px-6">
-        <h6 className="text-xl sm:text-2xl font-semibold">Equipe</h6>
-        <Contact />
-        
-        {/* Header section with responsive layout */}
-        <div className="flex flex-col sm:flex-row justify-between gap-4 sm:gap-0">
-          {users?.membres ? 
-            <h6 className="text-lg font-medium">{users.membres?.length-1} associé{users.membres?.length-1 > 1 ? "s" : ""}</h6> : 
-            <h6 className="text-lg font-medium">Aucune équipe liée.</h6>
-          }
-          
-          {/* Actions container with responsive adjustments */}
-          <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
-            {users?.membres ? 
-              <div className="w-full sm:w-auto">
-                {/*<SearchBar
+        console.log("token", storedData);
+        const response = await getOrganization();
+        setUsers(response);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fun();
+  }, [isAddOrgDialogOpen, isAddMemberDialogOpen, refresh]);
+
+  return (
+    <div className="flex relative flex-col gap-6 w-full px-4 sm:px-6">
+      <h6 className="text-xl sm:text-2xl font-semibold">Equipe</h6>
+      <Contact />
+
+      {/* Header section with responsive layout */}
+      <div className="flex flex-col sm:flex-row justify-between gap-4 sm:gap-0">
+        {users?.membres ? (
+          <h6 className="text-lg font-medium">
+            {users.membres?.length - 1} associé
+            {users.membres?.length - 1 > 1 ? "s" : ""}
+          </h6>
+        ) : (
+          <h6 className="text-lg font-medium">Aucune équipe liée.</h6>
+        )}
+
+        {/* Actions container with responsive adjustments */}
+        <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+          {users?.membres ? (
+            <div className="w-full sm:w-auto">
+              {/*<SearchBar
                   value={searchValue}
                   handleChange={setSearchValue}
                   placeholder={"Rechercher"}
                 />*/}
-              </div> : null
-            }
-            
-            {/* Organization button - repositioned for mobile */}
-            {!users?.organisation &&
-            <div className="sm:absolute sm:right-6 sm:-top-11 order-first sm:order-none mb-2 sm:mb-0">
-            <DialogComponent
-              open={isAddOrgDialogOpen}
-              onOpenChange={setIsAddOrgDialogOpen}
-              className={"sm:max-w-[768px]"}
-              dialoTrigger={
-                <Button
-                  variant={"default"}
-                  className="cursor-pointer bg-gradient-to-r from-[#FE6539] to-crimson-400 flex w-full sm:w-auto"
-                >
-                  <Plus className="mr-1" /> <span className="whitespace-nowrap">Ajouter une organisation</span>
-                </Button>
-              }
-              dialogContent={<AddOrganisation handleClose={() => setIsAddOrgDialogOpen(false)} />}
-              dialogTitle={null}
-            />
-          </div> }
-            
-            
-            {/* Add member button */}
-            <div className="w-full sm:w-auto">
-              {users?.organisation?.id ?
-                <DialogComponent
-                  open={isAddMemberDialogOpen}
-                  onOpenChange={setIsAddMemberDialogOpen}
-                  dialoTrigger={
-                    <Button
-                      variant={"default"}
-                      className="cursor-pointer bg-gradient-to-r from-[#FE6539] to-crimson-400 flex w-full sm:w-auto"
-                    >
-                      <Plus className="mr-1" /> <span className="whitespace-nowrap">Ajouter un membre</span>
-                    </Button>
-                  }
-                  dialogContent={<TeamFormHandler orgId={users?.organisation?.id} handleClose={() => setIsAddMemberDialogOpen(false)} />}
-                  dialogTitle={null}
-                /> : null
-              }
             </div>
+          ) : null}
+
+          {/* Organization button - repositioned for mobile */}
+          {!users?.organisation && (
+            <div className="sm:absolute sm:right-6 sm:-top-11 order-first sm:order-none mb-2 sm:mb-0">
+              <DialogComponent
+                open={isAddOrgDialogOpen}
+                onOpenChange={setIsAddOrgDialogOpen}
+                className={"sm:max-w-[768px]"}
+                dialoTrigger={
+                  <Button
+                    variant={"default"}
+                    className="cursor-pointer bg-gradient-to-r from-[#FE6539] to-crimson-400 flex w-full sm:w-auto"
+                  >
+                    <Plus className="mr-1" />{" "}
+                    <span className="whitespace-nowrap">
+                      Ajouter une organisation
+                    </span>
+                  </Button>
+                }
+                dialogContent={
+                  <AddOrganisation
+                    handleClose={() => setIsAddOrgDialogOpen(false)}
+                  />
+                }
+                dialogTitle={null}
+              />
+            </div>
+          )}
+
+          {/* Add member button */}
+          <div className="w-full sm:w-auto">
+            {users?.organisation?.id ? (
+              <DialogComponent
+                open={isAddMemberDialogOpen}
+                onOpenChange={setIsAddMemberDialogOpen}
+                dialoTrigger={
+                  <Button
+                    variant={"default"}
+                    className="cursor-pointer bg-gradient-to-r from-[#FE6539] to-crimson-400 flex w-full sm:w-auto"
+                  >
+                    <Plus className="mr-1" />{" "}
+                    <span className="whitespace-nowrap">Ajouter un membre</span>
+                  </Button>
+                }
+                dialogContent={
+                  <TeamFormHandlerWithMail
+                    orgId={users?.organisation?.id}
+                    handleClose={() => setIsAddMemberDialogOpen(false)}
+                  />
+                }
+                dialogTitle={null}
+              />
+            ) : null}
           </div>
         </div>
-        
-        {/* Cards grid with responsive sizing */}
-        <div className="flex flex-wrap gap-4">
-          {users
-            ? users.membres?.map((user, index) => (
-                <AssociateCard refresh={() => setRefresh(!refresh)} key={user.id + index} teamId={users?.organisation?.id} associate={user} />
-              ))
-            : <div className="col-span-full flex justify-center items-center py-8">
-                <EmptyState 
-                  title={"Vous n'appartenez à aucune organisation"} 
-                  description={"Veuillez créer une organisation pour commencer."}
-                />
-              </div>
-          }
-        </div>
-        {/*<div className="flex flex-wrap gap-6">
+      </div>
+
+      {/* Cards grid with responsive sizing */}
+      <div className="flex flex-wrap gap-4">
+        {users ? (
+          users.membres?.map((user, index) => (
+            <AssociateCard
+              refresh={() => setRefresh(!refresh)}
+              key={user.id + index}
+              teamId={users?.organisation?.id}
+              associate={user}
+            />
+          ))
+        ) : (
+          <div className="col-span-full flex justify-center items-center py-8">
+            <EmptyState
+              title={"Vous n'appartenez à aucune organisation"}
+              description={"Veuillez créer une organisation pour commencer."}
+            />
+          </div>
+        )}
+      </div>
+      {/*<div className="flex flex-wrap gap-6">
           {associates.map((associate, index) => (
             <AssociateCard key={associate.id + index} teamId={users?.organisation?.id} associate={associate} />
           ))}
         </div>*/}
-      </div>
-    );
-  
+    </div>
+  );
 }

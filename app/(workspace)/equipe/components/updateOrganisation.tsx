@@ -2,21 +2,34 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-import { updateOrganisation } from "@/lib/api/organisation";
+import {
+  updateOrganisation,
+  getOrganization,
+  OrganizationResponse,
+} from "@/lib/api/organisation";
 import { uploadToS3 } from "@/lib/s3-upload";
 import { FileInputChangeEvent } from "@/lib/types";
 import { AxiosError } from "axios";
 import { ChevronRight, CirclePlus } from "lucide-react";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
-export default function UpdateOrganisationForm({ orgId, handleClose }: { orgId: number; handleClose: () => void }) {
+export default function UpdateOrganisationForm({
+  orgId,
+  handleClose,
+}: {
+  orgId: number;
+  handleClose: () => void;
+}) {
   const [, setLogo] = useState<File>();
   const [logoUrl, setLogoUrl] = useState<string>("");
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [organization, setOrganization] = useState<OrganizationResponse | null>(
+    null
+  );
 
   const organisationSchema = z.object({
     nom_entreprise: z
@@ -27,15 +40,28 @@ export default function UpdateOrganisationForm({ orgId, handleClose }: { orgId: 
       .string()
       .min(1, "Le secteur d'activité est requis")
       .optional(),
-    taille: z.string().regex(/^[1-9]\d*$/, "La taille doit être un nombre entier positif").min(1, "La taille est requise").optional(),
+    taille: z
+      .string()
+      .regex(/^[1-9]\d*$/, "La taille doit être un nombre entier positif")
+      .min(1, "La taille est requise")
+      .optional(),
     adresse_siege: z.string().min(1, "L'adresse est requise").optional(),
     code_postal: z
       .string()
       .length(5, "Le code postal doit contenir 5 chiffres")
       .optional(),
     ville: z.string().min(1, "La ville est requise").optional(),
-    annee_election: z.string().regex(/^\d{4}$/, "L'année d'élection doit être valide (ex: 2024)").optional(),
-    convention_collective: z.string().min(1, "La convention collective est requise").optional(),
+    annee_election: z
+      .string()
+      .regex(
+        /^\d{4}$/,
+        "La dernière année d'élection doit être valide (ex: 2024)"
+      )
+      .optional(),
+    convention_collective: z
+      .string()
+      .min(1, "La convention collective est requise")
+      .optional(),
     membres_cse_invites: z.string().optional(),
   });
 
@@ -56,113 +82,137 @@ export default function UpdateOrganisationForm({ orgId, handleClose }: { orgId: 
     }
   };
 
+  useEffect(() => {
+    const fun = async () => {
+      try {
+        const response = await getOrganization();
+        if (response) {
+          setOrganization(response);
+        }
+      } catch (error) {
+        console.error("error geting organization", error);
+      }
+    };
+    fun();
+  }, [orgId]);
+
   return (
     <ScrollArea className="h-[calc(100vh-10rem)] w-full">
+      <form
+        className="flex flex-col gap-5 px-4 sm:px-8 md:px-12 lg:px-16 py-4 w-full max-w-3xl mx-auto"
+        onSubmit={async (e) => {
+          e.preventDefault();
+          const formData = new FormData(e.currentTarget);
 
-    <form
-      className="flex flex-col gap-5 px-4 sm:px-8 md:px-12 lg:px-16 py-4 w-full max-w-3xl mx-auto"
-      onSubmit={async (e) => {
-        e.preventDefault();
-        const formData = new FormData(e.currentTarget);
+          try {
+            organisationSchema.parse({
+              nom_entreprise: formData.get("nom_entreprise") || undefined,
+              secteur_activite: formData.get("secteur_activite") || undefined,
+              taille: formData.get("taille") || undefined,
+              adresse_siege: formData.get("adresse_siege") || undefined,
+              code_postal: formData.get("code_postal") || undefined,
+              ville: formData.get("ville") || undefined,
+              annee_election: formData.get("annee_election") || undefined,
+              convention_collective:
+                formData.get("convention_collective") || undefined,
+              membres_cse_invites:
+                formData.get("membres_cse_invites") || undefined,
+            });
 
-        try {
-          organisationSchema.parse({
-            nom_entreprise: formData.get("nom_entreprise") || undefined,
-            secteur_activite: formData.get("secteur_activite") || undefined,
-            taille: formData.get("taille") || undefined,
-            adresse_siege: formData.get("adresse_siege") || undefined,
-            code_postal: formData.get("code_postal") || undefined,
-            ville: formData.get("ville") || undefined,
-            annee_election: formData.get("annee_election") || undefined,
-            convention_collective: formData.get("convention_collective") || undefined,
-            membres_cse_invites: formData.get("membres_cse_invites") || undefined,
-          });
+            const organizationData: Partial<{
+              nom: string;
+              nom_entreprise: string;
+              secteur_activite: string;
+              taille: string;
+              adresse_siege: string;
+              code_postal: string;
+              ville: string;
+              annee_election: string;
+              collective: string;
+              invites: string[];
+              logo: string;
+              description: string;
+            }> = {};
 
-          const organizationData: Partial<{
-            nom: string;
-            nom_entreprise: string;
-            secteur_activite: string;
-            taille: string;
-            adresse_siege: string;
-            code_postal: string;
-            ville: string;
-            annee_election: string;
-            collective: string; 
-            invites: string[];
-            logo: string;
-            description: string;
-          }> = {};
+            const nomEntreprise = formData.get("nom_entreprise") as string;
+            if (nomEntreprise) {
+              organizationData.nom = nomEntreprise;
+              organizationData.nom_entreprise = nomEntreprise;
+            }
 
-          const nomEntreprise = formData.get("nom_entreprise") as string; 
-          if (nomEntreprise) {
-            organizationData.nom = nomEntreprise;
-            organizationData.nom_entreprise = nomEntreprise;
-          }
+            const secteur = formData.get("secteur_activite") as string;
+            if (secteur) organizationData.secteur_activite = secteur;
 
-          const secteur = formData.get("secteur_activite") as string;
-          if (secteur) organizationData.secteur_activite = secteur;
+            const tailleValue = formData.get("taille") as string;
+            if (tailleValue) organizationData.taille = tailleValue;
 
-          const tailleValue = formData.get("taille") as string; 
-          if (tailleValue) organizationData.taille = tailleValue;
+            const adresse = formData.get("adresse_siege") as string;
+            if (adresse) organizationData.adresse_siege = adresse;
 
-          const adresse = formData.get("adresse_siege") as string;
-          if (adresse) organizationData.adresse_siege = adresse;
+            const codePostalValue = formData.get("code_postal") as string;
+            if (codePostalValue) organizationData.code_postal = codePostalValue;
 
-          const codePostalValue = formData.get("code_postal") as string;
-          if (codePostalValue) organizationData.code_postal = codePostalValue;
+            const villeValue = formData.get("ville") as string;
+            if (villeValue) organizationData.ville = villeValue;
 
-          const villeValue = formData.get("ville") as string; 
-          if (villeValue) organizationData.ville = villeValue;
+            const anneeElection = formData.get("annee_election") as string;
+            if (anneeElection) organizationData.annee_election = anneeElection;
 
-          const anneeElection = formData.get("annee_election") as string;
-          if (anneeElection) organizationData.annee_election = anneeElection;
+            const conventionCollective = formData.get(
+              "convention_collective"
+            ) as string;
+            if (conventionCollective)
+              organizationData.collective = conventionCollective;
 
-          const conventionCollective = formData.get("convention_collective") as string;
-          if (conventionCollective) organizationData.collective = conventionCollective;
+            const membresInvites = formData.get(
+              "membres_cse_invites"
+            ) as string;
+            if (formData.has("membres_cse_invites")) {
+              if (membresInvites && membresInvites.trim() !== "") {
+                organizationData.invites = membresInvites
+                  .split(",")
+                  .map((email) => email.trim())
+                  .filter((email) => email);
+              } else {
+                organizationData.invites = [];
+              }
+            }
 
-          const membresInvites = formData.get("membres_cse_invites") as string;
-          if (formData.has("membres_cse_invites")) { 
-            if (membresInvites && membresInvites.trim() !== "") {
-              organizationData.invites = membresInvites.split(',').map(email => email.trim()).filter(email => email);
-            } else {
-              organizationData.invites = [];
+            if (logoUrl) organizationData.logo = logoUrl;
+            // The description field is not explicitly handled here as it's not part of the added fields.
+            // If it needs to be updated or cleared, specific logic would be required.
+
+            console.log("Submitting:", organizationData);
+            await updateOrganisation(orgId, organizationData);
+
+            toast.success(`L'organisation a été modifiée avec succès`);
+            handleClose();
+          } catch (error) {
+            if (error instanceof z.ZodError) {
+              const newErrors: Record<string, string> = {};
+              error.errors.forEach((err) => {
+                if (err.path) {
+                  newErrors[err.path[0]] = err.message;
+                }
+              });
+              setErrors(newErrors);
+              toast.error("Erreur de validation", {
+                description: "Veuillez corriger les erreurs dans le formulaire",
+              });
+            }
+            if (error instanceof AxiosError) {
+              toast.error("Erreur lors de la modification de l'organisation", {
+                description: error?.response?.data.detail,
+              });
+              throw error;
             }
           }
-
-          if (logoUrl) organizationData.logo = logoUrl;
-          // The description field is not explicitly handled here as it's not part of the added fields.
-          // If it needs to be updated or cleared, specific logic would be required.
-
-          console.log("Submitting:", organizationData);
-          await updateOrganisation(orgId, organizationData);
-
-          toast.success(`L'organisation a été modifiée avec succès`);
-          handleClose();
-        } catch (error) {
-          if (error instanceof z.ZodError) {
-            const newErrors: Record<string, string> = {};
-            error.errors.forEach((err) => {
-              if (err.path) {
-                newErrors[err.path[0]] = err.message;
-              }
-            });
-            setErrors(newErrors);
-            toast.error("Erreur de validation", {
-              description: "Veuillez corriger les erreurs dans le formulaire",
-            });
-          }
-          if (error instanceof AxiosError) {
-            toast.error("Erreur lors de la modification de l'organisation", {
-              description: error?.response?.data.detail,
-            });
-            throw error;
-          }
-        }
-      }}
-    >
+        }}
+      >
         <div className="flex flex-col gap-3">
           <Label htmlFor="nom_entreprise">Nom de l&apos;entreprise</Label>
           <Input
+            defaultValue={organization?.organisation.nom_entreprise}
             id="nom_entreprise"
             name="nom_entreprise"
             className="h-[36px]"
@@ -177,6 +227,7 @@ export default function UpdateOrganisationForm({ orgId, handleClose }: { orgId: 
           <div className="flex flex-col gap-3 w-full sm:w-[48%]">
             <Label htmlFor="secteur_activite">Secteur d&apos;activité</Label>
             <Input
+              defaultValue={organization?.organisation.secteur_activite}
               id="secteur_activite"
               name="secteur_activite"
               className="h-[36px]"
@@ -190,6 +241,7 @@ export default function UpdateOrganisationForm({ orgId, handleClose }: { orgId: 
           <div className="flex flex-col gap-3 w-full sm:w-[48%]">
             <Label htmlFor="taille">Nombre de salariés</Label>
             <Input
+              defaultValue={organization?.organisation.taille}
               type="number"
               id="taille"
               name="taille"
@@ -204,6 +256,7 @@ export default function UpdateOrganisationForm({ orgId, handleClose }: { orgId: 
         <div className="flex flex-col gap-3">
           <Label htmlFor="adresse_siege">Addresse du siège</Label>
           <Input
+            defaultValue={organization?.organisation.adresse_siege}
             id="adresse_siege"
             name="adresse_siege"
             type="text"
@@ -216,27 +269,38 @@ export default function UpdateOrganisationForm({ orgId, handleClose }: { orgId: 
         <div className="flex flex-col sm:flex-row sm:justify-between gap-5">
           <div className="flex flex-col gap-3 w-full sm:w-[48%]">
             <Label htmlFor="code_postal">Code postal</Label>
-            <Input id="code_postal" name="code_postal" className="h-[36px]" />
+            <Input
+              id="code_postal"
+              name="code_postal"
+              className="h-[36px]"
+              defaultValue={organization?.organisation.code_postal}
+            />
             {errors.code_postal && (
               <span className="text-red-500 text-xs">{errors.code_postal}</span>
             )}
           </div>
           <div className="flex flex-col gap-3 w-full sm:w-[48%]">
             <Label htmlFor="ville">Ville</Label>
-            <Input id="ville" name="ville" className="h-[36px]" />
+            <Input
+              id="ville"
+              name="ville"
+              className="h-[36px]"
+              defaultValue={organization?.organisation.ville}
+            />
             {errors.ville && (
               <span className="text-red-500 text-xs">{errors.ville}</span>
             )}
           </div>
         </div>
         <div className="flex flex-col gap-3">
-          <Label htmlFor="annee_election">Année d’élection</Label>
+          <Label htmlFor="annee_election">Dernière année d’élection</Label>
           <Input
             id="annee_election"
             name="annee_election"
             type="number"
             placeholder="YYYY"
             className="h-[36px]"
+            defaultValue={organization?.organisation.annee_election}
           />
           {errors.annee_election && (
             <span className="text-red-500 text-xs">
@@ -251,6 +315,7 @@ export default function UpdateOrganisationForm({ orgId, handleClose }: { orgId: 
             name="convention_collective"
             className="h-[36px]"
             placeholder="Entrez la convention collective"
+            defaultValue={organization?.organisation.collective ? organization?.organisation.collective : ""}
           />
           {errors.convention_collective && (
             <span className="text-red-500 text-xs">
@@ -286,6 +351,11 @@ export default function UpdateOrganisationForm({ orgId, handleClose }: { orgId: 
               type="file"
               accept="image/*"
               className="w-full h-[136px] bg-white-50 cursor-pointer opacity-0 absolute top-0 left-0 z-10"
+              defaultValue={
+                organization?.organisation.logo
+                  ? organization?.organisation.logo
+                  : ""
+              }
             />
             <Label
               htmlFor="logoInputAddOrgAfterLogin"
@@ -317,7 +387,7 @@ export default function UpdateOrganisationForm({ orgId, handleClose }: { orgId: 
             <ChevronRight />
           </Button>
         </div>
-    </form>
+      </form>
     </ScrollArea>
   );
 }

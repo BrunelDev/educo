@@ -26,6 +26,7 @@ export interface Webinaire {
   ressources: Ressource[];
   date_creation: string;
   date_modification: string;
+  inscrit: boolean;
 }
 
 export interface WebinairesResponse {
@@ -43,6 +44,16 @@ export interface RessourcesResponse {
 }
 
 const endpoint = endpoints.formations.webinaires.list;
+
+export const getWebinaireById = async (id: number): Promise<Webinaire> => {
+  try {
+    const response = await api.get<Webinaire>(`formations/webinaires/${id}/`);
+    return response.data;
+  } catch (error) {
+    console.error(`Erreur lors de la récupération du webinaire`, (error as Error).message);
+    throw error;
+  }
+};
 
 export const getWebinaires = async (
   page: number = 1
@@ -103,12 +114,15 @@ export const updateRessource = async (
 };
 
 // s'inscrire a webinaire
-export const subscribeToWebinaire = async (webinaireId: number): Promise<void> => {
+export const subscribeToWebinaire = async (
+  webinaireId: number
+): Promise<void> => {
   try {
-    await api.post("formations/webinaires/inscription/", { webinaire: webinaireId });
+    await api.post("formations/webinaires/inscription/", {
+      webinaire: webinaireId,
+    });
   } catch (error) {
     console.error("Error subscribing to webinaire:", error);
     throw error;
   }
 };
-
