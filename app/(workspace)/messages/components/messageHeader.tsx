@@ -69,7 +69,7 @@ const MessageHeader = () => {
       activeConversation?.title ||
       (otherParticipants?.length === 1
         ? otherParticipants[0].name
-        : `Groupe (${otherParticipants.length + 1} participants)`);
+        : `${otherParticipants.filter((participant) => participant._id !== userInfo.id)[0].name}`);
 
     // Determine if this is a group conversation
     const isGroupConversation = otherParticipants.length > 1;

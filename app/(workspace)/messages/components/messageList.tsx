@@ -213,7 +213,7 @@ export default function MessageList() {
   return (
     <div className="flex flex-col h-[calc(100vh-5rem)]">
       <div className="flex-grow overflow-hidden">
-        <ScrollArea className="h-[calc(100vh-24rem)]" ref={scrollAreaRef}>
+        <ScrollArea className="h-[calc(100vh-20rem)]" ref={scrollAreaRef}>
           {hasMore && !isGroup && (
             <div ref={ref} className="flex justify-center py-2">
               <Loader2 className="h-6 w-6 text-gray-400 animate-spin" />
