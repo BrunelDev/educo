@@ -16,7 +16,6 @@ import {
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { getUser, User } from "@/lib/api/users";
-import AudioPlayer from "react-h5-audio-player";
 import "react-h5-audio-player/lib/styles.css";
 
 export interface MessageSender {
