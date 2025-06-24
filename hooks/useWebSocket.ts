@@ -99,7 +99,6 @@ export const useWebSocket = (conversationId: string) => {
               fichier: data.message.fichier,
               image: data.message.image,
               audio: data.message.audio,
-              status: "received", // Mark incoming messages as received
               room: data.message.room, // Include room from direct messages
               is_deleted: data.message.is_deleted || false, // Add is_deleted, default to false
             };

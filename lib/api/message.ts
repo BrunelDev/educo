@@ -1,13 +1,11 @@
 import api, { endpoints } from "../api";
+import { MessageType} from "../types";
 
 export interface Sender {
   id: number;
   email: string;
-  type_utilisateur: "EMPLOYE" | "ADMIN" | "MEMBRE_CSE";
-  telephone: string;
-  date_creation: string;
-  date_modification: string;
-  is_active: boolean;
+  name: string;
+  image: string | null;
 }
 
 export interface Participant {
@@ -17,17 +15,32 @@ export interface Participant {
 }
 
 export interface Message {
-  id: number;
-  room: number;
-  sender: Sender;
-  content: string;
-  type_message: "text" | "file" | "image" | "audio";
-  fichier: string | null;
-  image: string | null;
-  audio: string | null;
-  timestamp: string;
-  is_read: boolean;
-  is_deleted: boolean;
+ id: number;
+   room: number;
+   sender: Sender;
+   content?: string;
+   type_message: MessageType;
+   fichier?: {
+     url: string;
+     name: string;
+     type: string;
+   };
+   image?: {
+     url: string;
+     name: string;
+     dimensions?: {
+       width: number;
+       height: number;
+     };
+   };
+   audio?: {
+     url: string;
+     name: string;
+     duration?: number;
+   };
+   timestamp: Date;
+   is_read: boolean;
+   is_deleted: boolean
 }
 
 export interface Conversation {
@@ -79,7 +92,7 @@ interface GroupMessageResponse {
   count: number;
   next: string | null;
   previous: string | null;
-  results: GroupMessage[];
+  results: Message[];
 }
 
 export const getGroupMessages = async (

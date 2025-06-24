@@ -67,7 +67,7 @@ export default function Contact() {
       <div className="flex flex-col sm:flex-row sm:justify-between gap-3 sm:gap-2 text-sm font-medium">
         <div className="flex items-center gap-2">
           <Phone className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0 text-gray-500" />
-          <h6 className="text-[12px] sm:text-sm truncate">{"organisation.organisation.createur.telephone"}</h6>
+          <h6 className="text-[12px] sm:text-sm truncate">{organisation.organisation.createur.telephone || "-"}</h6>
         </div>
         <div className="flex items-center gap-2">
           <MapPin className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0 text-gray-500" />

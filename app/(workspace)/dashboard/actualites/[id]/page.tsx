@@ -1,8 +1,8 @@
 "use client";
-
 import { use, useEffect, useState } from "react";
 import Image from "next/image";
 import { CalendarDays, UserCircle, Link as LinkIcon } from "lucide-react";
+import { getActualiteById } from "@/lib/api/actualites";
 // Updated Actuality interface based on your schema
 interface Actuality {
   id: number;
@@ -14,45 +14,6 @@ interface Actuality {
   publication_date: string; // ISO date string
   image_url?: string;
   is_from_rss: boolean;
-}
-
-// Updated mock function to simulate fetching an actuality by ID
-async function getActualityById(id: string) {
-  console.log(`Fetching actuality with id: ${id}`);
-
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-
-  const mockActualities: Actuality[] = [
-    {
-      id: 1,
-      title: "Lancement de la Nouvelle Plateforme CSE Impact",
-      description: "Annonce du lancement de la nouvelle plateforme CSE Impact.",
-      content:
-        "<p>C'est avec une grande joie que nous annonçons le lancement officiel de <strong>CSE Impact</strong>, votre nouvelle plateforme dédiée à l'actualité et aux services de votre comité social et économique.</p><p>Cette plateforme a été conçue pour vous offrir un accès simplifié à toutes les informations importantes, les événements à venir, les offres exclusives et bien plus encore. Naviguez à travers nos différentes sections pour découvrir tout ce que votre CSE a à vous offrir.</p><h2>Fonctionnalités Clés :</h2><ul><li>Actualités en temps réel</li><li>Calendrier des événements</li><li>Offres et avantages exclusifs</li><li>Documentation utile</li></ul><p>Nous espérons que vous apprécierez cette nouvelle expérience !</p>",
-      source: "L'équipe CSE Impact",
-      source_url: "https://example.com/cse-impact-launch",
-      publication_date: "2024-07-20T10:00:00Z",
-      image_url: "/placeholder-actuality.jpg",
-      is_from_rss: false,
-    },
-    {
-      id: 2,
-      title: "Prochain Webinaire : Gérer son Budget Efficacement",
-      description: "Webinaire sur la gestion efficace du budget personnel.",
-      content:
-        "<p>Ne manquez pas notre prochain webinaire exclusif sur la gestion budgétaire ! Apprenez des astuces et des stratégies pour optimiser vos finances personnelles.</p><p>Date : 5 Août 2024</p><p>Heure : 14h00</p><p>Intervenant : M. Jean Dupont, Expert Financier</p><p>Inscription gratuite via la section Formations.</p>",
-      source: "Service Formation CSE",
-      publication_date: "2024-07-15T14:30:00Z",
-      image_url: "/placeholder-webinar.jpg",
-      is_from_rss: false,
-    },
-  ];
-
-  const actuality = mockActualities.find((act) => act.id.toString() === id);
-  if (!actuality) {
-    throw new Error("Actuality not found");
-  }
-  return actuality;
 }
 
 export default function ActualityDetailPage({
@@ -71,7 +32,8 @@ export default function ActualityDetailPage({
     const fetchActuality = async () => {
       try {
         setLoading(true);
-        const actualityData = await getActualityById(id);
+        const actualityData = await getActualiteById(id);
+        console.log("actualityData", actualityData);
         setActuality(actualityData);
       } catch (err) {
         setError(

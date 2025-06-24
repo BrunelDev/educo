@@ -1,3 +1,6 @@
+import { Sender } from "../api/message";
+import { MessageType } from "../types";
+
 export interface MessageSender {
   id: number;
   email: string;
@@ -6,18 +9,32 @@ export interface MessageSender {
 }
 
 export interface WebSocketMessage {
-  id: number;
-  content: string;
-  type_message: "text" | "file" | "image" | "audio";
-  sender: MessageSender;
-  timestamp: string;
-  is_read: boolean;
-  fichier?: string | null;
-  image?: string | null;
-  audio?: string | null;
-  status?: "sent" | "received" | "stale";
-  room?: string; // from direct messages
-  is_deleted?: boolean; // from direct messages
+ id: number;
+   room: number;
+   sender: Sender;
+   content?: string;
+   type_message: MessageType;
+   fichier?: {
+     url: string;
+     name: string;
+     type: string;
+   };
+   image?: {
+     url: string;
+     name: string;
+     dimensions?: {
+       width: number;
+       height: number;
+     };
+   };
+   audio?: {
+     url: string;
+     name: string;
+     duration?: number;
+   };
+   timestamp: Date;
+   is_read: boolean;
+   is_deleted: boolean
 }
 
 export enum ConnectionState {

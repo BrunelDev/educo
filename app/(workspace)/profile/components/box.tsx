@@ -25,8 +25,7 @@ export function FirstBox({ user }: { user: User }) {
         />
         <div className="flex flex-col">
           <h1 className="text-lg sm:text-xl font-bold truncate">
-            {user.first_name ? user.first_name : user.email}{" "}
-            {user.last_name ? user.last_name : ""}
+            {user.first_name || user.last_name ? user.first_name + " " + user.last_name : user.email}{" "}
           </h1>
           <h6 className="text-sm text-gray-600 truncate">{user.email}</h6>
         </div>
@@ -64,13 +63,13 @@ export function SecondBox({ user }: { user: User }) {
             <div className="flex flex-col gap-1">
               <Label className="text-gray-500">Nom</Label>
               <h6 className="font-medium truncate">
-                {user.last_name ? user.last_name : "Doe"}
+                {user.last_name ? user.last_name : "-"}
               </h6>
             </div>
             <div className="flex flex-col gap-1">
               <Label className="text-gray-500">Mail</Label>
               <h6 className="font-medium truncate">
-                {user.email ? user.email : "Doe"}
+                {user.email ? user.email : "-"}
               </h6>
             </div>
           </div>
@@ -78,7 +77,7 @@ export function SecondBox({ user }: { user: User }) {
             <div className="flex flex-col gap-1">
               <Label className="text-gray-500">Prénom</Label>
               <h6 className="font-medium truncate">
-                {user.first_name ? user.first_name : user.email}
+                {user.first_name ? user.first_name : "-"}
               </h6>
             </div>
             <div className="flex flex-col gap-1">

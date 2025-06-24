@@ -41,19 +41,16 @@ export function MessageInput({
 
     // If there's an image to send
     if (fileToSend && imagePreview && isConnected) {
-      console.log("--------1", fileToSend, imagePreview, isConnected);
       sendFile();
       return;
     }
     //automactically detect message type to send
     if (fileToSend && isConnected) {
-      console.log("--------2", fileToSend, isConnected);
       sendFile();
       return;
     }
     // Otherwise send text message
     if (message.trim() && isConnected) {
-      console.log("--------3", message.trim(), isConnected);
       onSendMessage({
         type: "message",
         message: message.trim(),
@@ -97,7 +94,7 @@ export function MessageInput({
 
           // Send the message with the S3 URL
           console.log({
-            type: "_____________------------message",
+            type: "message",
             message: "fichier", // Use the S3 URL directly
             type_message: messageType,
             file_url: fileUrl,

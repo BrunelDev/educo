@@ -1,6 +1,5 @@
 "use client";
 import Image from "next/image";
-import { User } from "@/app/types/auth";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -13,12 +12,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { updateProfile } from "@/lib/api/users";
 import { uploadToS3 } from "@/lib/s3-upload";
-import { getCookies } from "@/lib/utils/cookies";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
+import {getUser, User} from "@/lib/api/users";
 
 const formSchema = z.object({
   first_name: z.string().optional(),
@@ -29,22 +28,30 @@ const formSchema = z.object({
 });
 
 export function ProfileForm() {
-  const userInfo: User = JSON.parse(getCookies("userInfo") || "{}");
+  const [userInfo, setUserInfo] = useState<User | null>(null);
+  useEffect(()=>{
+    const fetchUser = async () => {
+      const user = await getUser();
+      setUserInfo(user);
+      setImagePreview(user.image || null);
+    }
+    fetchUser();
+  },[])
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      first_name: userInfo.first_name,
-      last_name: userInfo.last_name,
-      email: userInfo.email,
-      telephone: userInfo.telephone,
-      image: userInfo.image || "",
+      first_name: userInfo?.first_name,
+      last_name: userInfo?.last_name,
+      email: userInfo?.email,
+      telephone: userInfo?.telephone,
+      image: userInfo?.image || "",
     },
   });
 
   const [fileBlob, setFileBlob] = useState<File>();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [imagePreview, setImagePreview] = useState<string | null>(userInfo.image || null);
+  const [imagePreview, setImagePreview] = useState<string | null>(userInfo?.image || null);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
@@ -97,7 +104,7 @@ export function ProfileForm() {
             <FormItem>
               <FormLabel>Prénom</FormLabel>
               <FormControl>
-                <Input placeholder="John" {...field} />
+                <Input placeholder="Prénom" {...field} defaultValue={userInfo?.first_name || ""}/>
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -111,7 +118,7 @@ export function ProfileForm() {
             <FormItem>
               <FormLabel>Nom</FormLabel>
               <FormControl>
-                <Input placeholder="Doe" {...field} />
+                <Input placeholder="Nom" {...field} defaultValue={userInfo?.last_name || ""}/>
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -126,8 +133,9 @@ export function ProfileForm() {
               <FormLabel>Email</FormLabel>
               <FormControl>
                 <Input
-                  placeholder="john.doe@example.com"
+                  placeholder="Email"
                   type="email"
+                  defaultValue={userInfo?.email || ""}
                   {...field}
                 />
               </FormControl>
@@ -143,7 +151,7 @@ export function ProfileForm() {
             <FormItem>
               <FormLabel>Téléphone</FormLabel>
               <FormControl>
-                <Input placeholder="+229 97000000" type="tel" {...field} />
+                <Input placeholder="Téléphone" type="tel" {...field} defaultValue={userInfo?.telephone || ""}/>
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -176,9 +184,9 @@ export function ProfileForm() {
                       };
                       reader.readAsDataURL(file);
                     } else {
-                      setImagePreview(userInfo.image || null);
+                      setImagePreview(userInfo?.image || null);
                       setFileBlob(undefined);
-                      field.onChange(userInfo.image || ""); // Reset form field if selection is cleared
+                      field.onChange(userInfo?.image || ""); // Reset form field if selection is cleared
                     }
                   }}
                 />
@@ -195,12 +203,12 @@ export function ProfileForm() {
                   )}
                 </div>
               )}
-              {!imagePreview && userInfo.image && (
+              {!imagePreview && userInfo?.image && (
                  <div className="mt-4 w-32 h-32 rounded-full overflow-hidden mx-auto border-2 border-gray-300 shadow-md">
                   <Image src={userInfo.image} alt="Photo de profil actuelle" width={128} height={128} className="w-full h-full object-cover" />
                 </div>
               )}
-               {!imagePreview && !userInfo.image && (
+               {!imagePreview && !userInfo?.image && (
                  <div className="mt-4 w-32 h-32 rounded-full overflow-hidden mx-auto border-2 border-gray-200 bg-gray-100 flex items-center justify-center shadow-md">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
                     <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />

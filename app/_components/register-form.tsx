@@ -58,9 +58,7 @@ export function RegisterForm({ token }: { token?: string }) {
           const response = await registerWithToken(email, password, token);
 
           if (response?.message) {
-            toast.success(
-              "Inscription réussie ! Un e-mail de confirmation a été envoyé. Veuillez vérifier votre boîte de réception pour activer votre compte."
-            );
+            toast.success("Inscription réussie !");
             router.push("/login");
             return;
           }

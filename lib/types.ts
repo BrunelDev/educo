@@ -1,3 +1,5 @@
+import { Sender } from "./api/message";
+
 enum NotificationType {
   meeting,
   formation,
@@ -281,17 +283,13 @@ interface User {
 }
 
 // Interface for Room
-interface Room {
-  id: number;
-  name: string;
-  participants: User[];
-}
+
 
 // Interface for Message
 interface Message {
   id: number;
-  room: Room;
-  sender: User;
+  room: number;
+  sender: Sender;
   content?: string;
   type_message: MessageType;
   fichier?: {
@@ -359,7 +357,6 @@ export type {
   ParticipantProps,
   Project,
   ProjectProps,
-  Room,
   SearchBarProps,
   TabsProps,
   User,

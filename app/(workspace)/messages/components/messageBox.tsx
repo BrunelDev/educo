@@ -1,4 +1,4 @@
-import { MessageType } from "@/lib/types";
+import { Message, MessageType } from "@/lib/types";
 import { getCookies } from "@/lib/utils/cookies";
 import { formatDistanceToNow } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -56,20 +56,7 @@ type_message
 : 
 "audio"
  */
-export interface Message {
-  id: number;
-  content: string;
-  file_name?: string;
-  file_type?: string;
-  file_url?: string;
-  type_message: "text" | "file" | "image" | "audio";
-  sender: MessageSender;
-  timestamp: string;
-  is_read: boolean;
-  fichier?: { url: string; name: string };
-  image?: { url: string; name: string };
-  audio?: { url: string; name: string };
-}
+
 
 interface MessageBoxProps {
   message: Message;
@@ -99,7 +86,7 @@ export default function MessageBox({ message, className }: MessageBoxProps) {
   const renderContent = () => {
     switch (message.type_message) {
       case MessageType.IMAGE:
-        const imageSource = message.image?.url || message.file_url;
+        const imageSource = message.image?.url ;
 
         // Function to handle image loading errors
         const handleImageError = () => {
@@ -130,7 +117,7 @@ export default function MessageBox({ message, className }: MessageBoxProps) {
                 </div>
                 <Image
                   src={imageSource}
-                  alt={`${message.sender.first_name}'s image`}
+                  alt={`${message.sender.name}'s image`}
                   width={300}
                   height={200}
                   className="rounded-lg object-contain"
@@ -149,7 +136,7 @@ export default function MessageBox({ message, className }: MessageBoxProps) {
                     </button>
                     <Image
                       src={imageSource}
-                      alt={`${message.sender.first_name}'s image (full size)`}
+                      alt={`${message.sender.name}'s image (full size)`}
                       width={1200}
                       height={800}
                       className="object-contain max-h-[90vh]"
@@ -162,22 +149,26 @@ export default function MessageBox({ message, className }: MessageBoxProps) {
           )
         );
       case MessageType.AUDIO:
-        const audioSource = message.audio?.url || message.file_url;
-        console.log(audioSource);
+        const audioSource = message.audio?.url ;
+        const proxyUrl = `/api/audio?url=${encodeURIComponent(audioSource!)}`;
         return (
           audioSource && (
-            <audio controls src={audioSource} className="max-w-full">
-              <source src={audioSource} type="audio/mpeg" />
-              <source src={audioSource} type="audio/ogg" />
-              <source src={audioSource} type="audio/wav" />
-              <source src={audioSource} type="audio/mp3" />
-              <source src={audioSource} type="audio/opus" />
-              <source src={audioSource} type="audio/webm" />
+            <audio
+              controls
+              src={proxyUrl}
+              className={className}
+              onError={(e: React.SyntheticEvent<HTMLAudioElement, Event>) => {
+                const target = e.target as HTMLAudioElement;
+                console.log("Erreur avec proxy:", target.error);
+              }}
+              onLoadStart={() => console.log("Début chargement via proxy")}
+            >
+              Votre navigateur ne supporte pas la lecture audio.
             </audio>
           )
         );
       case MessageType.FILE:
-        const fileSource = message.fichier?.url || message.file_url;
+        const fileSource = message.fichier?.url ;
 
         // Check if this is actually an image that was misclassified
         const isActuallyImage =
@@ -396,7 +387,7 @@ export default function MessageBox({ message, className }: MessageBoxProps) {
                   <ZoomIn className="text-white" />
                 </div>
                 <Image
-                  src={message.content}
+                  src={message.image?.url || ""}
                   alt="Image"
                   width={300}
                   height={200}
@@ -415,7 +406,7 @@ export default function MessageBox({ message, className }: MessageBoxProps) {
                       <X className="h-6 w-6" />
                     </button>
                     <Image
-                      src={message.content}
+                      src={message.image?.url || ""}
                       alt="Image (full size)"
                       width={1200}
                       height={800}
@@ -458,7 +449,7 @@ export default function MessageBox({ message, className }: MessageBoxProps) {
             ? user.image
             : "/userProfile-img.png"
         }
-        alt={message.sender.first_name}
+        alt={message.sender.name}
         width={30}
         height={30}
         className="rounded-full w-[30px] h-[30px]"
@@ -466,9 +457,7 @@ export default function MessageBox({ message, className }: MessageBoxProps) {
       <div className="flex-1">
         <div className="flex items-center gap-2 mb-1">
           <span className="font-medium">
-            {message.sender.first_name
-              ? message.sender.first_name
-              : message.sender.email}
+            {message.sender.name || message.sender.email}
           </span>
         </div>
         <div className="relative w-fit">

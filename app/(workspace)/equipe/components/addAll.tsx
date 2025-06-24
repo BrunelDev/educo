@@ -11,6 +11,7 @@ import { addMembersToTeam } from "@/lib/api/equipe";
 export default function AddMemberDialog({ teamId }: { teamId?: number }) {
   const [users, setUsers] = useState<User[] | null>(null);
   const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
+  const [email, setEmail] = useState<string>("");
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -22,6 +23,7 @@ export default function AddMemberDialog({ teamId }: { teamId?: number }) {
     };
     fetchUsers();
   }, []);
+
   return (
     <div className="flex flex-col gap-4 rounded-[12px] py-10 px-20 w-full">
       <DialogTitle className="text-[20px] font-bold text-white-800">
@@ -31,6 +33,8 @@ export default function AddMemberDialog({ teamId }: { teamId?: number }) {
       {
         <div className=" flex gap-2 items-center">
           <Input
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             type="email"
             placeholder="Invitez des gens par nom ou par email"
           />

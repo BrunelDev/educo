@@ -6,6 +6,7 @@ export interface OrganizationMember {
   first_name: string;
   last_name: string;
   image: string | null;
+  telephone: string | null;
 }
 
 export interface Organization {

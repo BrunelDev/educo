@@ -72,30 +72,30 @@ export const useGroupWebSocket = (groupId: string | number | null) => {
       ws.onmessage = (event) => {
         try {
           const data = JSON.parse(event.data);
+          console.log("event.data", event.data)
           console.log("Received group message from consumer:", data);
 
+          // Check if the message is an error message
+          if ('error' in data) {
+            console.error(`Error from group websocket: ${data.error}`);
+            toast.error(`Erreur: ${data.error}`);
+            return;
+          }
+
           // Based on ClosedGroupConsumer, the structure is flat: { auteur, message, timestamp }
-          if (data.message && data.auteur && data.timestamp) {
+          if (data.message) {
             const receivedMessage: WebSocketMessage = {
-              // WS messages from group consumer don't have an ID. Use timestamp + content as a temporary key.
-              id: Date.parse(data.timestamp) + Math.random(), // Or generate a more robust client-side ID
-              content: data.message,
-              type_message: "text",
-              sender: {
-                id: 0, // Placeholder ID, real ID might be found by matching email to a user list
-                email: data.auteur,
-                first_name: data.auteur.split("@")[0], // Best effort display name
-                last_name: "",
-              },
-              timestamp: data.timestamp,
-              is_read: true, // For groups, read status is complex. Default to true for incoming.
-              status: "received",
-              // Add fields from shared WebSocketMessage, defaulting them as they are not in group WS messages
-              room: `group_${groupId}`, // Can add a room identifier for context if needed
-              is_deleted: false,
-              fichier: null,
-              image: null,
-              audio: null,
+              id: data.message.id,
+              content: data.message.content,
+              type_message: data.message.type_message,
+              sender: data.message.sender,
+              timestamp: data.message.timestamp,
+              is_read: data.message.is_read,
+              fichier: data.message.fichier,
+              image: data.message.image,
+              audio: data.message.audio,
+              room: data.message.room, // Include room from direct messages
+              is_deleted: data.message.is_deleted || false, // Add is_deleted, default to false
             };
 
             setMessages((prevMessages) => {
@@ -112,9 +112,6 @@ export const useGroupWebSocket = (groupId: string | number | null) => {
               }
               return [...prevMessages, receivedMessage];
             });
-          } else if (data.error) {
-            console.error(`Error from group websocket: ${data.error}`);
-            toast.error(`Erreur: ${data.error}`);
           } else {
             console.warn("Received unknown group message format:", data);
           }

@@ -258,7 +258,6 @@ export function TeamFormHandlerWithMail({
           }}
           id="membres_cse_invites"
           name="membres_cse_invites"
-          type="email"
           placeholder="invite1@gmail.com, invite2@gmail.com"
           className="w-full"
         />

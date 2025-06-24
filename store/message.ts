@@ -3,14 +3,13 @@ import { Message, Conversation } from '@/lib/api/message';
 
 interface MessageStore {
   // State
-  messageList: Message[];
+  conversations: Conversation[];
   activeConversation: Conversation | null;
   isLoading: boolean;
   error: string | null;
 
   // Actions
 
- 
   setActiveConversation: (conversation: Conversation | null) => void;
   addMessage: (conversationId: number, message: Message) => void;
   //updateMessageStatus: (conversationId: number, messageId: number, isRead: boolean) => void;
@@ -20,7 +19,7 @@ interface MessageStore {
 
 export const useMessageStore = create<MessageStore>((set) => ({
   // Initial state
-  messageList: [],
+  conversations: [],
   activeConversation: null,
   isLoading: false,
   error: null,
@@ -32,22 +31,22 @@ export const useMessageStore = create<MessageStore>((set) => ({
   setActiveConversation: (conversation) =>
     set({ activeConversation: conversation }),
 
-  addMessage: (conversationId, message) =>
+    addMessage: (conversationId, message) =>
     set((state) => ({
-      messageList: state.messageList.map((conv) =>
+      conversations: state.conversations.map((conv) =>
         conv.id === conversationId
           ? {
               ...conv,
-              messages: [...conv.content, message],
-              derniere_activite: message.timestamp
+              messages: [...(conv.messages || []), message],
+              derniere_activite: message.timestamp.toISOString(),
             }
           : conv
-      )
+      ),
     })),
 
   /*updateMessageStatus: (conversationId, messageId, isRead) =>
     set((state) => ({
-      messageList: state.conversations.map((conv) =>
+      conversations: state.conversations.map((conv) =>
         conv.id === conversationId
           ? {
               ...conv,

@@ -7,11 +7,8 @@ import { useGroupWebSocket } from "@/hooks/useGroupWebSocket";
 import {
   getMessages,
   getGroupMessages,
-  Message as ApiDirectMessage,
-  GroupMessage as ApiGroupMessage,
-  Sender as ApiSenderType,
 } from "@/lib/api/message";
-import { WebSocketMessage, MessageSender } from "@/lib/types/websocket";
+import { WebSocketMessage } from "@/lib/types/websocket";
 import { useMessageStore } from "@/store/message";
 import { useIntersection } from "@mantine/hooks";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -76,57 +73,44 @@ export default function MessageList() {
     }
   };
 
-  const mapApiSenderToHookSender = (
-    apiSender: ApiSenderType & {
-      first_name?: string;
-      last_name?: string;
-      image?: string;
-    }
-  ): MessageSender => {
-    return {
-      id: apiSender.id,
-      email: apiSender.email,
-      first_name: apiSender.first_name || "",
-      last_name: apiSender.last_name || "",
-    };
-  };
 
-  const normalizeApiMessage = (
-    msg: ApiDirectMessage | ApiGroupMessage
+
+ /* const normalizeApiMessage = (
+    msg: Message
   ): WebSocketMessage => {
-    if (isGroup) {
-      // ApiGroupMessage
-      console.log("msg", msg);
-      const apiGroupMessage = msg as ApiGroupMessage;
+    // Use a type guard to safely distinguish between message types
+    if ("auteur" in msg) {
+      // This is an ApiGroupMessage
       return {
-        id: apiGroupMessage.id,
-        content: apiGroupMessage.contenu,
-        sender: mapApiSenderToHookSender(apiGroupMessage.auteur),
-        timestamp: apiGroupMessage.timestamp,
-        type_message: "text",
-        is_read: true,
-        status: "received",
-        fichier: null,
-        image: null,
-        audio: null,
+        id: msg.id,
+        room: activeGroup!.id, // Group messages from API don't have a room, so we use the active group's ID
+        sender: msg.sender,
+        content: msg.content,
+        timestamp: msg.timestamp,
+        type_message: "text", // Group messages are currently text-only from the API
+        is_read: true, // Assume incoming group messages are read
+        is_deleted: false,
+        fichier: msg.fichier,
+        image: msg.image,
+        audio: msg.audio,
       };
     } else {
-      // ApiDirectMessage
-      const apiDirectMessage = msg as ApiDirectMessage;
+      // This is an ApiDirectMessage
       return {
-        id: apiDirectMessage.id,
-        content: apiDirectMessage.content,
-        sender: mapApiSenderToHookSender(apiDirectMessage.sender),
-        timestamp: apiDirectMessage.timestamp,
-        type_message: apiDirectMessage.type_message,
-        is_read: apiDirectMessage.is_read,
-        status: "received",
-        fichier: apiDirectMessage.fichier,
-        image: apiDirectMessage.image,
-        audio: apiDirectMessage.audio,
+        id: msg.id,
+        room: msg.room,
+        sender: msg.sender,
+        content: msg.content,
+        type_message: msg.type_message,
+        fichier: msg.fichier,
+        image: msg.image,
+        audio: msg.audio,
+        timestamp: msg.timestamp,
+        is_read: msg.is_read,
+        is_deleted: msg.is_deleted,
       };
     }
-  };
+  };*/
 
   const messages: WebSocketMessage[] = messagesFromHook || [];
   const lastMessageId =
@@ -141,14 +125,13 @@ export default function MessageList() {
       try {
         if (isGroup) {
           const groupMessagesResponse = await getGroupMessages(activeGroup.id);
-          const normalized =
-            groupMessagesResponse.results.map(normalizeApiMessage);
+          const normalized = groupMessagesResponse.results;
           setMessages(normalized);
           setHasMore(false);
         } else {
           if (!activeConversation?.id) return;
           const response = await getMessages(activeConversation.id, pageNumber);
-          const normalized = response.results.map(normalizeApiMessage);
+          const normalized = response.results;
           setMessages((prev) => {
             const current = Array.isArray(prev) ? prev : [];
             const reversedNew = normalized.slice().reverse();
@@ -224,22 +207,7 @@ export default function MessageList() {
               console.log("message-------------", message);
               return (
                 <MessageBox
-                  key={`${message.id}-${index}`}
-                  /**
-                   *  id: number;
-                     content: string;
-                     file_name?: string;
-                     file_type?: string;
-                     file_url?: string;
-                     type_message: "text" | "file" | "image" | "audio";
-                     sender: MessageSender;
-                     timestamp: string;
-                     is_read: boolean;
-                     fichier?: { url: string; name: string };
-                     image?: { url: string; name: string };
-                     audio?: { url: string; name: string };
-                   }
-                   */
+                  key={`${message.timestamp}-${index}`}
                   message={message}
                   isLast={index === messages.length - 1}
                   isGroup={!!isGroup}
