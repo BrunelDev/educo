@@ -126,7 +126,8 @@ export default function MessageList() {
         if (isGroup) {
           const groupMessagesResponse = await getGroupMessages(activeGroup.id);
           const normalized = groupMessagesResponse.results;
-          setMessages(normalized);
+          const reversed = normalized.slice().reverse();
+          setMessages(reversed);
           setHasMore(false);
         } else {
           if (!activeConversation?.id) return;

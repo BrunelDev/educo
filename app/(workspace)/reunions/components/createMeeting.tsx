@@ -198,7 +198,7 @@ const StepOne = ({
   // Meeting type state
   const [localMeetingType, setLocalMeetingType] =
     useState<MeetingType>(type_reunion);
-  const [localMeetingTitle, setLocalMeetingTitle] = useState<string>("-");
+  const [localMeetingTitle, setLocalMeetingTitle] = useState<string>("Ordinaire");
   const [localMeetingPurpose, setLocalMeetingPurpose] = useState<string>(objet);
   const [localLocation, setLocalLocation] = useState<string[]>(emplacement);
   const [localMeetingLink, setLocalMeetingLink] = useState<string>(

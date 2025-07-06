@@ -363,7 +363,7 @@ const FilePopoverContent = ({ file }: FilePopoverContentProps) => {
           </div>
         }
         PopoverTrigger={
-          <div className="hover:bg-gray-100 cursor-pointer rounded-[4px] px-2 flex items-center justify-around py-1 text-red-600">
+          <div className="hover:bg-gray-100 cursor-pointer rounded-[4px] px-2 flex items-center justify-around py-1">
             <Folder size={18} />
             <h6>Deplacer</h6>
           </div>

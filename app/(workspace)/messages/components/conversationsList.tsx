@@ -69,10 +69,10 @@ export default function ConversationsList({
           >
             <Avatar>
               <AvatarImage src={conversation.participants?.[0]?.avatar || undefined} alt={conversation.participants?.[0]?.name} />
-              <AvatarFallback>{conversation.participants?.filter((participant) => participant._id !== user.id)[0]?.name.charAt(0)}</AvatarFallback>
+              <AvatarFallback>{conversation.participants?.filter((participant) => participant.id !== user.id)[0]?.name.charAt(0)}</AvatarFallback>
             </Avatar>
             <div className="flex-1">
-              <p className="font-semibold text-sm">{conversation.participants?.filter((participant) => participant._id !== user.id)[0]?.name}</p>
+              <p className="font-semibold text-sm">{conversation.participants?.filter((participant) => participant.id !== user.id)[0]?.name}</p>
               <p className="text-xs text-gray-500 truncate">{conversation.messages?.[0]?.content}</p>
             </div>
           </div>

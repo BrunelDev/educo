@@ -9,7 +9,7 @@ export interface Sender {
 }
 
 export interface Participant {
-  _id: number;
+  id: number;
   name: string;
   avatar: string | null;
 }

@@ -1,20 +1,32 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { User } from "@/lib/api/users";
-import { getCookies } from "@/lib/utils/cookies";
 import { useMessageStore } from "@/store/message";
 import { useGroupMessageStore } from "@/store/group-message";
 import { ChevronDown, ChevronLeft, Info } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { Avatar, AvatarFallback } from "@radix-ui/react-avatar";
+import { User } from "@/lib/api/users";
+import { getUser } from "@/lib/api/users";
 
 const MessageHeader = () => {
   const { activeConversation, setActiveConversation } = useMessageStore();
   const { activeGroup, setActiveGroup } = useGroupMessageStore();
-  const userInfo: User = JSON.parse(getCookies("userInfo") || "{}");
   const [showAllParticipants, setShowAllParticipants] = useState(false);
   const [isMobileView, setIsMobileView] = useState(false);
+
+  const [user, setUser] = useState<User | null>(null);
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await getUser();
+        setUser(res);
+      } catch (error) {
+        console.error("Error fetching user:", error);
+      }
+    };
+    fetchUser();
+  }, []);
 
   // Handle responsive layout
   useEffect(() => {
@@ -61,7 +73,7 @@ const MessageHeader = () => {
   // Get other participants (excluding current user)
   if (activeConversation) {
     const otherParticipants = activeConversation?.participants.filter(
-      (participant) => participant._id !== userInfo.id
+      (participant) => participant.id !== user?.id
     );
 
     // Get conversation name - use the other participant's name for 1:1 chats
@@ -69,7 +81,11 @@ const MessageHeader = () => {
       activeConversation?.title ||
       (otherParticipants?.length === 1
         ? otherParticipants[0].name
-        : `${otherParticipants.filter((participant) => participant._id !== userInfo.id)[0].name}`);
+        : `${
+            otherParticipants.filter(
+              (participant) => participant.id !== user?.id
+            )[0].name
+          }`);
 
     // Determine if this is a group conversation
     const isGroupConversation = otherParticipants.length > 1;
@@ -92,7 +108,7 @@ const MessageHeader = () => {
             <Image
               src={
                 activeConversation.participants.filter(
-                  (participant) => participant._id !== userInfo.id
+                  (participant) => participant.id !== user?.id
                 )[0].avatar || "/userProfile-img.png"
               }
               alt={conversationName}
@@ -119,7 +135,7 @@ const MessageHeader = () => {
                     : otherParticipants.slice(0, 2)
                   ).map((participant, index) => (
                     <span
-                      key={participant._id + index}
+                      key={participant.id + index}
                       className="whitespace-nowrap"
                     >
                       {participant.name}
@@ -164,7 +180,7 @@ const MessageHeader = () => {
 
   if (activeGroup) {
     const otherParticipants = activeGroup?.membres.filter(
-      (participant) => participant.id !== userInfo.id
+      (participant) => participant.id !== user?.id
     );
 
     // Get conversation name - use the other participant's name for 1:1 chats
