@@ -115,10 +115,10 @@ export default function History({refresh}: {refresh: boolean}) {
         <TableHeader>
           <TableRow className="border rounded-2xl">
             <TableHead>Consultation</TableHead>
-            <TableHead>Créé le</TableHead>
-            <TableHead>Document recu</TableHead>
+            <TableHead>Créée le</TableHead>
+            <TableHead>Documents reçus</TableHead>
             <TableHead className="text-right">Date</TableHead>
-            <TableHead className="text-right">Status</TableHead>
+            <TableHead className="text-right">Statut</TableHead>
             <TableHead className="text-center">Actions</TableHead>
           </TableRow>
         </TableHeader>

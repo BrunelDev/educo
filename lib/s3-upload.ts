@@ -26,8 +26,10 @@ export async function uploadToS3(files: File[]): Promise<string[]> {
           ContentType: file.type,
         })
       );
-
-      return `https://${process.env.NEXT_PUBLIC_AWS_BUCKET_NAME}.s3.${process.env.NEXT_PUBLIC_AWS_REGION}.amazonaws.com/${fileKey}`;
+      const url = `https://${process.env.NEXT_PUBLIC_AWS_BUCKET_NAME}.s3.${process.env.NEXT_PUBLIC_AWS_REGION}.amazonaws.com/${fileKey}`;
+      //encode url
+      const encodedUrl = encodeURI(url);
+      return encodedUrl;
     } catch (error) {
       console.error("Error uploading file:", error);
       throw error;

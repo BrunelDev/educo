@@ -10,7 +10,7 @@ import {
 import { uploadToS3 } from "@/lib/s3-upload";
 import { FileInputChangeEvent } from "@/lib/types";
 import { AxiosError } from "axios";
-import { ChevronRight, CirclePlus } from "lucide-react";
+import { ChevronRight, CirclePlus, X } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -74,9 +74,9 @@ export default function UpdateOrganisationForm({
       try {
         const urls = await uploadToS3([files[0]]);
         setLogoUrl(urls[0]);
-        toast.success("Logo uploaded successfully");
+        toast.success("Le logo a été chargé avec succès");
       } catch (error) {
-        toast.error("Failed to upload logo");
+        toast.error("Nous n'avons pas réussi à charger votre logo.");
         console.error(error);
       }
     }
@@ -315,7 +315,11 @@ export default function UpdateOrganisationForm({
             name="convention_collective"
             className="h-[36px]"
             placeholder="Entrez la convention collective"
-            defaultValue={organization?.organisation.collective ? organization?.organisation.collective : ""}
+            defaultValue={
+              organization?.organisation.collective
+                ? organization?.organisation.collective
+                : ""
+            }
           />
           {errors.convention_collective && (
             <span className="text-red-500 text-xs">
@@ -343,40 +347,58 @@ export default function UpdateOrganisationForm({
           <label className="font-medium text-white-800 text-xs">
             Logo de l&apos;entreprise
           </label>
-          <div className="relative rounded-[8px] overflow-hidden border border-dashed border-white-300">
-            <Input
-              name="logo"
-              id="logoInputAddOrgAfterLogin"
-              onChange={handleFileInputChange}
-              type="file"
-              accept="image/*"
-              className="w-full h-[136px] bg-white-50 cursor-pointer opacity-0 absolute top-0 left-0 z-10"
-              defaultValue={
-                organization?.organisation.logo
-                  ? organization?.organisation.logo
-                  : ""
-              }
-            />
-            <Label
-              htmlFor="logoInputAddOrgAfterLogin"
-              className="w-full h-[136px] bg-white-50 flex flex-col gap-2 justify-center items-center cursor-pointer"
-            >
-              <CirclePlus />
-              <h6>Glissez et déposez ou cliquez ici pour choisir un fichier</h6>
-              <div>Taille maximale 10MB</div>
-            </Label>
+          <div
+            className={`relative rounded-[8px] overflow-hidden border border-dashed border-white-300 w-full h-[136px] ${
+              logoUrl ? "border-none" : ""
+            } flex justify-center items-center`}
+          >
+            {logoUrl ? (
+              <div className="relative w-full h-full">
+                <Image
+                  src={logoUrl}
+                  alt="Aperçu du logo"
+                  layout="fill"
+                  objectFit="contain"
+                  style={{ width: "100%" }}
+                  className="rounded-[8px]"
+                />
+                <div className="absolute top-1 right-1 z-20 bg-white rounded-full p-1">
+                  <X
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setLogoUrl("");
+                      const input = document.getElementById(
+                        "logoInputAddOrgAfterLogin"
+                      ) as HTMLInputElement;
+                      if (input) input.value = "";
+                    }}
+                    className="cursor-pointer h-4 w-4 text-gray-600 hover:text-black"
+                  />
+                </div>
+              </div>
+            ) : (
+              <>
+                <Input
+                  name="logo"
+                  id="logoInputAddOrgAfterLogin"
+                  onChange={handleFileInputChange}
+                  type="file"
+                  accept="image/*"
+                  className="w-full h-full cursor-pointer opacity-0 absolute top-0 left-0 z-10"
+                />
+                <Label
+                  htmlFor="logoInputAddOrgAfterLogin"
+                  className="w-full h-full flex flex-col gap-2 justify-center items-center cursor-pointer text-center"
+                >
+                  <CirclePlus />
+                  <h6>
+                    Glissez et déposez ou cliquez ici pour choisir un fichier
+                  </h6>
+                  <div className="text-xs">Taille maximale 10MB</div>
+                </Label>
+              </>
+            )}
           </div>
-          {logoUrl && (
-            <div className="mt-2 flex justify-center">
-              <Image
-                src={logoUrl}
-                alt="Aperçu du logo"
-                className="h-20 w-auto rounded border object-contain"
-                width={100}
-                height={100}
-              />
-            </div>
-          )}
         </div>
         <div className="flex flex-col sm:flex-row justify-end gap-4 mt-6">
           <Button

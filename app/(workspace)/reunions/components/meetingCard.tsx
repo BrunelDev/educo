@@ -45,12 +45,12 @@ export default function MeetingCard({ meeting }: MeetingCatdProps) {
           </div>
 
           <div className="flex gap-2">
-            {meeting.emplacement == "En ligne" && (
+            {meeting.emplacement.includes("En ligne") && (
               <span className="px-3 py-1 bg-white rounded-full text-sm text-gray-600">
                 En ligne
               </span>
             )}
-            {meeting.emplacement == "En Physique" && (
+            {meeting.emplacement.includes("En Physique") && (
               <span className="px-3 py-1 bg-white rounded-full text-sm text-gray-600">
                 En présence
               </span>

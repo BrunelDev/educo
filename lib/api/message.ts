@@ -1,46 +1,49 @@
 import api, { endpoints } from "../api";
-import { MessageType} from "../types";
+import { MessageType } from "../types";
 
 export interface Sender {
+  id: number;
+  email: string;
+  name?: string;
+  first_name?: string;
+  last_name?: string;
+  image: string | null;
+}
+
+export interface Participant {
   id: number;
   email: string;
   name: string;
   image: string | null;
 }
 
-export interface Participant {
-  id: number;
-  name: string;
-  avatar: string | null;
-}
-
 export interface Message {
- id: number;
-   room: number;
-   sender: Sender;
-   content?: string;
-   type_message: MessageType;
-   fichier?: {
-     url: string;
-     name: string;
-     type: string;
-   };
-   image?: {
-     url: string;
-     name: string;
-     dimensions?: {
-       width: number;
-       height: number;
-     };
-   };
-   audio?: {
-     url: string;
-     name: string;
-     duration?: number;
-   };
-   timestamp: Date;
-   is_read: boolean;
-   is_deleted: boolean
+  id: number;
+  room: number;
+  sender: Sender;
+  content?: string;
+  type_message: MessageType;
+  fichier?: {
+    url: string;
+    name: string;
+    type: string;
+  };
+  image?: {
+    url: string;
+    name: string;
+    dimensions?: {
+      width: number;
+      height: number;
+    };
+  };
+  audio?: {
+    url: string;
+    name: string;
+    duration?: number;
+  };
+  timestamp: Date;
+  is_read: boolean;
+  is_deleted: boolean;
 }
 
 export interface Conversation {

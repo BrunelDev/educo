@@ -1,6 +1,7 @@
 "use client";
 import AddDocument from "@/app/(workspace)/reunions/details_de_la_reunion/components/addDocument";
 import AddMemberDialog from "@/app/(workspace)/reunions/details_de_la_reunion/components/addParticipant";
+import { CompteRendu } from "@/app/_components/compteRendu";
 import { DialogComponent } from "@/app/_components/dialogComponent";
 import DocumentComponent from "@/app/_components/document";
 import EmptyState from "@/app/_components/EmptyState";
@@ -9,11 +10,10 @@ import {
   removeDocumentFromTask,
   removeMemberFromTask,
   Task,
-  updateTask,
   updateCompteRendu,
+  updateTask,
 } from "@/lib/api/tache";
 import { MessageType } from "@/lib/types";
-import { Button } from "@/components/ui/button";
 import { Plus, Users } from "lucide-react";
 import { use, useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -30,7 +30,7 @@ export default function DetailTache({
   const [refresh2, setRefresh2] = useState(false);
   const [refresh3, setRefresh3] = useState(false);
   const [compteRenduText, setCompteRenduText] = useState<string>("");
-  const [isEditingCompteRendu, setIsEditingCompteRendu] = useState(false);
+ 
 
   useEffect(() => {
     const fetchData = async () => {
@@ -87,23 +87,7 @@ export default function DetailTache({
     }
   };
 
-  const handleConfirmCompteRendu = async () => {
-    if (!task) return;
-    toast.loading("Enregistrement du compte rendu...");
-    try {
-      await updateCompteRendu(task.id, compteRenduText);
-      setTask((prevTask) =>
-        prevTask ? { ...prevTask, compte_rendu: compteRenduText } : undefined
-      );
-      toast.dismiss();
-      toast.success("Compte rendu enregistré avec succès.");
-      setIsEditingCompteRendu(false);
-    } catch (error) {
-      console.error("Erreur lors de l'enregistrement du compte rendu:", error);
-      toast.dismiss();
-      toast.error("Erreur lors de l'enregistrement du compte rendu.");
-    }
-  };
+
 
   return (
     <div className="flex flex-col gap-4">
@@ -166,7 +150,7 @@ export default function DetailTache({
                   email: participant.email,
                   nom_complet:
                     participant.first_name + " " + participant.last_name,
-                  photo: participant.email,
+                  photo: participant?.image || "/userProfile-img.png",
                 }}
                 handleDelete={async () => {
                   try {
@@ -251,37 +235,18 @@ export default function DetailTache({
       </div>
 
       {/* Compte Rendu Section */}
-      <div className="mt-6">
-        <div className="flex justify-between items-center mb-3">
-          <h2 className="text-md font-semibold">Compte Rendu</h2>
-          <Button
-            onClick={() => {
-              if (isEditingCompteRendu) {
-                handleConfirmCompteRendu();
-              } else {
-                setIsEditingCompteRendu(true);
-              }
-            }}
-            variant={isEditingCompteRendu ? "default" : "outline"}
-          >
-            {isEditingCompteRendu ? "Confirmer" : "Modifier"}
-          </Button>
-        </div>
-        <div className="mt-4 w-full">
-          {isEditingCompteRendu ? (
-            <textarea
-              value={compteRenduText}
-              onChange={(e) => setCompteRenduText(e.target.value)}
-              className="w-full p-2 border rounded-md min-h-[200px] bg-transparent"
-              placeholder="Rédigez votre compte rendu ici..."
-            />
-          ) : (
-            <div className="p-2 border rounded-md min-h-[200px] bg-gray-50 whitespace-pre-wrap">
-              {compteRenduText || "Aucun compte rendu pour le moment."}
-            </div>
-          )}
-        </div>
-      </div>
+      {task && <CompteRendu
+        handleSubmiting={async (text: string) => {
+          if (!task) return;
+          console.log("text", text);
+          const res = await updateCompteRendu(task.id, text);
+          console.log("compte rendu", res);
+          setTask((prevTask) =>
+            prevTask ? { ...prevTask, compte_rendu: text } : undefined
+          );
+        }}
+        initialCompteRendu={compteRenduText || task.compte_rendu || ""}
+      />}
     </div>
   );
 }

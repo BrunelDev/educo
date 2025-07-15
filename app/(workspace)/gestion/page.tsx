@@ -1,30 +1,29 @@
-"use client"
-import ProjectCard from './components/project';
-import { getProjects, Project } from '@/lib/api/projets';
-import { useEffect, useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { DialogComponent } from '@/app/_components/dialogComponent';
-import ProjectForm from './components/projectForm';
-import { getOrganization } from '@/lib/api/organisation';
-import EmptyState from '@/app/_components/EmptyState';
+"use client";
+import ProjectCard from "./components/project";
+import { getProjects, Project } from "@/lib/api/projets";
+import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { DialogComponent } from "@/app/_components/dialogComponent";
+import ProjectForm from "./components/projectForm";
+import { getOrganization } from "@/lib/api/organisation";
+import EmptyState from "@/app/_components/EmptyState";
 
 export default function ProjectPage() {
-  
-
-  const [projects, setProjects] = useState<Project[]>()
-  const [orgId, setOrg] = useState<number>()
-  const [isProjectDialogOpen, setIsProjectDialogOpen] = useState(false)
-  const [refresh, setRefresh] = useState(false)
+  const [projects, setProjects] = useState<Project[]>();
+  const [orgId, setOrg] = useState<number>();
+  const [isProjectDialogOpen, setIsProjectDialogOpen] = useState(false);
+  const [refresh, setRefresh] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
-      const data = await getProjects()
-      setProjects(data)
-      const teamId = await getOrganization()
-      setOrg(teamId.organisation.id)
-    }
-    fetchData()
-  }, [isProjectDialogOpen, refresh])
+      const team = await getOrganization();
+      if (!team || !team.organisation) return;
+      setOrg(team.organisation.id);
+      const data = await getProjects(team.organisation.id);
+      setProjects(data);
+    };
+    fetchData();
+  }, [isProjectDialogOpen, refresh]);
 
   return (
     <div className="p-4 md:p-6">
@@ -34,7 +33,14 @@ export default function ProjectPage() {
           <DialogComponent
             open={isProjectDialogOpen}
             onOpenChange={setIsProjectDialogOpen}
-            dialogContent={<ProjectForm teamId={orgId ? orgId : 0} onSubmit={() => {setIsProjectDialogOpen(false)}}/>}
+            dialogContent={
+              <ProjectForm
+                teamId={orgId ? orgId : 0}
+                onSubmit={() => {
+                  setIsProjectDialogOpen(false);
+                }}
+              />
+            }
             dialoTrigger={
               <Button className="bg-gradient-to-r from-[#FE6539] to-crimson-400 w-full sm:w-auto">
                 Nouveau Projet
@@ -45,13 +51,17 @@ export default function ProjectPage() {
         </div>
       </div>
 
-      <div className='flex gap-4 flex-wrap'>
+      <div className="flex gap-4 flex-wrap">
         {projects && projects.length > 0 ? (
           projects.map((project, index) => (
-            <ProjectCard key={index} project={project} onSubmitProject={() => setRefresh(!refresh)}/>
+            <ProjectCard
+              key={index}
+              project={project}
+              onSubmitProject={() => setRefresh(!refresh)}
+            />
           ))
         ) : (
-          <div className='w-full flex justify-center items-center py-10'>
+          <div className="w-full flex justify-center items-center py-10">
             <EmptyState
               title={"Votre organisation n'a aucun projet pour le moment."}
               description={"Créez un projet pour commencer"}

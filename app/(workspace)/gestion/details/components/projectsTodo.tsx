@@ -11,7 +11,7 @@ interface ProjectTodoProps {
 }
 
 export default function ProjectsTodo({ tasks, filterBy = "a_faire", setRefresh }: ProjectTodoProps) {
-  const categoryLabel = filterBy === "a_faire" ? "A faire" : filterBy === "en_cours" ? "En cours" : "Terminée";
+  const categoryLabel = filterBy === "a_faire" ? "À faire" : filterBy === "en_cours" ? "En cours" : "Terminée";
   
   const { setNodeRef } = useDroppable({
     id: filterBy, // Use filterBy as the unique ID for the droppable area

@@ -13,81 +13,107 @@ import { Input } from "@/components/ui/input";
 import { updateProfile } from "@/lib/api/users";
 import { uploadToS3 } from "@/lib/s3-upload";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
-import {getUser, User} from "@/lib/api/users";
+import { getUser, User } from "@/lib/api/users";
 
 const formSchema = z.object({
   first_name: z.string().optional(),
   last_name: z.string().optional(),
-  email: z.string().email("Adresse email invalide").optional().or(z.literal('')), // Allow empty string
-  telephone: z.string().optional().or(z.literal('')), // Allow empty string
-  image: z.string().optional(),
+  email: z
+    .string()
+    .email("Adresse email invalide")
+    .optional()
+    .or(z.literal("")), // Allow empty string
+  telephone: z.string().optional().or(z.literal("")), // Allow empty string
+  image: z.any().optional(), // Allow file or string
 });
 
 export function ProfileForm() {
   const [userInfo, setUserInfo] = useState<User | null>(null);
-  useEffect(()=>{
-    const fetchUser = async () => {
-      const user = await getUser();
-      setUserInfo(user);
-      setImagePreview(user.image || null);
-    }
-    fetchUser();
-  },[])
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [fileBlob, setFileBlob] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      first_name: userInfo?.first_name,
-      last_name: userInfo?.last_name,
-      email: userInfo?.email,
-      telephone: userInfo?.telephone,
-      image: userInfo?.image || "",
+      first_name: "",
+      last_name: "",
+      email: "",
+      telephone: "",
+      image: undefined,
     },
   });
 
-  const [fileBlob, setFileBlob] = useState<File>();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [imagePreview, setImagePreview] = useState<string | null>(userInfo?.image || null);
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const user = await getUser();
+        setUserInfo(user);
+        if (user.image) {
+          setImagePreview(user.image);
+        }
+        form.reset({
+          first_name: user.first_name || "",
+          last_name: user.last_name || "",
+          email: user.email || "",
+          telephone: user.telephone || "",
+          image: user.image,
+        });
+      } catch (error) {
+        console.error("Fetch user error:", error);
+        toast.error("Erreur lors de la récupération des informations utilisateur.");
+      }
+    };
+    fetchUser();
+  }, [form]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
     try {
-      const data: Partial<z.infer<typeof formSchema>> = {};
+      let imageUrl = userInfo?.image;
 
       if (fileBlob) {
         try {
           const res = await uploadToS3([fileBlob]);
-          data.image = res[0];
-          toast.success("Photo de profil téléchargée avec succès");
-        } catch (error: unknown) {
-          toast.error("Échec du téléchargement de la photo");
-          throw error;
+          imageUrl = res[0];
+          toast.success("Photo de profil téléchargée avec succès.");
+        } catch (error) {
+          console.error("Upload error:", error);
+          toast.error("Échec du téléchargement de la photo.");
+          setIsSubmitting(false);
+          return;
         }
       }
 
-      // Only add fields that have values
-            // Add fields to data if they are provided and different from initial values, or if it's the image
-      if (values.first_name !== undefined) data.first_name = values.first_name;
-      if (values.last_name !== undefined) data.last_name = values.last_name;
-      if (values.email !== undefined) data.email = values.email;
-      if (values.telephone !== undefined) data.telephone = values.telephone;
-      // Image is handled separately with fileBlob
+      const data: Partial<User> = {
+        first_name: values.first_name,
+        last_name: values.last_name,
+        email: values.email,
+        telephone: values.telephone,
+        image: imageUrl,
+      };
 
-      // Only proceed if we have data to update
-      if (Object.keys(data).length > 0) {
+      const hasChanged = Object.keys(data).some(
+        (key) =>
+          data[key as keyof typeof data] !==
+          userInfo?.[key as keyof typeof userInfo]
+      );
+
+      if (hasChanged) {
         const res = await updateProfile(data);
-        document.cookie = `userInfo=${JSON.stringify(res.user)};path=/`
-        toast.success("Profil mis à jour avec succès");
+        document.cookie = `userInfo=${JSON.stringify(res.user)};path=/`;
+        toast.success("Profil mis à jour avec succès.");
         window.location.reload();
       } else {
-        toast.error("Aucune modification à enregistrer");
+        toast.info("Aucune modification à enregistrer.");
       }
     } catch (error) {
-      toast.error("Échec de la mise à jour du profil");
+      toast.error("Échec de la mise à jour du profil.");
       console.error(error);
     } finally {
       setIsSubmitting(false);
@@ -104,7 +130,7 @@ export function ProfileForm() {
             <FormItem>
               <FormLabel>Prénom</FormLabel>
               <FormControl>
-                <Input placeholder="Prénom" {...field} defaultValue={userInfo?.first_name || ""}/>
+                <Input placeholder="Prénom" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -118,7 +144,7 @@ export function ProfileForm() {
             <FormItem>
               <FormLabel>Nom</FormLabel>
               <FormControl>
-                <Input placeholder="Nom" {...field} defaultValue={userInfo?.last_name || ""}/>
+                <Input placeholder="Nom" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -132,12 +158,7 @@ export function ProfileForm() {
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input
-                  placeholder="Email"
-                  type="email"
-                  defaultValue={userInfo?.email || ""}
-                  {...field}
-                />
+                <Input placeholder="Email" type="email" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -151,7 +172,7 @@ export function ProfileForm() {
             <FormItem>
               <FormLabel>Téléphone</FormLabel>
               <FormControl>
-                <Input placeholder="Téléphone" type="tel" {...field} defaultValue={userInfo?.telephone || ""}/>
+                <Input placeholder="Téléphone" type="tel" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -163,59 +184,47 @@ export function ProfileForm() {
           name="image"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Photo de profile</FormLabel>
-              <FormControl>
-                <Input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) {
-                      setFileBlob(file); // Keep the file object for actual upload
-                      const reader = new FileReader();
-                      reader.onloadend = () => {
-                        const dataUrl = reader.result as string;
-                        setImagePreview(dataUrl);
-                        // field.onChange(dataUrl); // Option 1: Update form with Data URL
-                                                // Option 2: Keep original field.onChange for file object if backend expects file
-                                                // For now, let's assume the form's 'image' field is for the final URL after upload,
-                                                // so we won't call field.onChange here with the dataUrl.
-                                                // The actual image string for the form will be set on successful S3 upload.
-                      };
-                      reader.readAsDataURL(file);
-                    } else {
-                      setImagePreview(userInfo?.image || null);
-                      setFileBlob(undefined);
-                      field.onChange(userInfo?.image || ""); // Reset form field if selection is cleared
-                    }
-                  }}
+              <FormLabel>Photo de profil</FormLabel>
+              <div className="flex items-center gap-4">
+                <Image
+                  src={imagePreview || "/user-icon.svg"}
+                  alt="Aperçu de la photo de profil"
+                  width={80}
+                  height={80}
+                  className="rounded-full object-cover w-20 h-20 border"
                 />
-              </FormControl>
+                <FormControl>
+                  <>
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      ref={fileInputRef}
+                      style={{ display: "none" }}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          setFileBlob(file);
+                          const reader = new FileReader();
+                          reader.onloadend = () => {
+                            const dataUrl = reader.result as string;
+                            setImagePreview(dataUrl);
+                          };
+                          reader.readAsDataURL(file);
+                          field.onChange(file);
+                        }
+                      }}
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => fileInputRef.current?.click()}
+                    >
+                      Changer la photo
+                    </Button>
+                  </>
+                </FormControl>
+              </div>
               <FormMessage />
-              {/* Image Preview Code Starts Here */}
-              {imagePreview && (
-                <div className="mt-4 w-32 h-32 rounded-full overflow-hidden mx-auto border-2 border-gray-300 shadow-md">
-                  {imagePreview.startsWith('data:image') ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={imagePreview} alt="Aperçu de l'image" className="w-full h-full object-cover" />
-                  ) : (
-                    <Image src={imagePreview} alt="Aperçu de l'image" width={128} height={128} className="w-full h-full object-cover" />
-                  )}
-                </div>
-              )}
-              {!imagePreview && userInfo?.image && (
-                 <div className="mt-4 w-32 h-32 rounded-full overflow-hidden mx-auto border-2 border-gray-300 shadow-md">
-                  <Image src={userInfo.image} alt="Photo de profil actuelle" width={128} height={128} className="w-full h-full object-cover" />
-                </div>
-              )}
-               {!imagePreview && !userInfo?.image && (
-                 <div className="mt-4 w-32 h-32 rounded-full overflow-hidden mx-auto border-2 border-gray-200 bg-gray-100 flex items-center justify-center shadow-md">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                  </svg>
-                </div>
-              )}
-              {/* Image Preview Code Ends Here */}
             </FormItem>
           )}
         />

@@ -1,5 +1,6 @@
 "use client";
 import ParticipantComponent from "@/app/(workspace)/gestion/details/details_de_la_tache/components/participants";
+import { CompteRendu } from "@/app/_components/compteRendu";
 import { DialogComponent } from "@/app/_components/dialogComponent";
 import DocumentComponent from "@/app/_components/document";
 import EmptyState from "@/app/_components/EmptyState";
@@ -9,16 +10,16 @@ import {
   addMemberToMeeting,
   getOneMeting,
   removeDocumentFromMeeting,
+  updateMeeting,
 } from "@/lib/api/reunion";
 import { formatDateToFrench } from "@/lib/functions";
 import { Meeting } from "@/lib/types";
 import { Calendar, Plus, Users } from "lucide-react";
 import Link from "next/link";
 import { use, useEffect, useState } from "react";
+import { toast } from "sonner";
 import AddDocument from "../components/addDocument";
 import AddMemberDialog from "../components/addParticipant";
-import { toast } from "sonner";
-import Editor from "@/app/_components/editor";
 export default function Detail({
   params,
 }: {
@@ -31,6 +32,7 @@ export default function Detail({
     const fetchMeeting = async () => {
       const response = await getOneMeting(parseInt(id));
       setMeeting(response);
+      console.log("---TEST---", response);
       console.log(response.ordre_du_jour[0].description);
     };
     fetchMeeting();
@@ -230,9 +232,6 @@ export default function Detail({
             <div className="pb-2 border-b border-white-200">
               <h1 className="font-bold text-lg">Ordre du jour</h1>
             </div>
-            <Editor
-              _editorStateJSON={meeting.ordre_du_jour[0]?.description}
-            />
 
             {meeting.ordre_du_jour[0]?.description ? (
               <LexicalView
@@ -244,6 +243,12 @@ export default function Detail({
             <div></div>
           </div>
         </div>
+        <CompteRendu
+          handleSubmiting={async (text: string) => {
+            await updateMeeting(meeting.id, { compte_rendu: text });
+          }}
+          initialCompteRendu={meeting.compte_rendu}
+        />
       </div>
     );
   }
@@ -251,15 +256,21 @@ export default function Detail({
 }
 
 const Box = ({ meeting }: { meeting: Meeting }) => {
+  const temp_emplacement = meeting.emplacement;
+  const emplacement = temp_emplacement.map((e) =>
+    e === "PHYSIQUE" ? "Physique" : "En ligne"
+  );
   return (
     <div className="bg-white w-full rounded-[8px] py-2 px-3 flex flex-col gap-3 text-sm">
       <h6>{meeting.objet ? meeting.objet : "Objet manqant"}</h6>
-      <div className="rounded-[8px] p-[6px] bg-white-100 w-fit">
-        <h6 className="text-xs">{meeting.emplacement}</h6>
-      </div>
+      {emplacement && (
+        <div className="rounded-[8px] p-[6px] bg-white-100 w-fit">
+          <h6 className="text-xs">{emplacement.join(", ")}</h6>
+        </div>
+      )}
       {meeting.lien_reunion ? (
         <Link href={meeting.lien_reunion}>
-          <h6 className="underline text-coral-500">Lien de la reunion</h6>
+          <h6 className="underline text-coral-500">Lien de la réunion</h6>
         </Link>
       ) : null}
     </div>

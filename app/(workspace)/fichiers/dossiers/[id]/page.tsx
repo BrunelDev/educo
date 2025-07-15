@@ -16,7 +16,6 @@ import { use, useEffect, useState, Fragment } from "react";
 import { toast } from "sonner";
 import FileCard from "../../components/file";
 import Folder from "../../components/folder";
-import Image from "next/image";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -220,15 +219,16 @@ const CreateFile = ({ folderId }: { folderId: string }) => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    const fileName = formData.get("nom");
     const file = formData.get("media") as File;
+    const fileName = file.name
 
     if (fileName && file) {
       try {
         // Upload file to S3
         const fileUrl = await uploadToS3([file]);
         console.log("S3 Upload response:", fileUrl);
-
+        //the name should be the same as the file name
+        
         const fileData = {
           nom: fileName.toString(),
           type_fichier: "DOCUMENT",
@@ -247,10 +247,7 @@ const CreateFile = ({ folderId }: { folderId: string }) => {
 
   return (
     <form action="" className="flex flex-col gap-3" onSubmit={handleSubmit}>
-      <label htmlFor="fileName">Nom du fichier</label>
-      <Input type="text" id="fileName" required name="nom" />
 
-      <label htmlFor="fileUrl">URL du fichier</label>
       <div>
         <label className="font-medium text-white-800 text-xs">Fichier</label>
         <div className="relative rounded-[8px] overflow-hidden border border-dashed border-white-300">
@@ -282,7 +279,12 @@ const CreateFile = ({ folderId }: { folderId: string }) => {
       <div className="flex justify-center items-center">
         {fileUrl && (
           <div className="flex justify-center w-1/2 items-center">
-            <Image src={fileUrl} alt="File Preview" width={100} height={100} />
+            {
+              // sImple and basic UI and modern for name of file preview
+              <p className="text-sm font-medium text-center mb-2 truncate w-[200px]">
+                {fileUrl}
+              </p>
+            }
           </div>
         )}
       </div>

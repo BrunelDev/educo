@@ -1,47 +1,125 @@
 "use client";
-import { Input } from "@/components/ui/input";
-import { deleteProject, Project, updateProject } from "@/lib/api/projets";
-import { Ellipsis, FilePenLine, Trash2 } from "lucide-react";
-import Link from "next/link";
 import { useState } from "react";
+import Link from "next/link";
+import { Ellipsis, FilePenLine, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import { Popover } from "../../components/popover";
+
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import {
+  Popover,
+  PopoverContent as ShadcnPopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Popover as CustomPopover } from "../../components/popover";
+
+import {
+  deleteProject,
+  Project,
+  ProjectStatus,
+  updateProject,
+} from "@/lib/api/projets";
+
 interface ProjectCardProps {
   project: Project;
   onSubmitProject: () => void;
 }
-export default function ProjectCard({ project, onSubmitProject }: ProjectCardProps) {
+
+export default function ProjectCard({
+  project,
+  onSubmitProject,
+}: ProjectCardProps) {
   const [open, setOpen] = useState(false);
+  const [openStatus, setOpenStatus] = useState(false);
+
+  const handleUpdateStatus = async (status: ProjectStatus) => {
+    try {
+      await updateProject(project.id, { status });
+      toast.success("Statut du projet mis à jour avec succès");
+      setOpenStatus(false);
+      onSubmitProject();
+    } catch (error) {
+      console.error("Error updating project status:", error);
+      toast.error("Erreur lors de la mise à jour du statut du projet");
+    }
+  };
 
   return (
-    <div className="relative bg-[#ffffff] w-full sm:w-[calc(50%-0.5rem)] lg:w-[calc(33.333%-0.666rem)] xl:w-[calc(25%-0.75rem)] h-[120px] rounded-[12px] py-4 px-3 flex flex-col justify-between">
+    <div className="sm:w-[calc(50%-0.5rem)] lg:w-[calc(33.333%-0.666rem)] xl:w-[calc(25%-0.75rem)] h-fit relative">
       <Link
         href={`/gestion/details/${project.id}`}
-        className="flex flex-col gap-3 justify-between text-sm cursor-pointer h-full"
+        className="gap-3 text-sm relative bg-white w-full h-[180px] rounded-[12px] py-4 px-3 flex flex-col cursor-pointer hover:bg-gray-100 duration-200"
       >
         <div className="flex justify-between">
           <h6 className="truncate font-bold">{project.title}</h6>
         </div>
-        <h6 className="text-xs truncate">{project.description}</h6>
-        <div className="flex justify-between">
-          <div
-            className={`w-fit h-[22px] p-2 rounded-[8px] flex items-center justify-center  ${
-              project.status === "termine"
-                ? "bg-white"
-                : "bg-crimson-400 text-white"
-            }`}
-          >
-            <h6 className="text-xs">{project.status_display}</h6>
-          </div>
-        </div>
+        {/* description can go to 5 lines before truncate*/}
+        <h6 className="text-xs text-gray-500 overflow-hidden [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:4]">
+          {project.description}
+        </h6>
       </Link>
-      <Popover
+      <div className="flex justify-between absolute bottom-5 left-4">
+        <Popover open={openStatus} onOpenChange={setOpenStatus}>
+          <PopoverTrigger asChild>
+            <Badge
+              className={`cursor-pointer
+                  ${
+                    project.status === "termine"
+                      ? "bg-green-100 text-green-800"
+                      : ""
+                  }
+                  ${
+                    project.status === "en_cours"
+                      ? "bg-blue-100 text-blue-800"
+                      : ""
+                  }
+                  ${
+                    project.status === "a_faire"
+                      ? "bg-yellow-100 text-yellow-800"
+                      : ""
+                  }
+                `}
+            >
+              {project.status_display}
+            </Badge>
+          </PopoverTrigger>
+          <ShadcnPopoverContent className="w-auto p-0">
+            <div className="flex flex-col gap-y-1 p-0">
+              <div
+                onClick={() => {
+                  handleUpdateStatus("a_faire");
+                }}
+                className="py-1 px-2 text-center text-sm cursor-pointer w-full hover:bg-accent rounded"
+              >
+                À faire
+              </div>
+              <div
+                onClick={() => handleUpdateStatus("en_cours")}
+                className="py-1 px-2 text-center text-sm hover:bg-accent rounded cursor-pointer"
+              >
+                En cours
+              </div>
+              <div
+                onClick={() => handleUpdateStatus("termine")}
+                className="py-1 px-2 text-center text-sm hover:bg-accent rounded cursor-pointer"
+              >
+                Terminé
+              </div>
+            </div>
+          </ShadcnPopoverContent>
+        </Popover>
+      </div>
+      <CustomPopover
         open={open}
         onOpenChange={setOpen}
-        PopoverContent={<PopoverContent project={project} onSubmit={() => {
-          setOpen(false)
-      onSubmitProject()
-          }}/>
+        PopoverContent={
+          <PopoverMenuContent
+            project={project}
+            onSubmit={() => {
+              setOpen(false);
+              onSubmitProject();
+            }}
+          />
         }
         PopoverTrigger={
           <div className="w-6 h-6 justify-center items-center rounded-sm cursor-pointer flex hover:bg-coral-50 duration-200 absolute right-2 top-3 z-50">
@@ -58,10 +136,9 @@ interface PopoverContentProps {
   onSubmit: () => void;
 }
 
-const PopoverContent = ({ project, onSubmit }: PopoverContentProps) => {
+const PopoverMenuContent = ({ project, onSubmit }: PopoverContentProps) => {
   const [updatedName, setUpdatedName] = useState(project.title);
 
-  // Function to delete the project
   const handleDeleteProject = async () => {
     try {
       await deleteProject(project.id);
@@ -73,7 +150,6 @@ const PopoverContent = ({ project, onSubmit }: PopoverContentProps) => {
     }
   };
 
-  // Function to update the project name
   const handleUpdateProjectName = async () => {
     if (!updatedName.trim()) {
       toast.error("Le nom du projet ne peut pas être vide");
@@ -94,7 +170,7 @@ const PopoverContent = ({ project, onSubmit }: PopoverContentProps) => {
     <div className="py-2 px-1 text-sm w-[125px] flex flex-col gap-[6px]">
       <div className="hover:bg-gray-100 cursor-pointer rounded-[4px] px-2 flex items-center justify-around py-1">
         <FilePenLine size={18} />
-        <Popover
+        <CustomPopover
           PopoverContent={
             <div>
               <Input

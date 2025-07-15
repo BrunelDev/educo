@@ -117,7 +117,7 @@ export default function CreateGroupForm({
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Description (Optionnel)</FormLabel>
+              <FormLabel>Description (Optionnelle)</FormLabel>
               <FormControl>
                 <Textarea
                   placeholder="Ex: Discussions sur les campagnes à venir"

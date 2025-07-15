@@ -109,11 +109,12 @@ const MessageHeader = () => {
               src={
                 activeConversation.participants.filter(
                   (participant) => participant.id !== user?.id
-                )[0].avatar || "/userProfile-img.png"
+                )[0].image || "/userProfile-img.png"
               }
               alt={conversationName}
               height={40}
               width={40}
+              style={{ objectFit: "cover", width: "40px", height: "40px" }}
               className="rounded-full object-cover"
               onError={(e) => {
                 const target = e.target as HTMLImageElement;

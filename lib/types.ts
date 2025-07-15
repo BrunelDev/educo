@@ -61,11 +61,12 @@ interface AgendaItem {
 
 // Main meeting interface
 interface Meeting {
+  compte_rendu: string;
   id: number;
   type_reunion: string;
   titre: string;
   objet: string;
-  emplacement: string;
+  emplacement: string[];
   lien_reunion: string;
   date_heure: string | Date;
   frequence: string;
@@ -283,7 +284,6 @@ interface User {
 }
 
 // Interface for Room
-
 
 // Interface for Message
 interface Message {

@@ -347,7 +347,7 @@ const StepOne = ({
           onChange={(e) => {
             setLocalMeetingPurpose(e.target.value);
           }}
-          placeholder="Suivi des activités du CSE"
+          placeholder="Ex : Suivi des activités du CSE"
           className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
         />
         {errors.purpose && (
@@ -415,7 +415,7 @@ const StepOne = ({
             setLocalMeetingLink(e.target.value);
           }}
           className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-          placeholder="https://meet.google.com/abc-defg-hij"
+          placeholder="Ex : https://meet.google.com/abc-defg-hij"
         />
         {errors.link && (
           <p className="text-red-500 text-sm mt-1">{errors.link}</p>

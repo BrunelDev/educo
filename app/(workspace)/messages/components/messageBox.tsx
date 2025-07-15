@@ -57,7 +57,6 @@ type_message
 "audio"
  */
 
-
 interface MessageBoxProps {
   message: Message;
   isOwnMessage?: boolean;
@@ -69,7 +68,7 @@ interface MessageBoxProps {
 export default function MessageBox({ message, className }: MessageBoxProps) {
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const [imageError, setImageError] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
+  const [, setUser] = useState<User | null>(null);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -86,7 +85,7 @@ export default function MessageBox({ message, className }: MessageBoxProps) {
   const renderContent = () => {
     switch (message.type_message) {
       case MessageType.IMAGE:
-        const imageSource = message.image?.url ;
+        const imageSource = message.image?.url;
 
         // Function to handle image loading errors
         const handleImageError = () => {
@@ -149,7 +148,7 @@ export default function MessageBox({ message, className }: MessageBoxProps) {
           )
         );
       case MessageType.AUDIO:
-        const audioSource = message.audio?.url ;
+        const audioSource = message.audio?.url;
         const proxyUrl = `/api/audio?url=${encodeURIComponent(audioSource!)}`;
         return (
           audioSource && (
@@ -157,6 +156,7 @@ export default function MessageBox({ message, className }: MessageBoxProps) {
               controls
               src={proxyUrl}
               className={className}
+              style={{ maxWidth: "90%" }}
               onError={(e: React.SyntheticEvent<HTMLAudioElement, Event>) => {
                 const target = e.target as HTMLAudioElement;
                 console.log("Erreur avec proxy:", target.error);
@@ -168,7 +168,7 @@ export default function MessageBox({ message, className }: MessageBoxProps) {
           )
         );
       case MessageType.FILE:
-        const fileSource = message.fichier?.url ;
+        const fileSource = message.fichier?.url;
 
         // Check if this is actually an image that was misclassified
         const isActuallyImage =
@@ -199,7 +199,7 @@ export default function MessageBox({ message, className }: MessageBoxProps) {
             fileSource && (
               <>
                 <div
-                  className="max-w-[300px] relative group cursor-pointer"
+                  className="max-w-[200px] xs:max-w-[240px] sm:max-w-[200px] relative group cursor-pointer"
                   onClick={() => setIsImageModalOpen(true)}
                 >
                   <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100">
@@ -313,7 +313,7 @@ export default function MessageBox({ message, className }: MessageBoxProps) {
         return (
           fileSource && (
             <div
-              className={`${bgColor} rounded-md overflow-hidden border border-gray-200 max-w-[300px]`}
+              className={`${bgColor} rounded-md overflow-hidden border border-gray-200 max-w-[200px]`}
             >
               <div className="p-4 flex items-center gap-3">
                 <div className={`${iconColor} p-2 rounded-md`}>
@@ -423,11 +423,11 @@ export default function MessageBox({ message, className }: MessageBoxProps) {
         // Regular text message
         return (
           <p
-            className={`text-gray-800 bg-white-50 p-2 w-fit ${
+            className={`text-gray-800 bg-white-50 p-1.5 sm:p-2 w-fit text-xs sm:text-sm md:text-base ${
               message.sender.id == JSON.parse(getCookies("userInfo") || "")?.id
                 ? "rounded-b-[8px] rounded-tl-[8px]"
                 : "rounded-b-[8px] rounded-tr-[8px]"
-            } min-w-[100px] break-all max-w-[280px] xs:max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg`}
+            } min-w-[80px] sm:min-w-[100px] break-all max-w-[240px] xs:max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg`}
           >
             {message.content}
           </p>
@@ -437,32 +437,33 @@ export default function MessageBox({ message, className }: MessageBoxProps) {
 
   return (
     <div
-      className={`flex gap-4 p-4 w-fit ${className} my-8 ${
+      className={`flex gap-2 sm:gap-4 p-3 sm:p-4 w-fit ${className} my-6 sm:my-8 ${
         message.sender.id == JSON.parse(getCookies("userInfo") || "")?.id
-          ? "ml-auto"
+          ? "sm:ml-auto ml-2"
           : ""
       }`}
     >
       <Image
         src={
-          message.sender.id === user?.id && user.image
-            ? user.image
-            : "/userProfile-img.png"
+          message.sender.image ? message.sender.image : "/userProfile-img.png"
         }
-        alt={message.sender.name}
+        alt={message.sender.name!}
         width={30}
         height={30}
-        className="rounded-full w-[30px] h-[30px]"
+        style={{ objectFit: "cover", flexShrink: 0 }}
+        className="rounded-full w-[25px] h-[25px] sm:w-[30px] sm:h-[30px]"
       />
       <div className="flex-1">
-        <div className="flex items-center gap-2 mb-1">
-          <span className="font-medium">
-            {message.sender.name || message.sender.email}
+        <div className="flex items-center gap-1 sm:gap-2 mb-1">
+          <span className="font-medium text-xs sm:text-sm md:text-base">
+            {message.sender.name ||
+              message.sender.first_name + " " + message.sender.last_name ||
+              message.sender.email}
           </span>
         </div>
         <div className="relative w-fit">
           {renderContent()}
-          <span className="text-sm text-gray-500 absolute right-0 -bottom-6 text-nowrap">
+          <span className="text-xs sm:text-sm text-gray-500 absolute left-0 sm:right-0 -bottom-5 sm:-bottom-6 text-nowrap">
             {formatDistanceToNow(message.timestamp, {
               locale: fr,
               addSuffix: true,

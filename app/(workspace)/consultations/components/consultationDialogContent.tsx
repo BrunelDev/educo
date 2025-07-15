@@ -4,9 +4,11 @@ import { Button } from "@/components/ui/button";
 import { createConsultation } from "@/lib/api/consultation";
 import { ConsultationDialogProps, ConsultationType } from "@/lib/types";
 import { format } from "date-fns";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export default function ConsultationDialogContent({
   consultation,
@@ -32,31 +34,6 @@ export default function ConsultationDialogContent({
   const [value, setValue] = useState<string>(consultation.consultationType);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleCreateConsultation = async () => {
-    try {
-      setIsLoading(true);
-      toast.loading("Création de la consultation en cours...");
-      const formattedDate = format(new Date(), "yyyy-MM-dd");
-
-      const data = {
-        type_consultation: consultation.consultationType,
-        statut: "En attente",
-        description: consultation.description,
-        date_requise: formattedDate,
-        participants: [],
-      };
-
-      await createConsultation(data);
-      toast.dismiss();
-      toast.success("La consultation a été créée avec succès!");
-      handleSubmit();
-    } catch (error) {
-      console.error("Error creating consultation:", error);
-      toast.error("Erreur lors de la création de la consultation");
-    } finally {
-      setIsLoading(false);
-    }
-  };
   const consultationList: ConsultationDialogProps[] = [
     {
       consultationType: ConsultationType.Orientation, // Changed from Accord to Orientation for the first example, assuming it was a placeholder
@@ -335,8 +312,82 @@ Le CSE est systématiquement consulté sur les mesures liées à la sécurité, 
     },
   ];
 
+  const [maxHeight, setMaxHeight] = useState<string>("500px");
+
+  useEffect(() => {
+    const updateMaxHeight = () => {
+      // Calculate available viewport height minus some padding for other UI elements
+      const viewportHeight = window.innerHeight;
+      // Adjust the offset as needed based on your layout
+      const offset = 150; // Approximate space for headers, padding, etc.
+      const availableHeight = viewportHeight - offset;
+
+      // Set a minimum height to avoid very small dialogs
+      const minHeight = 300;
+      const maxHeight = 750;
+      // Set the max height to either the available height or minimum height, whichever is larger
+      if (availableHeight < minHeight) {
+        setMaxHeight(`${minHeight}px`);
+      } else if (availableHeight > maxHeight) {
+        setMaxHeight(`${maxHeight}px`);
+      } else {
+        setMaxHeight(`${availableHeight}px`);
+      }
+    };
+
+    // Update on mount
+    updateMaxHeight();
+
+    // Update on window resize
+    window.addEventListener("resize", updateMaxHeight);
+    return () => window.removeEventListener("resize", updateMaxHeight);
+  }, []);
+
+  const [localDate, setLocalDate] = useState("");
+  const [showDateInput, setShowDateInput] = useState(false);
+
+  const handleCreateConsultation = async () => {
+    try {
+      // Check if date is in the past when custom date is selected
+      if (showDateInput && localDate) {
+        const selectedDate = new Date(localDate);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Set to beginning of day for fair comparison
+
+        if (selectedDate < today) {
+          toast.error("La date ne peut pas être dans le passé");
+          return;
+        }
+      }
+
+      setIsLoading(true);
+      toast.loading("Création de la consultation en cours...");
+      let formattedDate = format(new Date(), "yyyy-MM-dd");
+      if (showDateInput && localDate) {
+        formattedDate = localDate;
+      }
+
+      const data = {
+        type_consultation: consultation.consultationType,
+        statut: "En attente",
+        description: consultation.description,
+        date_requise: formattedDate,
+        participants: [],
+      };
+
+      await createConsultation(data);
+      toast.dismiss();
+      toast.success("La consultation a été créée avec succès!");
+      handleSubmit();
+    } catch (error) {
+      console.error("Error creating consultation:", error);
+      toast.error("Erreur lors de la création de la consultation");
+    } finally {
+      setIsLoading(false);
+    }
+  };
   return (
-    <ScrollArea className="h-[500px] px-5">
+    <ScrollArea className="px-5" style={{ height: maxHeight, maxHeight }}>
       <div className="flex flex-col gap-6">
         <div className="flex flex-col gap-5">
           <h6>Type de consultation</h6>
@@ -352,7 +403,7 @@ Le CSE est systématiquement consulté sur les mesures liées à la sécurité, 
           />
         </div>
         <div className="flex pl-10 items-center bg-gradient-to-l from-[#FE6539] to-crimson-400 text-white-50 rounded-[8px] p-2 text-sm">
-          <h6>Comment ca se passe</h6>
+          <h6>Comment ça se passe ?</h6>
         </div>
         <p className="text-sm">
           {
@@ -373,6 +424,34 @@ Le CSE est systématiquement consulté sur les mesures liées à la sécurité, 
               </pre>
             ))}
         </div>
+
+        <div className="flex items-center space-x-2 mt-4">
+          <Checkbox
+            id="add-date"
+            checked={showDateInput}
+            onCheckedChange={(checked) => setShowDateInput(checked === true)}
+          />
+          <label
+            htmlFor="add-date"
+            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+          >
+            Ajouter une date
+          </label>
+        </div>
+
+        {showDateInput && (
+          <div className="flex flex-col gap-4 w-fit">
+            <label className="font-medium text-white-800 text-xs block">
+              Date
+            </label>
+            <Input
+              type="date"
+              value={localDate}
+              onChange={(e) => setLocalDate(e.target.value)}
+              className="w-fit"
+            />
+          </div>
+        )}
         <Button
           className="bg-gradient-to-r from-coral-400 to-crimson-400"
           onClick={handleCreateConsultation}

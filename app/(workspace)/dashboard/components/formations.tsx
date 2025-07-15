@@ -57,7 +57,7 @@ const FormationComponent = ({ imageUrl, title }: FormationComponentProps) => {
 
   return (
     <div className="w-full flex flex-col sm:flex-row sm:justify-between items-start sm:items-center p-2 rounded-[8px] bg-[#FFFFFF99] gap-2 sm:gap-0">
-      <div className="flex gap-3">
+      <div className="flex w-full gap-3">
         <div className="relative h-[40px] w-[40px] rounded-lg overflow-hidden bg-gray-100">
           {imageUrl ? (
             <Image
@@ -65,7 +65,13 @@ const FormationComponent = ({ imageUrl, title }: FormationComponentProps) => {
               width={60}
               height={60}
               alt="formation image"
-              className="h-full w-full object-cover rounded-lg"
+              className="h-full w-full object-cover"
+              style={{
+                objectFit: "cover",
+                flexShrink: 0,
+                minWidth: "60px",
+                minHeight: "60px",
+              }}
             />
           ) : (
             <div className="flex items-center justify-center h-full w-full bg-coral-50">
@@ -75,11 +81,18 @@ const FormationComponent = ({ imageUrl, title }: FormationComponentProps) => {
                 height={60}
                 alt="formation placeholder"
                 className="h-full w-full object-cover opacity-70"
+                style={{ flexShrink: 0, minWidth: "60px", minHeight: "60px" }}
               />
             </div>
           )}
         </div>
-        <h6 className="flex items-center">{title}</h6>
+
+        <h6
+          className="flex items-center"
+          style={{ width: "calc(100% - 45px)" }}
+        >
+          {title}
+        </h6>
       </div>
       <div
         className="bg-white-50 hover:bg-white-100 cursor-pointer py-[6px] px-3 rounded-[8px] flex justify-center items-center"

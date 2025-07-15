@@ -48,6 +48,7 @@ export interface Consultation {
   }[];
   documents: Document[];
   commentaires: Comment[];
+  compte_rendu?: string;
 }
 
 /*export interface ConsultationResponse {
@@ -86,6 +87,7 @@ export interface UpdateConsultationDto {
   statut?: ConsultationStatus;
   participants?: number[];
   documents?: AddDocumentDto[]; // Add documents to the consultation
+  compte_rendu?: string;
 }
 
 /**

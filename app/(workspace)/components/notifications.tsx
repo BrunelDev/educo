@@ -122,7 +122,9 @@ const NotificationItem = ({ notification }: { notification: Notification }) => {
           <h6 className="text-xs text-gray-600">
             {new Date(notification.date_creation).getHours() +
               ":" +
-              new Date(notification.date_creation).getMinutes()}
+              (new Date(notification.date_creation).getMinutes() < 10
+                ? "0" + new Date(notification.date_creation).getMinutes()
+                : new Date(notification.date_creation).getMinutes())}
           </h6>
         </div>
       </div>

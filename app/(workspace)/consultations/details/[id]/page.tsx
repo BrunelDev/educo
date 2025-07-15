@@ -13,13 +13,16 @@ import {
   removeMemberFromConsultation,
   updateConsultation,
 } from "@/lib/api/consultation";
-import { Plus, Users } from "lucide-react";
+import { ArrowLeft, Plus, Users } from "lucide-react";
 import { use, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { CompteRendu } from "@/app/_components/compteRendu";
 export default function ConsultationDetail({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const router = useRouter();
   const { id } = use(params);
   const [consultation, setConsultation] = useState<Consultation>();
   const [refresh, setRefresh] = useState(false);
@@ -104,8 +107,15 @@ export default function ConsultationDetail({
   }, [id, refresh]);
   if (consultation) {
     return (
-      <div>
-        <div className="flex flex-col gap-5 pt-5">
+      <div className="pt-5">
+        <button
+          onClick={() => router.back()}
+          className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors mb-4"
+        >
+          <ArrowLeft size={20} />
+          <span className="font-semibold">Retour</span>
+        </button>
+        <div className="flex flex-col gap-5">
           <div className="flex flex-col gap-4">
             <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center gap-2">
               <div className="space-y-2 w-full">
@@ -137,9 +147,7 @@ export default function ConsultationDetail({
               <Users />
               <h6>Participants</h6>
               <DialogComponent
-                className={
-                  "min-w-0 px-1 sm:px-3"
-                }
+                className={"min-w-0 px-1 sm:px-3"}
                 open={openDialog}
                 onOpenChange={setOpenDialog}
                 dialoTrigger={
@@ -231,6 +239,14 @@ export default function ConsultationDetail({
             </div>
           </div>
         </div>
+        <CompteRendu
+          handleSubmiting={async (text: string) => {
+            await updateConsultation(consultation.id, { compte_rendu: text });
+            await fetchConsultationData();
+            setRefresh(!refresh);
+          }}
+          initialCompteRendu={consultation.compte_rendu!}
+        />
       </div>
     );
   }

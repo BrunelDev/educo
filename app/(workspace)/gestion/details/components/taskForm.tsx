@@ -2,21 +2,25 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+//import {
+//  Select,
+//  SelectContent,
+//  SelectGroup,
+//  SelectItem,
+//  SelectLabel,
+//  SelectTrigger,
+//  SelectValue,
+//} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import {
   getOrganisationMembers,
   OrganizationMember,
 } from "@/lib/api/organisation";
-import { createTask, CreateTaskDto, TaskType } from "@/lib/api/tache";
+import {
+  createTask,
+  CreateTaskDto,
+  //TaskType
+} from "@/lib/api/tache";
 import { useEffect, useState } from "react";
 
 import { uploadToS3 } from "@/lib/s3-upload";
@@ -107,7 +111,7 @@ export default function TaskForm({
       </div>
 
       <div>
-        <Select
+        {/*<Select
           onValueChange={(value) => setValue("task_type", value as TaskType)}
           defaultValue={defaultCategory}
         >
@@ -118,11 +122,11 @@ export default function TaskForm({
             <SelectGroup>
               <SelectLabel></SelectLabel>
               <SelectItem value="en_cours">En cours</SelectItem>
-              <SelectItem value="a_faire">A faire</SelectItem>
+              <SelectItem value="a_faire">À faire</SelectItem>
               <SelectItem value="termine">Terminée</SelectItem>
             </SelectGroup>
           </SelectContent>
-        </Select>
+        </Select>*/}
         {errors.task_type && (
           <span className="text-red-500 text-sm">
             {errors.task_type.message}
@@ -130,8 +134,45 @@ export default function TaskForm({
         )}
       </div>
 
-      <div>
-        <Input type="file" onChange={(e) => setFile(e.target.files?.[0])} />
+      <div className="space-y-2">
+        <div className="flex items-center gap-2">
+          <label
+            htmlFor="file-upload"
+            className="cursor-pointer px-4 py-2 border rounded-md bg-slate-100 hover:bg-slate-200 transition-colors flex items-center gap-2"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="lucide lucide-upload"
+            >
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+            Choisir un fichier
+          </label>
+          <input
+            id="file-upload"
+            type="file"
+            className="hidden"
+            onChange={(e) => {
+              const selectedFile = e.target.files?.[0];
+              setFile(selectedFile);
+            }}
+          />
+          {file && (
+            <span className="text-sm text-gray-600 truncate max-w-[200px]">
+              {file.name}
+            </span>
+          )}
+        </div>
       </div>
 
       <div>

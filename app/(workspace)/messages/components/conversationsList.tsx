@@ -68,7 +68,7 @@ export default function ConversationsList({
             }}
           >
             <Avatar>
-              <AvatarImage src={conversation.participants?.[0]?.avatar || undefined} alt={conversation.participants?.[0]?.name} />
+              <AvatarImage src={conversation.participants?.filter((participant) => participant.id !== user.id)[0]?.image || undefined} alt={conversation.participants?.[0]?.name} />
               <AvatarFallback>{conversation.participants?.filter((participant) => participant.id !== user.id)[0]?.name.charAt(0)}</AvatarFallback>
             </Avatar>
             <div className="flex-1">

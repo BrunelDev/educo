@@ -195,15 +195,15 @@ export default function MessageList() {
   }
 
   return (
-    <div className="flex flex-col h-[calc(100vh-5rem)]">
-      <div className="flex-grow overflow-hidden">
-        <ScrollArea className="h-[calc(100vh-20rem)]" ref={scrollAreaRef}>
+    <div className="flex flex-col w-full h-[calc(100vh-5rem)]">
+      <div className="flex-grow">
+        <ScrollArea className="h-[calc(100vh-20rem)]" ref={scrollAreaRef} scrollHideDelay={0}>
           {hasMore && !isGroup && (
             <div ref={ref} className="flex justify-center py-2">
               <Loader2 className="h-6 w-6 text-gray-400 animate-spin" />
             </div>
           )}
-          <div className="p-4">
+          <div className="w-full">
             {messages.map((message, index) => {
               console.log("message-------------", message);
               return (

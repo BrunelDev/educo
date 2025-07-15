@@ -8,6 +8,7 @@ export default function WebinarContent() {
   const [pastWebinars, setPastWebinars] = useState<Webinaire[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [refresh, setRefresh] = useState(false);
 
   useEffect(() => {
     const fetchAndSetWebinars = async () => {
@@ -24,7 +25,7 @@ export default function WebinarContent() {
       }
     };
     fetchAndSetWebinars();
-  }, []);
+  }, [refresh]);
 
   useEffect(() => {
     if (allWebinars.length > 0) {
@@ -65,7 +66,7 @@ export default function WebinarContent() {
         {upcomingWebinars.length > 0 ? (
           <div className="flex flex-wrap gap-4">
             {upcomingWebinars.map((webinar) => (
-              <WebinarCard key={webinar.id} webinar={webinar} />
+              <WebinarCard key={webinar.id} webinar={webinar} onChange={() => setRefresh(!refresh)}/>
             ))}
           </div>
         ) : (
@@ -78,7 +79,7 @@ export default function WebinarContent() {
         {pastWebinars.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {pastWebinars.map((webinar) => (
-              <WebinarCard key={webinar.id} webinar={webinar} />
+              <WebinarCard key={webinar.id} webinar={webinar} onChange={() => setRefresh(!refresh)}/>
             ))}
           </div>
         ) : (

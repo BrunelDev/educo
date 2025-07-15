@@ -97,7 +97,7 @@ export default function FileCard({
     return { IconComponent, fileType, bgColor, iconColor };
   };
 
-  const { IconComponent, fileType, bgColor, iconColor } = getFileInfo();
+  const { IconComponent, bgColor, iconColor } = getFileInfo();
 
   // Check if file is an image and has a valid URL
   const isImage =
@@ -125,23 +125,23 @@ export default function FileCard({
     }
   };
   const handleDownload = async () => {
-    const imageUrl = file.url; 
-  
+    const imageUrl = file.url;
+
     const response = await fetch(imageUrl, {
-      mode: 'cors',
+      mode: "cors",
     });
-  
+
     if (!response.ok) {
       alert("Échec du téléchargement");
       return;
     }
-  
+
     const blob = await response.blob();
     const url = URL.createObjectURL(blob);
-  
-    const link = document.createElement('a');
+
+    const link = document.createElement("a");
     link.href = url;
-    link.download = file.nom; 
+    link.download = file.nom;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -194,10 +194,7 @@ export default function FileCard({
           <div className={`${iconColor} p-3 rounded-full mb-3`}>
             <IconComponent size={40} />
           </div>
-          <p className="text-sm font-medium text-center mb-2 truncate w-full">
-            {file.nom}
-          </p>
-          <p className="text-xs text-gray-500 mb-4">{fileType}</p>
+          
 
           <div className="flex gap-2">
             <Link
@@ -331,13 +328,7 @@ const FilePopoverContent = ({ file }: FilePopoverContentProps) => {
           PopoverTrigger={<h6>Renommer</h6>}
         />
       </div>
-      <div
-        className="hover:bg-gray-100 cursor-pointer rounded-[4px] px-2 flex items-center justify-around py-1 text-red-600"
-        onClick={handleDeleteFile}
-      >
-        <Trash2 size={18} />
-        <h6>Supprimer</h6>
-      </div>
+
       <Popover
         PopoverContent={
           <div>
@@ -365,10 +356,17 @@ const FilePopoverContent = ({ file }: FilePopoverContentProps) => {
         PopoverTrigger={
           <div className="hover:bg-gray-100 cursor-pointer rounded-[4px] px-2 flex items-center justify-around py-1">
             <Folder size={18} />
-            <h6>Deplacer</h6>
+            <h6>Déplacer</h6>
           </div>
         }
       />
+      <div
+        className="hover:bg-gray-100 cursor-pointer rounded-[4px] px-2 flex items-center justify-around py-1 text-red-600"
+        onClick={handleDeleteFile}
+      >
+        <Trash2 size={18} />
+        <h6>Supprimer</h6>
+      </div>
     </div>
   );
 };

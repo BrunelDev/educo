@@ -126,3 +126,15 @@ export const subscribeToWebinaire = async (
     throw error;
   }
 };
+
+// se désinscrire de webinaire
+export const unsubscribeFromWebinaire = async (
+  webinaireId: number
+): Promise<void> => {
+  try {
+    await api.delete(`formations/webinaires/inscription/${webinaireId}/`);
+  } catch (error) {
+    console.error("Error unsubscribing from webinaire:", error);
+    throw error;
+  }
+};

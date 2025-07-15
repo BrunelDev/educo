@@ -27,6 +27,7 @@ import {
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getUser } from "@/lib/api/users";
+import { usePathname } from "next/navigation";
 // Menu items.
 const items = [
   {
@@ -80,11 +81,18 @@ export function AppSidebar() {
   const [userInfo, setUserInfo] = useState<User | null>(null);
   useEffect(() => {
     const fun = async () => {
-      const userInfoResponse: User = await getUser()
-      setUserInfo(userInfoResponse)
-    }
-    fun()
+      const userInfoResponse: User = await getUser();
+      setUserInfo(userInfoResponse);
+    };
+    fun();
   }, []);
+  const pathname = usePathname();
+  console.log(pathname);
+  console.log(items);
+  const isActive = (path: string) => {
+    return pathname.includes(path);
+  };
+  console.log(pathname);
   return (
     <Sidebar className="w-[210px]">
       <SidebarContent>
@@ -105,11 +113,20 @@ export function AppSidebar() {
                   <SidebarMenuButton
                     key={item.title + index}
                     asChild
-                    className="group/item relative hover:bg-gradient-to-r hover:from-[#FFDDE3] hover:to-[#FFDDE300] w-full py-2 px-3"
+                    className={`group/item relative hover:bg-gradient-to-r ${
+                      isActive(item.url)
+                        ? "bg-gradient-to-r from-[#FFDDE3] to-[#FFDDE300]"
+                        : ""
+                    } hover:from-[#FFDDE3] hover:to-[#FFDDE300] w-full py-2 px-3`}
                   >
                     <a href={item.url} className="flex items-center gap-3">
-                      <div className="h-6 w-1 absolute left-0 top-1/2 -translate-y-1/2 bg-red-500 opacity-0 group-hover/item:opacity-100 group-hover/item:animate-slide-in"></div>
-                      <item.icon />
+                      <div
+                        className={`h-6 w-1 absolute left-0 top-1/2 -translate-y-1/2 bg-red-500 opacity-0 group-hover/item:opacity-100 group-hover/item:animate-slide-in`}
+                      ></div>
+                      {isActive(item.url) && <div
+                        className={`h-6 w-1 absolute left-0 top-1/2 -translate-y-1/2 bg-red-500 opacity-100`}
+                        style={{transform: "translateX(0px)"}}
+                      ></div>}
                       <span>{item.title}</span>
                     </a>
                   </SidebarMenuButton>
@@ -122,18 +139,20 @@ export function AppSidebar() {
       <SidebarFooter>
         <Link
           href={"/profile"}
-          className="flex justify-between items-center px-2 py-1 hover:pl-4 hover:bg-white-100 duration-200 rounded-[8px]"
+          className={`flex justify-between items-center px-2 py-1 hover:pl-4 hover:bg-white-100 ${
+            isActive(pathname) ? "bg-white-100" : ""
+          } duration-200 rounded-[8px]`}
         >
           <div className="flex items-center gap-5 ">
             <div className="relative h-[32px] w-[32px] rounded-full overflow-hidden bg-gray-100">
-            <Image
-              width={32}
-              height={32}
-              src={userInfo?.image ? userInfo.image : "/userProfile-img.png"}
-              alt={"user profile image"}
-            />
+              <Image
+                width={32}
+                height={32}
+                src={userInfo?.image ? userInfo.image : "/userProfile-img.png"}
+                alt={"user profile image"}
+              />
             </div>
-            
+
             <h6
               className={`text-white-800 font-semibold text-sm ${
                 userInfo?.first_name ? "" : "truncate w-[100px]"

@@ -6,6 +6,7 @@ const endpoint = endpoints.meetings;
 // Interface for partial meeting updates
 export interface UpdateMeetingDto {
   // Include fields from MeetingFormState but make them optional
+  compte_rendu?: string;
   type_reunion?: MeetingType;
   titre?: string;
   objet?: string;
@@ -51,6 +52,7 @@ export const getMeetings = async (
 export const getOneMeting = async (id: number): Promise<Meeting> => {
   try {
     const response = await api.get(`${endpoint.list}${id}/`);
+    console.log("---TEST---", response.data);
     return response.data;
   } catch (error: unknown) {
     console.error("Error fetching meeting", error);

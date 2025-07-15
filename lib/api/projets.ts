@@ -36,9 +36,13 @@ export interface ProjectResponse {
   results: Project[];
 }
 
-export const getProjects = async (): Promise<Project[]> => {
+export const getProjects = async (team_id?: number): Promise<Project[]> => {
   try {
-    const response = await api.get<Project[]>(endpoints.projets.base);
+    const response = await api.get<Project[]>(endpoints.projets.base, {
+      params: {
+        team_id: team_id,
+      },
+    });
     return response.data;
   } catch (error: unknown) {
     console.error("Erreur lors de la récupération des projets :", error);
@@ -56,6 +60,7 @@ export const createProject = async (
   project: createProjectParams
 ): Promise<Project> => {
   try {
+    console.log(project);
     const response = await api.post<Project>(endpoints.projets.base, {
       ...project,
     });

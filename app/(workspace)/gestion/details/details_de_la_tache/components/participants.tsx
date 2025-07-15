@@ -18,9 +18,10 @@ export default function ParticipantComponent({
   return (
     <div className="w-[320px] p-4 flex justify-between bg-[#FFFFFF99] rounded-[8px]">
       <Image
-        src={"/userProfile-img.png"}
+        src={participant.photo || "/userProfile-img.png"}
         width={36}
         height={36}
+        style={{ objectFit: "cover", width: "36px", height: "36px" }}
         alt={`${participant.nom_complet} profile image`}
         className="rounded-full"
       />

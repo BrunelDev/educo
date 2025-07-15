@@ -249,7 +249,7 @@ export function TeamFormHandlerWithMail({
           htmlFor="membres_cse_invites"
           className="font-medium text-white-800 text-xs mb-2 block"
         >
-          Invitez des gens à votre réunion (emails séparés par virgule)
+          Invitez des gens à votre organisation (emails séparés par virgule)
         </Label>
         <Input
           value={emails}

@@ -1,31 +1,26 @@
 import { Input } from "@/components/ui/input";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   deleteDossier,
   Dossier,
   editDossier,
   FoldersList,
+  getFoldersList,
+  moveFolderToFolder,
 } from "@/lib/api/fichiers";
 import { useFolderStore } from "@/store/folders";
-import {
-  FilePenLine,
-  Folder,
-  FolderClosed,
-  MoreVertical,
-  Trash2,
-} from "lucide-react";
+import { FilePenLine, Folder, MoreHorizontal, Trash2 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Popover } from "../../components/popover";
-import Image from "next/image";
-import { getFoldersList, moveFolderToFolder } from "@/lib/api/fichiers";
-import {
-  Select,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-} from "@/components/ui/select";
 import { toast } from "sonner";
+import { Popover } from "../../components/popover";
 
 export default function FolderCard({
   folder,
@@ -50,24 +45,36 @@ export default function FolderCard({
     );
   else {
     return (
-      <div className="flex items-center justify-between p-3 bg-white rounded-lg hover:bg-gray-50 w-[237px] h-12">
+      <div className="relative hover:bg-[#ffffffb7] duration-200 rounded-[8px]">
+        {" "}
         <Link
           href={`/fichiers/dossiers/${folder.id}`}
-          className="flex items-center gap-3 w-[90%]"
+          className="flex gap-3 w-[90%]"
         >
-          <FolderClosed />
-          <h6 className="text-sm truncate w-full">{folder.nom}</h6>
+          <div className="w-[186px] flex flex-col gap-2 justify-center items-center group">
+            <Image
+              src={"/folder-icon.svg"}
+              width={100}
+              height={100}
+              alt="document icon"
+            />
+            <h6 className="text-center">{folder.nom}</h6>
+          </div>
         </Link>
-        <Popover
-          PopoverContent={
-            <PopoverContent folder={folder} fetchDossiers={fetchDossiers} />
-          }
-          PopoverTrigger={
-            <div className="w-6 h-6 justify-center items-center rounded-sm cursor-pointer flex hover:bg-coral-50  duration-200">
-              <MoreVertical className="" size={18} />
-            </div>
-          }
-        />
+        <div className="absolute top-2 right-2">
+          <Popover
+            PopoverContent={
+              <PopoverContent folder={folder} fetchDossiers={fetchDossiers} />
+            }
+            PopoverTrigger={
+              <div
+                className="w-6 h-6 flex justify-center rounded-sm cursor-pointer hover:bg-coral-50  duration-200"
+              >
+                <MoreHorizontal className="" size={18} />
+              </div>
+            }
+          />
+        </div>
       </div>
     );
   }
@@ -185,15 +192,7 @@ const PopoverContent = ({
           PopoverTrigger={<h6>Renommer</h6>}
         />
       </div>
-      <div
-        className="hover:bg-gray-100 cursor-pointer rounded-[4px] px-2 flex items-center justify-around py-1 text-red-600"
-        onClick={() => {
-          deleteFolder();
-        }}
-      >
-        <Trash2 size={18} />
-        <h6>Supprimer</h6>
-      </div>
+
       <Popover
         PopoverContent={
           <div>
@@ -221,10 +220,19 @@ const PopoverContent = ({
         PopoverTrigger={
           <div className="hover:bg-gray-100 cursor-pointer rounded-[4px] px-2 flex items-center justify-around py-1">
             <Folder size={18} />
-            <h6>Deplacer</h6>
+            <h6>Déplacer</h6>
           </div>
         }
       />
+      <div
+        className="hover:bg-gray-100 cursor-pointer rounded-[4px] px-2 flex items-center justify-around py-1 text-red-600"
+        onClick={() => {
+          deleteFolder();
+        }}
+      >
+        <Trash2 size={18} />
+        <h6>Supprimer</h6>
+      </div>
     </div>
   );
 };
