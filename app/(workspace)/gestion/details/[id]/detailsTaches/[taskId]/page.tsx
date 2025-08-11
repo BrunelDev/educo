@@ -18,6 +18,7 @@ import { Plus, Users } from "lucide-react";
 import { use, useEffect, useState } from "react";
 import { toast } from "sonner";
 import ParticipantComponent from "../../../details_de_la_tache/components/participants";
+import GoBack from "@/app/_components/goback";
 
 export default function DetailTache({
   params,
@@ -91,6 +92,7 @@ export default function DetailTache({
 
   return (
     <div className="flex flex-col gap-4">
+      <GoBack title="Retour" />
       <div className="flex justify-between w-full">
         <div className="space-y-2 w-full">
           <div className="flex justify-between items-center w-full">

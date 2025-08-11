@@ -10,7 +10,8 @@ export interface MeetingFormState {
   lien_reunion?: string;
 
   // Step 2 - Schedule
-  date_heure: string;
+  date_heure_debut: string;
+  date_heure_fin?: string;
   frequence: string;
   documents: Array<{
     fichier: string;
@@ -39,7 +40,8 @@ export interface MeetingFormState {
 
   updateStep2: (
     data: Partial<{
-      date_heure: string;
+      date_heure_debut: string;
+      date_heure_fin?: string;
       frequence: string;
       documents: Array<{
         fichier: string;
@@ -62,7 +64,8 @@ const initialState = {
   objet: "",
   emplacement: [],
   lien_reunion: "",
-  date_heure: "",
+  date_heure_debut: "",
+  date_heure_fin: undefined,
   frequence: "",
   documents: [],
   participants: [],

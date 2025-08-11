@@ -30,11 +30,12 @@ export default function AssociateCard({
   return (
     <div className="bg-[#FFFFFF99] w-[330px] h-[140px] p-3 rounded-[8px] flex flex-col justify-between">
       <div className="flex justify-between">
-        <div className="w-[60px] h-[60px] rounded-full overflow-hidden">
+        <div className="w-[60px] h-[60px] rounded-full overflow-hidden relative">
           <Image
             src={associate.image || "/userProfile-img.png"}
-            width={60}
-            height={60}
+            fill
+            sizes="60px"
+            className="object-cover"
             alt="user image"
           />
         </div>
@@ -75,7 +76,8 @@ export default function AssociateCard({
           <DialogHeader>
             <DialogTitle>Confirmer la suppression</DialogTitle>
             <DialogDescription>
-              Êtes-vous sûr de vouloir supprimer ce membre ? Cette action est irréversible.
+              Êtes-vous sûr de vouloir supprimer ce membre ? Cette action est
+              irréversible.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

@@ -4,6 +4,7 @@ import { use, useEffect, useState } from "react";
 import { getWebinaireById, Webinaire } from "@/lib/api/formations";
 import Image from "next/image";
 import { Calendar, Clock } from "lucide-react";
+import GoBack from "@/app/_components/goback";
 
 export default function WebinarPage({
   params,
@@ -60,6 +61,7 @@ export default function WebinarPage({
 
   return (
     <div className="min-h-screen py-8">
+      <GoBack title="Retour" />
       {/* Optional Hero Image */}
       {webinar.image && (
         <div className="max-w-4xl mx-auto mb-8 px-4 sm:px-6 lg:px-8">

@@ -68,7 +68,8 @@ interface Meeting {
   objet: string;
   emplacement: string[];
   lien_reunion: string;
-  date_heure: string | Date;
+  date_heure_debut: string | Date;
+  date_heure_fin: string | Date;
   frequence: string;
   participants: MeetingParticipant[];
   documents: MeetingDocument[];

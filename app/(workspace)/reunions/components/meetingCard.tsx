@@ -16,11 +16,11 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { Popover } from "../../components/popover";
 
-interface MeetingCatdProps {
+interface MeetingCardProps {
   meeting: Meeting;
 }
 
-export default function MeetingCard({ meeting }: MeetingCatdProps) {
+export default function MeetingCard({ meeting }: MeetingCardProps) {
   return (
     <div className="bg-[#FFFFFF99] rounded-[8px] py-2 px-3 w-full sm:w-[350px] relative">
       <Link
@@ -41,7 +41,7 @@ export default function MeetingCard({ meeting }: MeetingCatdProps) {
         <div className="flex justify-between items-center">
           <div className="w-fit flex gap-2 text-xs">
             <CalendarDays size={14} />
-            <h6>{formatDateToFrench(meeting.date_heure.toString())}</h6>
+            <h6>{formatDateToFrench(meeting.date_heure_debut.toString())}</h6>
           </div>
 
           <div className="flex gap-2">
@@ -83,7 +83,7 @@ export default function MeetingCard({ meeting }: MeetingCatdProps) {
           <div
             className={`w-6 h-6 rounded-full bg-white-50 border border-crimson-200 flex justify-center items-center cursor-pointer`}
           >
-            {new Date(meeting.date_heure).getTime() < new Date().getTime() && (
+            {new Date(meeting.date_heure_debut).getTime() < new Date().getTime() && (
               <Check color="#FF264F" size={18} />
             )}
           </div>

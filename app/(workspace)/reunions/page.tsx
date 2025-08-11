@@ -31,12 +31,12 @@ export default function Reunions() {
         : meetings.filter((meeting) => meeting.type_reunion === filter);
 
     const upcoming = typeFilteredMeetings.filter(meeting => {
-      const meetingDate = new Date(meeting.date_heure);
+      const meetingDate = new Date(meeting.date_heure_debut);
       return meetingDate > now;
     });
 
     const past = typeFilteredMeetings.filter(meeting => {
-      const meetingDate = new Date(meeting.date_heure);
+      const meetingDate = new Date(meeting.date_heure_debut);
       return meetingDate <= now;
     });
 

@@ -7,6 +7,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
+import Image from "next/image";
 
 interface TaskCardProps {
   title: string;
@@ -86,11 +87,28 @@ export default function TaskCard({
       </div>
       <p>{description}</p>
       <div className="w-full border-b"></div>
-      <div className="flex justify-between">
-        <h6>Nombre de participant</h6>
-        <div className="flex gap-1">
-          <h6>{participant.length}</h6>
-        </div>
+      <div className="flex -space-x-2 overflow-hidden">
+        {participant && participant.length > 0 ? (
+          participant.map((attendee, index) => (
+            <Image
+              key={attendee?.id || index} // Use a more stable key if possible
+              src={attendee.image || "/userProfile-img.png"} // Fallback to a default icon
+              alt={attendee.first_name || `Participant ${index + 1}`}
+              width={32}
+              height={32}
+              className="rounded-full h-8 w-8 border-2 border-white object-cover"
+              onError={(e) => {
+                // Fallback if the primary image fails to load
+                (e.target as HTMLImageElement).onerror = null;
+                (e.target as HTMLImageElement).src = "/userProfile-img.png";
+              }}
+            />
+          ))
+        ) : (
+          <div className="text-xs text-gray-500 italic pr-2">
+            Aucun participant
+          </div>
+        )}
       </div>
     </div>
   );

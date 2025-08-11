@@ -159,7 +159,7 @@ export default function History({refresh}: {refresh: boolean}) {
                       router.push(`/consultations/details/${consultation.id}`);
                     }}
                   >
-                    {formatDateToFrench(consultation.date_requise)}
+                    {formatDateToFrench(consultation.date_requise, false)}
                   </TableCell>
                   <TableCell
                     className="w-full flex justify-end cursor-pointer"

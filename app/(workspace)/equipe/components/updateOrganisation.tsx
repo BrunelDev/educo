@@ -88,6 +88,7 @@ export default function UpdateOrganisationForm({
         const response = await getOrganization();
         if (response) {
           setOrganization(response);
+          setLogoUrl(response.organisation.logo || "");
         }
       } catch (error) {
         console.error("error geting organization", error);
@@ -315,11 +316,7 @@ export default function UpdateOrganisationForm({
             name="convention_collective"
             className="h-[36px]"
             placeholder="Entrez la convention collective"
-            defaultValue={
-              organization?.organisation.collective
-                ? organization?.organisation.collective
-                : ""
-            }
+            defaultValue={organization?.organisation.collective || ""}
           />
           {errors.convention_collective && (
             <span className="text-red-500 text-xs">
@@ -352,7 +349,7 @@ export default function UpdateOrganisationForm({
               logoUrl ? "border-none" : ""
             } flex justify-center items-center`}
           >
-            {logoUrl ? (
+            {logoUrl  ? (
               <div className="relative w-full h-full">
                 <Image
                   src={logoUrl}

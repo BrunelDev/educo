@@ -90,9 +90,9 @@ export default function CreateMeeting() {
       <StepProgress steps={steps} />
       <div className="w-full">
         {currentStep === 1 ? (
-          <StepOne errors={form1Error} setErrors={setForm1Error} />
-        ) : currentStep === 2 ? (
           <StepTwo errors={form2Error} setErrors={setForm2Error} />
+        ) : currentStep === 2 ? (
+          <StepOne errors={form1Error} setErrors={setForm1Error} />
         ) : currentStep === 3 ? (
           <StepThree />
         ) : currentStep === 4 ? (
@@ -198,7 +198,8 @@ const StepOne = ({
   // Meeting type state
   const [localMeetingType, setLocalMeetingType] =
     useState<MeetingType>(type_reunion);
-  const [localMeetingTitle, setLocalMeetingTitle] = useState<string>("Ordinaire");
+  const [localMeetingTitle, setLocalMeetingTitle] =
+    useState<string>("Ordinaire");
   const [localMeetingPurpose, setLocalMeetingPurpose] = useState<string>(objet);
   const [localLocation, setLocalLocation] = useState<string[]>(emplacement);
   const [localMeetingLink, setLocalMeetingLink] = useState<string>(
@@ -438,6 +439,9 @@ const StepTwo = ({
   const [localDate, setLocalDate] = useState<string>("");
   const [localTime, setLocalTime] = useState<string>("");
   const [localFrequency, setLocalFrequency] = useState<string>(frequence);
+  const [showEndDate, setShowEndDate] = useState<boolean>(false);
+  const [localEndDate, setLocalEndDate] = useState<string>("");
+  const [localEndTime, setLocalEndTime] = useState<string>("");
 
   useEffect(() => {
     const newErrors: Error2 = {};
@@ -463,8 +467,26 @@ const StepTwo = ({
       const combinedDateTime = new Date(
         `${localDate}T${localTime}`
       ).toISOString();
+
+      if (localEndDate && localEndTime) {
+        const combinedEndDate = new Date(
+          `${localEndDate}T${localEndTime}`
+        ).toISOString();
+
+        updateStep2({
+          date_heure_debut: combinedDateTime,
+          date_heure_fin: combinedEndDate,
+          frequence: localFrequency,
+          documents: filesList.map((f) => ({
+            nom_fichier: "le nom",
+            fichier: f.fileUrl,
+            type_document: "DOCUMENT",
+          })),
+        });
+      }
+
       updateStep2({
-        date_heure: combinedDateTime,
+        date_heure_debut: combinedDateTime,
         frequence: localFrequency,
         documents: filesList.map((f) => ({
           nom_fichier: "le nom",
@@ -473,7 +495,16 @@ const StepTwo = ({
         })),
       });
     }
-  }, [localDate, localTime, localFrequency, filesList, updateStep2, setErrors]);
+  }, [
+    localDate,
+    localTime,
+    localFrequency,
+    filesList,
+    updateStep2,
+    setErrors,
+    localEndDate,
+    localEndTime,
+  ]);
 
   const handleFileInputChange = (e: FileInputChangeEvent): void => {
     const newFile = e.target.files[0];
@@ -540,6 +571,49 @@ const StepTwo = ({
           {errors.frequency && (
             <p className="text-red-500 text-sm mt-1">{errors.frequency}</p>
           )}
+        </div>
+      </div>
+      <div className="w-full flex items-center gap-2">
+        <Label htmlFor="endDate">Ajouter une date de fin</Label>
+        <Checkbox
+          id="endDate"
+          checked={showEndDate}
+          onCheckedChange={(checked) => setShowEndDate(checked as boolean)}
+        />
+      </div>
+
+      <div className="flex flex-col sm:flex-row w-full gap-4 justify-between">
+        <div className="w-full sm:w-1/2">
+          <Label
+            htmlFor="endDateInput"
+            className="font-medium text-white-800 text-xs block mb-1"
+          >
+            Date de fin
+          </Label>
+          <Input
+            type="date"
+            value={localEndDate}
+            onChange={(e) => setLocalEndDate(e.target.value)}
+            className="w-full"
+            disabled={!showEndDate}
+            id="endDateInput"
+          />
+        </div>
+        <div className="w-full sm:w-1/2">
+          <Label
+            htmlFor="endTime"
+            className="font-medium text-white-800 text-xs block mb-1"
+          >
+            Heure de fin
+          </Label>
+          <Input
+            type="time"
+            value={localEndTime}
+            onChange={(e) => setLocalEndTime(e.target.value)}
+            className="w-full"
+            disabled={!showEndDate}
+            id="endTime"
+          />
         </div>
       </div>
       <div className="w-full">
@@ -714,7 +788,9 @@ const StepThree = () => {
                   </div>
 
                   <span className="text-sm truncate max-w-[240px] sm:max-w-xs">
-                    {user.email}
+                    {user.first_name
+                      ? user.first_name + " " + user.last_name
+                      : user.email}
                   </span>
                 </div>
                 <Checkbox

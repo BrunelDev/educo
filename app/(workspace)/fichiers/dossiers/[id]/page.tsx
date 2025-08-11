@@ -24,6 +24,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import GoBack from "@/app/_components/goback";
 
 export default function DossierPage({
   params,
@@ -100,6 +101,7 @@ export default function DossierPage({
 
   return (
     <div className="p-4 flex flex-col gap-10">
+      <GoBack title="Retour" />
       <Breadcrumb className="mb-4">
         <BreadcrumbList>
           <BreadcrumbItem>

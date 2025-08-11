@@ -105,12 +105,12 @@ export const logout = async (): Promise<void> => {
   }
 };
 
-export const formatDateToFrench = (dateString: string) => {
+export const formatDateToFrench = (dateString: string, showHour = true) => {
   return new Intl.DateTimeFormat("fr-FR", {
     day: "numeric",
     month: "long",
     year: "numeric",
-    hour: "numeric",
-    minute: "numeric",
+    hour: showHour ? "numeric" : undefined,
+    minute: showHour ? "numeric" : undefined,
   }).format(new Date(dateString));
 };

@@ -55,7 +55,9 @@ export default function AddMemberDialog({
                     />
                   </div>
                   <span className="w-2/3 sm:w-full truncate font-medium">
-                    {user.email}
+                    {user.first_name
+                      ? user.first_name + " " + user.last_name
+                      : user.email}
                   </span>
                 </div>
                 <div className="flex-shrink-0 h-5 w-5 rounded-sm flex justify-center items-center hover:bg-coral-50 cursor-pointer">

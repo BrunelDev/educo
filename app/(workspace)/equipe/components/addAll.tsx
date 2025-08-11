@@ -78,7 +78,9 @@ export default function AddMemberDialog({ teamId }: { teamId?: number }) {
                     />
                   </div>
 
-                  {user.email}
+                  {user.first_name
+                    ? user.first_name + " " + user.last_name
+                    : user.email}
                 </div>
                 <div className="h-5 w-5 rounded-sm flex justify-center items-center hover:bg-coral-50 cursor-pointer">
                   <Input

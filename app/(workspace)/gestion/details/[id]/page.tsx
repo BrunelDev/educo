@@ -14,6 +14,7 @@ import {
 import { TaskType, updateTask } from "@/lib/api/tache";
 import { toast } from "sonner";
 import TaskCard from "../components/project";
+import GoBack from "@/app/_components/goback";
 
 // Define a cleaner type for a single task, based on the Project type
 type Task = Project["taches"][0];
@@ -82,6 +83,7 @@ export default function Detail({ params }: { params: Promise<{ id: string }> }) 
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >
+      <GoBack title="Retour" />
       <div className="flex flex-col gap-5 p-4 md:p-6">
         <h6 className="text-xl font-bold mb-2">
           {projectDetails ? projectDetails.title : "Chargement du titre..."}

@@ -123,10 +123,10 @@ export function TeamFormHandlerWithMail({
   orgId: number;
   handleClose?: () => void;
 }) {
-  const [users, setUsers] = useState<User[]>([]);
+ // const [users, setUsers] = useState<User[]>([]);
   const [selectedMembers, setSelectedMembers] = useState<number[]>([]);
 
-  useEffect(() => {
+ /* useEffect(() => {
     const fun = async () => {
       try {
         let storedData = "";
@@ -145,13 +145,13 @@ export function TeamFormHandlerWithMail({
       }
     };
     fun();
-  }, []);
+  }, []);*/
 
-  const handleCheckboxChange = (checked: boolean, userId: number) => {
+  /*const handleCheckboxChange = (checked: boolean, userId: number) => {
     setSelectedMembers((prev) =>
       checked ? [...prev, userId] : prev.filter((id) => id !== userId)
     );
-  };
+  };*/
   const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
   const formatAndValidateEmails = (
@@ -262,7 +262,7 @@ export function TeamFormHandlerWithMail({
           className="w-full"
         />
       </div>
-      {users
+      {/*users
         ? users.map((user, index) => (
             <div
               key={index}
@@ -294,7 +294,7 @@ export function TeamFormHandlerWithMail({
               />
             </div>
           ))
-        : null}
+        : null*/}
       <Button
         type="submit"
         className="mt-4 px-4 py-2 bg-gradient-to-r from-coral-400 to-crimson-400 text-white rounded"

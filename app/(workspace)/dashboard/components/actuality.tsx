@@ -80,7 +80,6 @@ const ActualityComponent = ({
   return (
     <Link
       href={`/dashboard/actualites/${id}`}
-      target="blank"
       className="flex w-full gap-2 cursor-pointer"
     >
       {imageUrl ? (

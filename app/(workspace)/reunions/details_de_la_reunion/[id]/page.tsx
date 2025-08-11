@@ -20,6 +20,7 @@ import { use, useEffect, useState } from "react";
 import { toast } from "sonner";
 import AddDocument from "../components/addDocument";
 import AddMemberDialog from "../components/addParticipant";
+import GoBack from "@/app/_components/goback";
 export default function Detail({
   params,
 }: {
@@ -42,6 +43,8 @@ export default function Detail({
   if (meeting) {
     return (
       <div className="flex flex-col gap-5 pt-5 text-sm">
+        <GoBack title="Retour" />
+
         <div className="flex gap-8 items-center">
           <div className="bg-gradient-to-r from-coral-400 to-crimson-400 h-fit py-[6px] px-2 rounded-[8px] text-white">
             {meeting.type_reunion}
@@ -51,11 +54,11 @@ export default function Detail({
             <h6 className="text-xl font-bold">{meeting.titre}</h6>
             <div className="flex gap-3">
               <Calendar size={20} />
-              <h6>{formatDateToFrench(meeting.date_heure.toString())}</h6>
+              <h6>{formatDateToFrench(meeting.date_heure_debut.toString())}</h6>
             </div>
           </div>
         </div>
-        <Box meeting={meeting} />
+        {meeting.emplacement && <Box meeting={meeting} />}
         <div className="flex flex-col lg:flex-row lg:justify-between gap-6">
           <div className="w-full lg:w-2/3 flex flex-col gap-4">
             <div className="flex gap-3">
@@ -102,13 +105,12 @@ export default function Detail({
                         ];
 
                         // Update the meeting with the new participants
-                        const updatedMeeting = await addMemberToMeeting(
+                        await addMemberToMeeting(
                           meeting.id,
                           updatedParticipants
                         );
 
-                        // Update the local state
-                        setMeeting(updatedMeeting);
+                        
 
                         // Reload the page to ensure all data is up-to-date
                         setRefresh((v: boolean) => {

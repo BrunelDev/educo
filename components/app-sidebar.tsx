@@ -123,10 +123,12 @@ export function AppSidebar() {
                       <div
                         className={`h-6 w-1 absolute left-0 top-1/2 -translate-y-1/2 bg-red-500 opacity-0 group-hover/item:opacity-100 group-hover/item:animate-slide-in`}
                       ></div>
-                      {isActive(item.url) && <div
-                        className={`h-6 w-1 absolute left-0 top-1/2 -translate-y-1/2 bg-red-500 opacity-100`}
-                        style={{transform: "translateX(0px)"}}
-                      ></div>}
+                      {isActive(item.url) && (
+                        <div
+                          className={`h-6 w-1 absolute left-0 top-1/2 -translate-y-1/2 bg-red-500 opacity-100`}
+                          style={{ transform: "translateX(0px)" }}
+                        ></div>
+                      )}
                       <span>{item.title}</span>
                     </a>
                   </SidebarMenuButton>
@@ -146,10 +148,11 @@ export function AppSidebar() {
           <div className="flex items-center gap-5 ">
             <div className="relative h-[32px] w-[32px] rounded-full overflow-hidden bg-gray-100">
               <Image
-                width={32}
-                height={32}
                 src={userInfo?.image ? userInfo.image : "/userProfile-img.png"}
                 alt={"user profile image"}
+                fill
+                sizes="32px"
+                className="object-cover"
               />
             </div>
 
