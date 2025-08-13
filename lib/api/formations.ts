@@ -27,6 +27,7 @@ export interface Webinaire {
   date_creation: string;
   date_modification: string;
   inscrit: boolean;
+  formateur_image: string;
 }
 
 export interface WebinairesResponse {
@@ -135,6 +136,68 @@ export const unsubscribeFromWebinaire = async (
     await api.delete(`formations/webinaires/inscription/${webinaireId}/`);
   } catch (error) {
     console.error("Error unsubscribing from webinaire:", error);
+    throw error;
+  }
+};
+
+// --- Dossiers (Formations) ---
+
+export interface DossierRessource {
+  id: number;
+  titre: string;
+  type_ressource: string;
+  url: string;
+  description: string;
+  auteur: string;
+  date_creation: string;
+}
+
+export interface DossierUtilisateur {
+  id: number;
+  email: string;
+  nom_complet: string;
+}
+
+export interface Dossier {
+  id: number;
+  nom: string;
+  description: string | null;
+  parent: number | { id: number; nom: string } | null;
+  ressources: DossierRessource[];
+  utilisateur?: DossierUtilisateur;
+  date_creation: string;
+  date_modification: string;
+  chemin_complet: string;
+  sous_dossiers: Dossier[];
+}
+
+export interface GetDossiersParams {
+  parent_id?: number;
+  include_empty?: boolean;
+}
+
+// Lister vos dossiers
+export const getDossiers = async (
+  params: GetDossiersParams = {}
+): Promise<Dossier[]> => {
+  try {
+    const response = await api.get<Dossier[]>(`formations/dossiers/`, {
+      params,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching dossiers:", error);
+    throw error;
+  }
+};
+
+// Détails d'un dossier
+export const getDossierById = async (id: number): Promise<Dossier> => {
+  try {
+    const response = await api.get<Dossier>(`formations/dossiers/${id}/`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching dossier details:", error);
     throw error;
   }
 };

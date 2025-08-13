@@ -53,3 +53,33 @@ export const getNotifications = async ({
     throw error
   }
 };
+
+export const updateNotification = async (id: number): Promise<void> => {
+  try {
+    await api.put(`${endpoint}${id}/`);
+  } catch (error) {
+    console.error("Error updating notification:", error);
+    throw error;
+  }
+};
+
+
+export interface DeleteNotificationResponse {
+  status: string;
+  message: string;
+}
+
+export const deleteNotification = async (
+  id: number
+): Promise<DeleteNotificationResponse> => {
+  try {
+    const response = await api.delete<DeleteNotificationResponse>(
+      `${endpoint}${id}/`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting notification:", error);
+    throw error;
+  }
+};
+

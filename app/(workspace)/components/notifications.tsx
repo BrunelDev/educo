@@ -1,8 +1,10 @@
 "use client";
-import { getNotifications } from "@/lib/api/notifications";
+import { getNotifications, deleteNotification } from "@/lib/api/notifications";
 import { Notification, NotificationApiResponse } from "@/lib/api/notifications";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { X } from "lucide-react";
+import { toast } from "sonner";
 
 export function Notifications() {
   const [displayNotifications, setDisplayNotifications] =
@@ -21,6 +23,24 @@ export function Notifications() {
     fetchNotifications();
   }, []);
 
+  const handleDelete = async (id: number) => {
+    try {
+      await deleteNotification(id);
+      setNotifications((prev) =>
+        prev
+          ? {
+              ...prev,
+              count: Math.max(0, (prev.count || 0) - 1),
+              results: prev.results.filter((n) => n.id !== id),
+            }
+          : prev
+      );
+      toast.success("Notification supprimée");
+    } catch (error) {
+      console.error("Error deleting notification:", error);
+    }
+  };
+
   return (
     <main className="z-[9999999999]">
       {displayNotifications ? (
@@ -29,6 +49,7 @@ export function Notifications() {
             setDisplayNotifications((v) => !v);
           }}
           notifications={notifications?.results}
+          onDelete={handleDelete}
         />
       ) : (
         <NotificationIcon
@@ -58,9 +79,11 @@ const NotificationIcon = ({ handleClick }: { handleClick: () => void }) => (
 const NotificationComponent = ({
   handleClick,
   notifications,
+  onDelete,
 }: {
   notifications?: Notification[];
   handleClick: () => void;
+  onDelete: (id: number) => void;
 }) => {
   if (notifications) {
     return (
@@ -89,7 +112,12 @@ const NotificationComponent = ({
             {notifications.map((notification, index) => (
               <NotificationItem
                 notification={notification}
-                key={index + notification.id}
+                key={
+                  index +
+                  notification.id +
+                  new Date(notification.date_creation).getTime()
+                }
+                onDelete={onDelete}
               />
             ))}
           </div>
@@ -99,7 +127,13 @@ const NotificationComponent = ({
   }
 };
 
-const NotificationItem = ({ notification }: { notification: Notification }) => {
+const NotificationItem = ({
+  notification,
+  onDelete,
+}: {
+  notification: Notification;
+  onDelete: (id: number) => void;
+}) => {
   return (
     <div className="relative border-b border-dashed hover:px-3 group hover:bg-white-100 rounded-lg py-1 duration-200 w-full">
       {notification.est_lu ? (
@@ -119,18 +153,29 @@ const NotificationItem = ({ notification }: { notification: Notification }) => {
           <h3 className="text-sm text-white-800 font-semibold">
             {notification.titre}
           </h3>
-          <h6 className="text-xs text-gray-600">
+          <h6 className="text-xs text-gray-600 group-hover:hidden">
             {new Date(notification.date_creation).getHours() +
               ":" +
               (new Date(notification.date_creation).getMinutes() < 10
                 ? "0" + new Date(notification.date_creation).getMinutes()
                 : new Date(notification.date_creation).getMinutes())}
           </h6>
+          <div className="hidden group-hover:block absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+            <button
+              className="inline-flex items-center justify-center h-7 w-7 rounded-md text-crimson-600 hover:bg-crimson-50 hover:text-crimson-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-crimson-300 active:scale-95"
+              onClick={() => onDelete(notification.id)}
+              aria-label="Supprimer la notification"
+              title="Supprimer"
+            >
+              <X size={16} />
+            </button>
+          </div>
         </div>
       </div>
 
       <p className="text-sm truncate">
-        {notification.contenu_associe_info.str_representation}
+        {notification.contenu_associe_info?.str_representation ||
+          notification.message}
       </p>
     </div>
   );

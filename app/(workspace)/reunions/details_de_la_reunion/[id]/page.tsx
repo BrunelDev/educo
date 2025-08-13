@@ -1,6 +1,7 @@
 "use client";
 import ParticipantComponent from "@/app/(workspace)/gestion/details/details_de_la_tache/components/participants";
 import { CompteRendu } from "@/app/_components/compteRendu";
+import { CommentSection } from "@/app/_components/comment";
 import { DialogComponent } from "@/app/_components/dialogComponent";
 import DocumentComponent from "@/app/_components/document";
 import EmptyState from "@/app/_components/EmptyState";
@@ -8,6 +9,7 @@ import LexicalView from "@/app/_components/LexicalView";
 import {
   addDocument,
   addMemberToMeeting,
+  deleteParticipantFromMeeting,
   getOneMeting,
   removeDocumentFromMeeting,
   updateMeeting,
@@ -110,8 +112,6 @@ export default function Detail({
                           updatedParticipants
                         );
 
-                        
-
                         // Reload the page to ensure all data is up-to-date
                         setRefresh((v: boolean) => {
                           return !v;
@@ -135,6 +135,15 @@ export default function Detail({
                     <ParticipantComponent
                       key={participant.utilisateur_details.id + index}
                       participant={participant.utilisateur_details}
+                      handleDelete={async () => {
+                        await deleteParticipantFromMeeting(
+                          meeting.id,
+                          participant.utilisateur_details.id
+                        );
+                        setRefresh((v: boolean) => {
+                          return !v;
+                        });
+                      }}
                     />
                   ))
                 ) : (
@@ -251,6 +260,14 @@ export default function Detail({
           }}
           initialCompteRendu={meeting.compte_rendu}
         />
+        
+        {/* Comment Section */}
+        <div>
+          <CommentSection 
+            reunionId={meeting.id} 
+            currentUserId={1} // TODO: Replace with actual current user ID from auth context
+          />
+        </div>
       </div>
     );
   }

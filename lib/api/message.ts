@@ -167,3 +167,25 @@ export const getMessages = async (
     throw error;
   }
 };
+
+export const deleteMessage = async (id: number): Promise<void> => {
+  try {
+    // DELETE /api/messagerie/{id}/ -> 204 No Content
+    await api.delete(`${endpoints.messagerie.base}${id}/`);
+  } catch (error) {
+    console.error("Error deleting message:", error);
+    throw error;
+  }
+};
+
+export const deleteGroupMessage = async (
+  groupe_id: number,
+  id: number
+): Promise<void> => {
+  try {
+    await api.delete(`messagerie/groupes-fermes/${groupe_id}/messages/${id}/`);
+  } catch (error) {
+    console.error("Error deleting group message:", error);
+    throw error;
+  }
+};

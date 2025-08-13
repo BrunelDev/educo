@@ -39,6 +39,7 @@ export default function TaskCard({
     transform: CSS.Translate.toString(transform),
     touchAction: "none",
   };
+  console.log("participants",participant);
 
   return (
     <div
@@ -92,8 +93,8 @@ export default function TaskCard({
           participant.map((attendee, index) => (
             <Image
               key={attendee?.id || index} // Use a more stable key if possible
-              src={attendee.image || "/userProfile-img.png"} // Fallback to a default icon
-              alt={attendee.first_name || `Participant ${index + 1}`}
+              src={attendee.photo || "/userProfile-img.png"} // Fallback to a default icon
+              alt={attendee.first_name + " " + attendee.last_name || `Participant ${index + 1}`}
               width={32}
               height={32}
               className="rounded-full h-8 w-8 border-2 border-white object-cover"

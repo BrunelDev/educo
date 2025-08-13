@@ -47,7 +47,7 @@ const WebinarCardBotton = ({ webinar, onChange }: WebinarCardProps) => {
         <Image
           width={24}
           height={24}
-          src={webinar.image ? webinar.image : "/hostImage.png"}
+          src={webinar.formateur_image ? webinar.formateur_image : "/hostImage.png"}
           alt="webinar profile"
           className="rounded-full"
           style={{ objectFit: "cover", flexShrink: 0, minWidth: '24px', minHeight: '24px' }}

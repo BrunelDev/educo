@@ -60,7 +60,7 @@ const ReunionComponent = ({ meeting }: MeetingComponentProps) => {
             height={12}
             alt="calendar icon"
           />
-          <h6>{formatDateToFrench(meeting.date_heure.toLocaleString())}</h6>
+          <h6>{formatDateToFrench(meeting.date_heure_debut.toLocaleString())}</h6>
         </div>
       </div>
       <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center gap-1 sm:gap-0">

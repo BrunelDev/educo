@@ -90,9 +90,9 @@ export default function CreateMeeting() {
       <StepProgress steps={steps} />
       <div className="w-full">
         {currentStep === 1 ? (
-          <StepTwo errors={form2Error} setErrors={setForm2Error} />
-        ) : currentStep === 2 ? (
           <StepOne errors={form1Error} setErrors={setForm1Error} />
+        ) : currentStep === 2 ? (
+          <StepTwo errors={form2Error} setErrors={setForm2Error} />
         ) : currentStep === 3 ? (
           <StepThree />
         ) : currentStep === 4 ? (
