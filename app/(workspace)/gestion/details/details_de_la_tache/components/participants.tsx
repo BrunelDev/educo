@@ -17,17 +17,19 @@ interface ParticipantComponentProps {
     id: number;
     email: string;
     nom_complet: string;
-    photo: string;
+    photo: string | null;
   };
   handleDelete?: () => Promise<void>;
+  label?: string;
 }
 export default function ParticipantComponent({
   participant,
   handleDelete,
+  label,
 }: ParticipantComponentProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
   return (
-    <div className="w-[320px] p-4 flex justify-between bg-[#FFFFFF99] rounded-[8px]">
+    <div className="w-[320px] p-4 flex justify-between items-center bg-[#FFFFFF99] hover:bg-gray-100 rounded-[8px]">
       <Image
         src={participant.photo || "/userProfile-img.png"}
         width={36}
@@ -36,11 +38,14 @@ export default function ParticipantComponent({
         alt={`${participant.nom_complet} profile image`}
         className="rounded-full"
       />
-      <h6 className="w-2/3 truncate">
+      <div className="flex flex-col gap-1">
+      <h6 className="w-[150px] truncate">
         {participant.nom_complet !== " " && participant.nom_complet !== ""
           ? participant.nom_complet
           : participant.email}
       </h6>
+      <p className="text-xs text-coral-400">{label}</p>
+      </div>  
       <div
         className="cursor-pointer hover:bg-gray-100 p-2 rounded-[4px]"
         onClick={() => setIsDeleteDialogOpen(true)}

@@ -9,11 +9,13 @@ export interface CommentAuthor {
   first_name: string;
   last_name: string;
   nom_complet: string;
+  photo: string;
 }
 
 export interface Comment {
   id: number;
   reunion: number;
+  tache: number;
   auteur: CommentAuthor;
   contenu: string;
   date_creation: string;
@@ -25,7 +27,8 @@ export interface Comment {
 }
 
 export interface CreateCommentDto {
-  reunion: number;
+  reunion?: number;
+  tache?: number;
   contenu: string;
   parent?: number | null;
 }
@@ -226,7 +229,7 @@ export const removeDocumentFromMeeting = async (
 
 export const addMemberToMeeting = async (
   meeting_id: number,
-  user_id: number[]
+  user_id: number[] | string[]
 ): Promise<Meeting> => {
   try {
     const response = await api.post<Meeting>(
@@ -255,7 +258,9 @@ export const createComment = async (
   commentData: CreateCommentDto
 ): Promise<Comment> => {
   try {
+    console.log("payload", commentData)
     const response = await api.post("/reunion/commentaires/creer/", commentData);
+    console.log("--------------el f2-----------------",response.data);
     return response.data;
   } catch (error) {
     console.error("Error creating comment:", error);
@@ -304,7 +309,7 @@ export const getComment = async (commentId: number): Promise<Comment> => {
 export const updateComment = async (
   commentId: number,
   updateData: UpdateCommentDto
-): Promise<{ contenu: string }> => {
+): Promise<Comment> => {
   try {
     const response = await api.patch(
       `/reunion/commentaires/${commentId}/`,

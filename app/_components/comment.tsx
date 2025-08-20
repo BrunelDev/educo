@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { formatDistanceToNow } from "date-fns";
 import { fr } from "date-fns/locale";
 import {
@@ -35,10 +35,7 @@ import {
   Comment,
   CreateCommentDto,
   UpdateCommentDto,
-  createComment,
-  updateComment,
-  deleteComment,
-  getMeetingComments,
+  CommentsListResponse,
 } from "@/lib/api/reunion";
 import { getUser, User } from "@/lib/api/users";
 
@@ -50,6 +47,8 @@ interface CommentItemProps {
   onEdit?: (comment: Comment) => void;
   onDelete?: (commentId: number) => void;
   depth?: number;
+  deleteComment: (commentId: number) => Promise<void>;
+  createComment: (data: CreateCommentDto) => Promise<Comment>;
 }
 
 interface CommentFormProps {
@@ -61,11 +60,19 @@ interface CommentFormProps {
   initialValue?: string;
   isEditing?: boolean;
   userData?: User | null;
+  createComment: (data: CreateCommentDto) => Promise<Comment>;
 }
 
 interface CommentListProps {
   reunionId: number;
   currentUserId?: number;
+  getComments: (id: number) => Promise<CommentsListResponse>;
+  createComment: (data: CreateCommentDto) => Promise<Comment>;
+  updateComment: (
+    commentId: number,
+    data: UpdateCommentDto
+  ) => Promise<Comment>;
+  deleteComment: (commentId: number) => Promise<void>;
 }
 
 // Individual Comment Component
@@ -76,6 +83,8 @@ export const CommentItem: React.FC<CommentItemProps> = ({
   onEdit,
   onDelete,
   depth = 0,
+  deleteComment,
+  createComment,
 }) => {
   const [showReplyForm, setShowReplyForm] = useState(false);
   const [showReplies, setShowReplies] = useState(false);
@@ -100,7 +109,7 @@ export const CommentItem: React.FC<CommentItemProps> = ({
     if (depth < maxDepth) {
       setShowReplyForm(true);
     } else {
-      onReply?.(comment.parent || comment.id);
+      onReply?.(comment.parent || comment.id || 0);
     }
   };
 
@@ -129,11 +138,16 @@ export const CommentItem: React.FC<CommentItemProps> = ({
   useEffect(() => {
     const getUserData = async () => {
       const userData = await getUser();
+      console.log("userData", userData);
       setUserData(userData);
     };
     getUserData();
   }, []);
-  const isAuthor = userData?.id === comment.auteur.id;
+  const isAuthor = !!(
+    userData?.id &&
+    comment.auteur &&
+    userData.id === comment.auteur.id
+  );
 
   return (
     <div className={`${depth > 0 ? "ml-12" : ""}`}>
@@ -142,9 +156,12 @@ export const CommentItem: React.FC<CommentItemProps> = ({
           <div className="flex space-x-3">
             {/* Avatar */}
             <Avatar className="h-10 w-10 flex-shrink-0">
-              <AvatarImage src="" alt={comment.auteur.nom_complet} />
+              <AvatarImage
+                src={comment.auteur?.photo || ""}
+                alt={comment.auteur?.nom_complet ?? "Utilisateur"}
+              />
               <AvatarFallback className="bg-gradient-to-r from-coral-400 to-crimson-400 text-white text-sm font-medium">
-                {getInitials(comment.auteur.nom_complet)}
+                {getInitials(comment.auteur?.nom_complet ?? "Utilisateur")}
               </AvatarFallback>
             </Avatar>
 
@@ -154,7 +171,7 @@ export const CommentItem: React.FC<CommentItemProps> = ({
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <h4 className="font-semibold text-gray-900 text-sm">
-                    {comment.auteur.nom_complet}
+                    {comment.auteur?.nom_complet ?? "Utilisateur inconnu"}
                   </h4>
                   <span className="text-gray-500 text-xs">
                     {formatDate(comment.date_creation)}
@@ -203,46 +220,54 @@ export const CommentItem: React.FC<CommentItemProps> = ({
               </div>
 
               {/* Action Buttons */}
-              <div className="flex items-center space-x-6 mt-3">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleReply}
-                  className="text-gray-500 hover:text-orange-600 hover:bg-orange-50 h-8 px-2 transition-colors"
-                >
-                  <MessageCircleMore className="h-4 w-4 mr-1" />
-                  <span className="text-xs">
-                    {comment.reponses.length > 0 ? comment.reponses.length : ""}
-                  </span>
-                </Button>
+              {(() => {
+                const repliesCount = Array.isArray(comment.reponses)
+                  ? comment.reponses.length
+                  : 0;
+                return (
+                  <div className="flex items-center space-x-6 mt-3">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleReply}
+                      className="text-gray-500 hover:text-orange-600 hover:bg-orange-50 h-8 px-2 transition-colors"
+                    >
+                      <MessageCircleMore className="h-4 w-4 mr-1" />
+                      <span className="text-xs">
+                        {repliesCount > 0 ? repliesCount : ""}
+                      </span>
+                    </Button>
 
-                {/* Show/Hide Replies Button */}
-                {comment.reponses && comment.reponses.length > 0 && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setShowReplies(!showReplies)}
-                    className="text-gray-500 hover:text-orange-600 hover:bg-orange-50 h-8 px-2 transition-colors"
-                  >
-                    <span className="text-xs">
-                      {showReplies
-                        ? "Masquer les réponses"
-                        : `Afficher les réponses (${comment.reponses.length})`}
-                    </span>
-                  </Button>
-                )}
-              </div>
+                    {/* Show/Hide Replies Button */}
+                    {repliesCount > 0 && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setShowReplies(!showReplies)}
+                        className="text-gray-500 hover:text-orange-600 hover:bg-orange-50 h-8 px-2 transition-colors"
+                      >
+                        <span className="text-xs">
+                          {showReplies
+                            ? "Masquer les réponses"
+                            : `Afficher les réponses (${repliesCount})`}
+                        </span>
+                      </Button>
+                    )}
+                  </div>
+                );
+              })()}
 
               {/* Reply Form */}
               {showReplyForm && (
                 <div className="mt-4">
                   <CommentForm
                     userData={userData}
-                    reunionId={comment.reunion}
+                    reunionId={comment.reunion || comment.tache}
                     parentId={comment.id}
                     placeholder="Répondre à ce commentaire..."
                     onSubmit={handleReplySubmit}
                     onCancel={() => setShowReplyForm(false)}
+                    createComment={createComment}
                   />
                 </div>
               )}
@@ -266,23 +291,27 @@ export const CommentItem: React.FC<CommentItemProps> = ({
                 onEdit={onEdit}
                 onDelete={onDelete}
                 depth={depth + 1}
+                deleteComment={deleteComment}
+                createComment={createComment}
               />
             ))}
           </div>
         )}
 
       {/* Show more replies indicator */}
-      {comment.reponses && comment.reponses.length > 0 && depth >= maxDepth && (
-        <Button
-          variant="ghost"
-          size="sm"
-          className="ml-12 mt-2 text-blue-600 hover:text-blue-700 text-xs"
-          onClick={() => onReply?.(comment.id)}
-        >
-          Voir {comment.reponses.length} réponse
-          {comment.reponses.length > 1 ? "s" : ""}
-        </Button>
-      )}
+      {Array.isArray(comment.reponses) &&
+        comment.reponses.length > 0 &&
+        depth >= maxDepth && (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="ml-12 mt-2 text-blue-600 hover:text-blue-700 text-xs"
+            onClick={() => onReply?.(comment.id)}
+          >
+            Voir {comment.reponses.length} réponse
+            {comment.reponses.length > 1 ? "s" : ""}
+          </Button>
+        )}
     </div>
   );
 };
@@ -297,6 +326,7 @@ export const CommentForm: React.FC<CommentFormProps> = ({
   initialValue = "",
   isEditing = false,
   userData,
+  createComment,
 }) => {
   const [content, setContent] = useState(initialValue);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -307,14 +337,38 @@ export const CommentForm: React.FC<CommentFormProps> = ({
 
     setIsSubmitting(true);
     try {
-      const commentData: CreateCommentDto = {
-        reunion: reunionId,
-        contenu: content.trim(),
-        parent: parentId,
-      };
-
-      const newComment = await createComment(commentData);
-      onSubmit?.(newComment);
+      if (isEditing) {
+        // For editing, delegate to onSubmit; parent handles update API
+        onSubmit?.({
+          // Minimal object carrying edited content
+          id: 0,
+          reunion: reunionId,
+          contenu: content.trim(),
+          auteur: {
+            id: 0,
+            email: "",
+            first_name: "",
+            last_name: "",
+            nom_complet: "",
+          },
+          date_creation: new Date().toISOString(),
+          date_modification: new Date().toISOString(),
+          parent: parentId ?? null,
+          reponses: [],
+          est_reponse: !!parentId,
+          niveau_profondeur: 0,
+        } as unknown as Comment);
+      } else {
+        const commentData: CreateCommentDto = {
+          reunion: reunionId,
+          tache: reunionId,
+          contenu: content.trim(),
+          parent: parentId,
+        };
+        console.log("DTO", commentData);
+        const newComment = await createComment(commentData);
+        onSubmit?.(newComment);
+      }
       setContent("");
       toast.success("Commentaire ajouté avec succès");
     } catch {
@@ -333,6 +387,7 @@ export const CommentForm: React.FC<CommentFormProps> = ({
     <form onSubmit={handleSubmit} className="space-y-3">
       <div className="flex space-x-3">
         <Avatar className="h-10 w-10 flex-shrink-0">
+          <AvatarImage src={userData?.image || ""} />
           <AvatarFallback className="bg-gradient-to-r from-coral-400 to-crimson-400 text-white text-sm font-medium">
             {getInitials(
               userData?.first_name + " " + userData?.last_name ||
@@ -391,26 +446,31 @@ export const CommentForm: React.FC<CommentFormProps> = ({
 export const CommentList: React.FC<CommentListProps> = ({
   reunionId,
   currentUserId,
+  getComments,
+  createComment,
+  updateComment,
+  deleteComment,
 }) => {
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingComment, setEditingComment] = useState<Comment | null>(null);
 
-  useEffect(() => {
-    fetchComments();
-  }, [reunionId]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const fetchComments = async () => {
+  const fetchComments = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await getMeetingComments(reunionId);
+      const response = await getComments(reunionId);
+      console.log("-------Liste des commentaires---------", response);
       setComments(response.results);
     } catch {
       toast.error("Erreur lors du chargement des commentaires");
     } finally {
       setLoading(false);
     }
-  };
+  }, [getComments, reunionId]);
+
+  useEffect(() => {
+    fetchComments();
+  }, [fetchComments]);
 
   const handleNewComment = (newComment: Comment) => {
     if (newComment.parent) {
@@ -463,6 +523,7 @@ export const CommentList: React.FC<CommentListProps> = ({
     const getUserData = async () => {
       const userData = await getUser();
       setUserData(userData);
+      console.log("userData///////////*------------------", userData);
     };
     getUserData();
   }, []);
@@ -494,6 +555,7 @@ export const CommentList: React.FC<CommentListProps> = ({
           reunionId={reunionId}
           onSubmit={handleNewComment}
           placeholder="Que pensez-vous de cette réunion ?"
+          createComment={createComment}
         />
       </div>
 
@@ -518,6 +580,8 @@ export const CommentList: React.FC<CommentListProps> = ({
               onReply={handleReply}
               onEdit={handleEditComment}
               onDelete={handleDeleteComment}
+              deleteComment={deleteComment}
+              createComment={createComment}
             />
           ))
         )}
@@ -541,6 +605,7 @@ export const CommentList: React.FC<CommentListProps> = ({
               onSubmit={(comment) => handleUpdateComment(comment.contenu)}
               onCancel={() => setEditingComment(null)}
               placeholder="Modifier votre commentaire..."
+              createComment={createComment}
             />
           )}
         </DialogContent>
@@ -551,9 +616,24 @@ export const CommentList: React.FC<CommentListProps> = ({
 
 // Main Comment Section Component
 export const CommentSection: React.FC<{
+  type?: "reunion" | "tache";
   reunionId: number;
   currentUserId?: number;
-}> = ({ reunionId, currentUserId }) => {
+  createComment: (data: CreateCommentDto) => Promise<Comment>;
+  updateComment: (
+    commentId: number,
+    data: UpdateCommentDto
+  ) => Promise<Comment>;
+  deleteComment: (commentId: number) => Promise<void>;
+  getComments: (id: number) => Promise<CommentsListResponse>;
+}> = ({
+  reunionId,
+  currentUserId,
+  getComments,
+  createComment,
+  updateComment,
+  deleteComment,
+}) => {
   return (
     <div className="max-w-2xl ">
       <div className="mb-6">
@@ -565,7 +645,14 @@ export const CommentSection: React.FC<{
         </p>
       </div>
 
-      <CommentList reunionId={reunionId} currentUserId={currentUserId} />
+      <CommentList
+        reunionId={reunionId}
+        currentUserId={currentUserId}
+        getComments={getComments}
+        createComment={createComment}
+        updateComment={updateComment}
+        deleteComment={deleteComment}
+      />
     </div>
   );
 };

@@ -40,7 +40,12 @@ export function CompteRendu({
               setIsEditingCompteRendu(true);
             }
           }}
-          variant={isEditingCompteRendu ? "default" : "outline"}
+          variant={"default"}
+          className={`text-white ${
+            isEditingCompteRendu
+              ? "bg-gradient-to-r from-coral-400 to-crimson-400 hover:brightness-95"
+              : "bg-gradient-to-r from-coral-400 to-crimson-400 hover:brightness-95"
+          }`}
         >
           {isEditingCompteRendu ? "Confirmer" : "Modifier"}
         </Button>

@@ -30,6 +30,11 @@ enum InvitationStatus {
   ACCEPTE = "ACCEPTE",
   REFUSE = "REFUSE",
 }
+interface ExternalParticipant {
+  email: string;
+  disponible: "PRESENT" | "ABSENT" | "EN_ATTENTE";
+  date_response?: string;
+}
 
 // Interface for meeting participants
 interface MeetingParticipant {
@@ -42,6 +47,7 @@ interface MeetingParticipant {
     nom_complet: string;
     photo: string;
   };
+  disponible?: "PRESENT" | "ABSENT" | "EN_ATTENTE";
 }
 
 // Interface for meeting documents
@@ -72,6 +78,7 @@ interface Meeting {
   date_heure_fin: string | Date;
   frequence: string;
   participants: MeetingParticipant[];
+  participants_externes: ExternalParticipant[];
   documents: MeetingDocument[];
   ordre_du_jour: AgendaItem[];
 }
@@ -289,7 +296,7 @@ interface User {
 // Interface for Message
 interface Message {
   id: number;
-  room: number;
+  room: number ;
   sender: Sender;
   content?: string;
   type_message: MessageType;

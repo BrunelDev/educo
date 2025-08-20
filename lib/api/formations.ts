@@ -150,6 +150,10 @@ export interface DossierRessource {
   description: string;
   auteur: string;
   date_creation: string;
+  // Optional fields observed in API payloads
+  date_modification?: string;
+  webinaire?: number;
+  utilisateur?: number;
 }
 
 export interface DossierUtilisateur {
@@ -164,11 +168,18 @@ export interface Dossier {
   description: string | null;
   parent: number | { id: number; nom: string } | null;
   ressources: DossierRessource[];
-  utilisateur?: DossierUtilisateur;
+  utilisateur?: number | DossierUtilisateur;
   date_creation: string;
   date_modification: string;
   chemin_complet: string;
   sous_dossiers: Dossier[];
+}
+
+export interface DossiersResponse {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: Dossier[];
 }
 
 export interface GetDossiersParams {
@@ -176,12 +187,13 @@ export interface GetDossiersParams {
   include_empty?: boolean;
 }
 
+
 // Lister vos dossiers
 export const getDossiers = async (
   params: GetDossiersParams = {}
-): Promise<Dossier[]> => {
+): Promise<DossiersResponse> => {
   try {
-    const response = await api.get<Dossier[]>(`formations/dossiers/`, {
+    const response = await api.get<DossiersResponse>(`formations/dossiers/`, {
       params,
     });
     return response.data;

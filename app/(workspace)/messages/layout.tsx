@@ -28,7 +28,7 @@ export default function MessageLayout({
     const fetchData = async () => {
       try {
         const convResponse = await getConversationList();
-        console.log("conv list -----", convResponse.results);
+        console.log("conv list -----", convResponse);
         setConversations(convResponse?.results || []);
         const groupResponse = await getGroups();
         console.log(groupResponse);

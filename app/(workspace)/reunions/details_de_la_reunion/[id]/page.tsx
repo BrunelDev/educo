@@ -13,16 +13,22 @@ import {
   getOneMeting,
   removeDocumentFromMeeting,
   updateMeeting,
+  getMeetingComments,
+  createComment,
+  updateComment,
+  deleteComment,
 } from "@/lib/api/reunion";
 import { formatDateToFrench } from "@/lib/functions";
 import { Meeting } from "@/lib/types";
 import { Calendar, Plus, Users } from "lucide-react";
 import Link from "next/link";
 import { use, useEffect, useState } from "react";
-import { toast } from "sonner";
 import AddDocument from "../components/addDocument";
 import AddMemberDialog from "../components/addParticipant";
 import GoBack from "@/app/_components/goback";
+import { deleteExternalMemberPresence } from "@/lib/api/organisation";
+//import { deleteExternalMemberPresence } from "@/lib/api/organisation";
+
 export default function Detail({
   params,
 }: {
@@ -35,8 +41,7 @@ export default function Detail({
     const fetchMeeting = async () => {
       const response = await getOneMeting(parseInt(id));
       setMeeting(response);
-      console.log("---TEST---", response);
-      console.log(response.ordre_du_jour[0].description);
+      console.log("---External---", response.participants_externes);
     };
     fetchMeeting();
   }, [id, refresh]);
@@ -76,6 +81,19 @@ export default function Detail({
                 }
                 dialogContent={
                   <AddMemberDialog
+                    label="Invitez des participants à votre réunion (emails séparés par virgule)"
+                    handleEmailSubmission={async (emails: string[]) => {
+                      try {
+                        await addMemberToMeeting(meeting.id, emails);
+                        setDialogOpen1(false);
+                      } catch (error) {
+                        console.error("Error adding participants:", error);
+                        throw error;
+                      }
+                    }}
+                    existingParticipants={meeting.participants.map(
+                      (p) => p.utilisateur_details.id
+                    )}
                     handleSubmission={async (
                       users: number[]
                     ): Promise<void> => {
@@ -94,11 +112,6 @@ export default function Detail({
                         const uniqueNewParticipants = newParticipants.filter(
                           (p) => !existingParticipantIds.includes(p)
                         );
-
-                        if (uniqueNewParticipants.length === 0) {
-                          toast.message("Aucun participant à ajouter");
-                          return; // No new participants to add
-                        }
 
                         // Combine existing and new participants
                         const updatedParticipants: number[] = [
@@ -133,6 +146,13 @@ export default function Detail({
                 {meeting.participants.length > 0 ? (
                   meeting.participants.map((participant, index) => (
                     <ParticipantComponent
+                      label={
+                        participant.disponible === "ABSENT"
+                          ? "(Absent)"
+                          : participant.disponible === "EN_ATTENTE"
+                          ? "(En attente)"
+                          : "(Présent)"
+                      }
                       key={participant.utilisateur_details.id + index}
                       participant={participant.utilisateur_details}
                       handleDelete={async () => {
@@ -152,6 +172,39 @@ export default function Detail({
                     description={""}
                   />
                 )}
+              </div>
+              <div>
+                {meeting?.participants_externes.length > 0 &&
+                  meeting.participants_externes.map(
+                    (participant, index) =>
+                      participant.email && (
+                        <ParticipantComponent
+                          label={
+                            participant.disponible === "ABSENT"
+                              ? "(Absent)"
+                              : participant.disponible === "EN_ATTENTE"
+                              ? "(En attente)"
+                              : "(Présent)"
+                          }
+                          key={participant.email + index}
+                          participant={{
+                            id: index,
+                            email: participant.email,
+                            nom_complet: participant.email,
+                            photo: null,
+                          }}
+                          handleDelete={async () => {
+                            await deleteExternalMemberPresence({
+                              reunion_id: meeting.id,
+                              email: participant.email,
+                            });
+                            setRefresh((v: boolean) => {
+                              return !v;
+                            });
+                          }}
+                        />
+                      )
+                  )}
               </div>
             </div>
 
@@ -260,11 +313,16 @@ export default function Detail({
           }}
           initialCompteRendu={meeting.compte_rendu}
         />
-        
+
         {/* Comment Section */}
         <div>
-          <CommentSection 
-            reunionId={meeting.id} 
+          <CommentSection
+            type="reunion"
+            getComments={getMeetingComments}
+            createComment={createComment}
+            updateComment={updateComment}
+            deleteComment={deleteComment}
+            reunionId={meeting.id}
             currentUserId={1} // TODO: Replace with actual current user ID from auth context
           />
         </div>

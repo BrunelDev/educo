@@ -2,12 +2,16 @@
 import { Button } from "@/components/ui/button";
 import { useMessageStore } from "@/store/message";
 import { useGroupMessageStore } from "@/store/group-message";
-import { ChevronDown, ChevronLeft, Info } from "lucide-react";
+import { ChevronDown, ChevronLeft, Info, Trash2 } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { Avatar, AvatarFallback } from "@radix-ui/react-avatar";
 import { User } from "@/lib/api/users";
 import { getUser } from "@/lib/api/users";
+import { Popover } from "../../components/popover";
+import { Ellipsis } from "lucide-react";
+import { deleteMessage, deleteGroupMessage } from "@/lib/api/message";
+import { toast } from "sonner";
 
 const MessageHeader = () => {
   const { activeConversation, setActiveConversation } = useMessageStore();
@@ -172,8 +176,21 @@ const MessageHeader = () => {
         </div>
 
         {/* Action buttons */}
+
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" className="rounded-full"></Button>
+          <Popover
+            PopoverContent={
+              <PopoverDeleteAll
+                isGroup={false}
+                conversationId={activeConversation.id}
+              />
+            }
+            PopoverTrigger={
+              <Button variant="ghost" size="icon" className="rounded-full">
+                <Ellipsis />
+              </Button>
+            }
+          />
         </div>
       </div>
     );
@@ -208,10 +225,11 @@ const MessageHeader = () => {
         )}
         <div className="w-full flex items-center gap-3">
           {/* Avatar/Image */}
-          <div className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-200">
+          <div className="w-10 h-10 flex items-center justify-center rounded-full bg-gradient-to-r from-coral-400 to-crimson-400">
             <Avatar>
-              {/* Assuming groups don't have images for now */}
-              <AvatarFallback>{activeGroup.nom.charAt(0)}</AvatarFallback>
+              <AvatarFallback className="text-white text-sm font-medium">
+                {activeGroup.nom.charAt(0)}
+              </AvatarFallback>
             </Avatar>
           </div>
 
@@ -266,7 +284,16 @@ const MessageHeader = () => {
 
         {/* Action buttons */}
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" className="rounded-full"></Button>
+          <Popover
+            PopoverContent={
+              <PopoverDeleteAll isGroup={true} groupId={activeGroup.id} />
+            }
+            PopoverTrigger={
+              <Button variant="ghost" size="icon" className="rounded-full">
+                <Ellipsis />
+              </Button>
+            }
+          />
         </div>
       </div>
     );
@@ -274,3 +301,57 @@ const MessageHeader = () => {
 };
 
 export default MessageHeader;
+
+const PopoverDeleteAll = ({
+  isGroup,
+  conversationId,
+  groupId,
+}: {
+  isGroup: boolean;
+  conversationId?: number;
+  groupId?: number;
+}) => {
+  const [loading, setLoading] = useState(false);
+
+  const handleDeleteAll = async () => {
+    if (loading) return;
+    const ok = window.confirm(
+      "Voulez-vous supprimer tous les messages de cette conversation ?"
+    );
+    if (!ok) return;
+
+    setLoading(true);
+    try {
+      if (isGroup && groupId) {
+        await deleteGroupMessage(groupId);
+      } else if (!isGroup && conversationId) {
+        // Backend expects the conversation id to delete its messages in bulk
+        await deleteMessage(conversationId);
+      }
+      toast.success("Tous les messages ont été supprimés");
+      // Optionally notify other components to refresh
+      try {
+        window.dispatchEvent(new CustomEvent("refresh-messages"));
+        window.location.reload();
+      } catch {}
+    } catch (error) {
+      console.error("Error deleting all messages:", error);
+      toast.error("Erreur lors de la suppression des messages");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="py-2 px-1 text-sm w-[150px] flex flex-col gap-[6px]">
+      <button
+        className="hover:bg-gray-100 cursor-pointer rounded-[4px] px-2 flex items-center justify-start gap-2 py-1 text-red-600 disabled:opacity-60"
+        onClick={handleDeleteAll}
+        disabled={loading}
+      >
+        <Trash2 size={18} />
+        {loading ? "Suppression..." : "Supprimer tout"}
+      </button>
+    </div>
+  );
+};

@@ -1,4 +1,10 @@
 import api, { endpoints } from "../api";
+import {
+  CommentsListResponse,
+  CreateCommentDto,
+  UpdateCommentDto,
+  Comment,
+} from "./reunion";
 
 export type TaskType = "a_faire" | "en_cours" | "termine";
 
@@ -240,20 +246,20 @@ export const removeDocumentFromTask = async (
 };
 
 export interface CompteRendu {
-    id: number;
-    project: number;
-    project_details: ProjectDetails;
-    title: string;
-    description: string;
-    compte_rendu: string | null;
-    task_type: string;
-    task_type_display: string;
-    file_url: string | null;
-    fichiers_urls: string[];
-    assigned_members: TaskUser[];
-    creator: TaskUser;
-    date_creation: string;
-    date_modification: string;
+  id: number;
+  project: number;
+  project_details: ProjectDetails;
+  title: string;
+  description: string;
+  compte_rendu: string | null;
+  task_type: string;
+  task_type_display: string;
+  file_url: string | null;
+  fichiers_urls: string[];
+  assigned_members: TaskUser[];
+  creator: TaskUser;
+  date_creation: string;
+  date_modification: string;
 }
 
 /**
@@ -262,7 +268,9 @@ export interface CompteRendu {
  */
 export const getCompteRendus = async (): Promise<CompteRendu[]> => {
   try {
-    const response = await api.get<CompteRendu[]>(`${endpoints.taches.base}compte-rendu/`);
+    const response = await api.get<CompteRendu[]>(
+      `${endpoints.taches.base}compte-rendu/`
+    );
     return response.data;
   } catch (error) {
     console.error("Error fetching compte rendus", (error as Error).message);
@@ -292,6 +300,94 @@ export const updateCompteRendu = async (
   }
 };
 
+/**
+ * Create a new comment for a meeting
+ * @param commentData The comment data to create
+ * @returns The created comment
+ */
 
+export const createComment = async (
+  commentData: CreateCommentDto
+): Promise<Comment> => {
+  try {
+    const _data = {
+      ...commentData,
+      tache: commentData.reunion,
+    };
+    console.log("payload", _data)
+    const response = await api.post("/tasks/commentaires/creer/", _data);
+    console.log("--------------el f2-----------------",response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error creating comment:", error);
+    throw error;
+  }
+};
 
+/**
+ * Get all comments for a specific meeting
+ * @param reunionId The ID of the meeting
+ * @returns List of comments for the meeting
+ */
+export const getComments = async (
+  reunionId: number
+): Promise<CommentsListResponse> => {
+  try {
+    const response = await api.get(`/tasks/taches/${reunionId}/commentaires/`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching meeting comments:", error);
+    throw error;
+  }
+};
 
+/**
+ * Get a specific comment by ID
+ * @param commentId The ID of the comment
+ * @returns The comment data with replies
+ */
+export const getComment = async (commentId: number): Promise<Comment> => {
+  try {
+    const response = await api.get(`/tasks/commentaires/${commentId}/`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching comment:", error);
+    throw error;
+  }
+};
+
+/**
+ * Update a comment's content
+ * @param commentId The ID of the comment to update
+ * @param updateData The new content for the comment
+ * @returns The updated comment content
+ */
+export const updateComment = async (
+  commentId: number,
+  updateData: UpdateCommentDto
+): Promise<Comment> => {
+  try {
+    const response = await api.patch(
+      `/tasks/commentaires/${commentId}/`,
+      updateData
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error updating comment:", error);
+    throw error;
+  }
+};
+
+/**
+ * Delete a comment
+ * @param commentId The ID of the comment to delete
+ * @returns Promise that resolves when comment is deleted
+ */
+export const deleteComment = async (commentId: number): Promise<void> => {
+  try {
+    await api.delete(`/tasks/commentaires/${commentId}/`);
+  } catch (error) {
+    console.error("Error deleting comment:", error);
+    throw error;
+  }
+};

@@ -14,9 +14,11 @@ import {
   ZoomIn,
 } from "lucide-react";
 import Image from "next/image";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { getUser, User } from "@/lib/api/users";
 import "react-h5-audio-player/lib/styles.css";
+import { deleteOneGroupMessage } from "@/lib/api/message";
+import { toast } from "sonner";
 
 export interface MessageSender {
   id: number;
@@ -24,38 +26,6 @@ export interface MessageSender {
   first_name: string;
   last_name: string;
 }
-/**
- * content
-: 
-"audio"
-file_name
-: 
-"1750613415448-WhatsApp Audio 2025-06-19 à 23.31.17_1087db7d.waptt.opus"
-file_type
-: 
-"audio/ogg"
-file_url
-: 
-"https://cse-impact.s3.eu-north-1.amazonaws.com/public/1750613415448-WhatsApp Audio 2025-06-19 à 23.31.17_1087db7d.waptt.opus"
-id
-: 
-19
-is_read
-: 
-false
-sender
-: 
-{id: 4, email: 'ahokpossibrunel@gmail.com'}
-sender_id
-: 
-4
-timestamp
-: 
-"2025-06-22T17:30:17.081680+00:00"
-type_message
-: 
-"audio"
- */
 
 interface MessageBoxProps {
   message: Message;
@@ -63,12 +33,57 @@ interface MessageBoxProps {
   className?: string;
   isGroup?: boolean;
   isLast?: boolean;
+  setReload?: (reload: string) => void;
 }
 
-export default function MessageBox({ message, className }: MessageBoxProps) {
+export default function MessageBox({
+  message,
+  className,
+  isGroup,
+  setReload,
+}: MessageBoxProps) {
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [, setUser] = useState<User | null>(null);
+  const [contextMenu, setContextMenu] = useState<{
+    open: boolean;
+    x: number;
+    y: number;
+  }>({
+    open: false,
+    x: 0,
+    y: 0,
+  });
+  const longPressTimer = useRef<number | null>(null);
+  const touchStartPoint = useRef<{ x: number; y: number } | null>(null);
+  const LONG_PRESS_MS = 550; // long-press duration
+  const MOVE_THRESHOLD = 10; // px tolerance before cancelling
+
+  const openMenuAt = (x: number, y: number) => {
+    // Clamp the position within the viewport with a basic assumed menu size
+    const margin = 8;
+    const assumedWidth = 180; // matches min width of menu content
+    const assumedHeight = 120; // rough height for a few items
+    const clampedX = Math.max(
+      margin,
+      Math.min(
+        x,
+        (typeof window !== "undefined" ? window.innerWidth : x) -
+          assumedWidth -
+          margin
+      )
+    );
+    const clampedY = Math.max(
+      margin,
+      Math.min(
+        y,
+        (typeof window !== "undefined" ? window.innerHeight : y) -
+          assumedHeight -
+          margin
+      )
+    );
+    setContextMenu({ open: true, x: clampedX, y: clampedY });
+  };
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -81,6 +96,21 @@ export default function MessageBox({ message, className }: MessageBoxProps) {
     };
     fetchUser();
   }, [message.sender.id]);
+
+  // Close context menu on outside interactions
+  useEffect(() => {
+    const close = () => setContextMenu((s) => ({ ...s, open: false }));
+    if (contextMenu.open) {
+      window.addEventListener("click", close);
+      window.addEventListener("scroll", close, true);
+      window.addEventListener("resize", close);
+    }
+    return () => {
+      window.removeEventListener("click", close);
+      window.removeEventListener("scroll", close, true);
+      window.removeEventListener("resize", close);
+    };
+  }, [contextMenu.open]);
 
   const renderContent = () => {
     switch (message.type_message) {
@@ -423,10 +453,10 @@ export default function MessageBox({ message, className }: MessageBoxProps) {
         // Regular text message
         return (
           <p
-            className={`text-gray-800 bg-white-50 p-1.5 sm:p-2 w-fit text-xs sm:text-sm md:text-base ${
+            className={`text-gray-800  p-1.5 sm:p-2 w-fit text-xs sm:text-sm md:text-base ${
               message.sender.id == JSON.parse(getCookies("userInfo") || "")?.id
-                ? "rounded-b-[8px] rounded-tl-[8px]"
-                : "rounded-b-[8px] rounded-tr-[8px]"
+                ? "rounded-b-[8px] rounded-tl-[8px] bg-crimson-400 text-white"
+                : "rounded-b-[8px] rounded-tr-[8px] bg-gray-200"
             } min-w-[80px] sm:min-w-[100px] break-all max-w-[240px] xs:max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg`}
           >
             {message.content}
@@ -439,7 +469,7 @@ export default function MessageBox({ message, className }: MessageBoxProps) {
     <div
       className={`flex gap-2 sm:gap-4 p-3 sm:p-4 w-fit ${className} my-6 sm:my-8 ${
         message.sender.id == JSON.parse(getCookies("userInfo") || "")?.id
-          ? "sm:ml-auto ml-2"
+          ? "ml-auto "
           : ""
       }`}
     >
@@ -455,13 +485,58 @@ export default function MessageBox({ message, className }: MessageBoxProps) {
       />
       <div className="flex-1">
         <div className="flex items-center gap-1 sm:gap-2 mb-1">
-          <span className="font-medium text-xs sm:text-sm md:text-base">
+          <span
+            className={`font-medium text-xs sm:text-sm md:text-base ${
+              new Date().getTime() - new Date(message.timestamp).getTime() <
+              1000 * 31
+                ? "min-w-[120px]"
+                : ""
+            }`}
+          >
             {message.sender.name ||
               message.sender.first_name + " " + message.sender.last_name ||
               message.sender.email}
           </span>
         </div>
-        <div className="relative w-fit">
+        <div
+          className="relative w-fit"
+          onContextMenu={(e) => {
+            e.preventDefault();
+            openMenuAt(e.clientX, e.clientY);
+          }}
+          onTouchStart={(e) => {
+            if (longPressTimer.current)
+              window.clearTimeout(longPressTimer.current);
+            const touch = e.touches[0];
+            touchStartPoint.current = { x: touch.clientX, y: touch.clientY };
+            longPressTimer.current = window.setTimeout(() => {
+              openMenuAt(touch.clientX, touch.clientY);
+            }, LONG_PRESS_MS);
+          }}
+          onTouchMove={(e) => {
+            if (!touchStartPoint.current) return;
+            const touch = e.touches[0];
+            const dx = Math.abs(touch.clientX - touchStartPoint.current.x);
+            const dy = Math.abs(touch.clientY - touchStartPoint.current.y);
+            if (dx > MOVE_THRESHOLD || dy > MOVE_THRESHOLD) {
+              if (longPressTimer.current)
+                window.clearTimeout(longPressTimer.current);
+              longPressTimer.current = null;
+            }
+          }}
+          onTouchEnd={() => {
+            if (longPressTimer.current)
+              window.clearTimeout(longPressTimer.current);
+            longPressTimer.current = null;
+            touchStartPoint.current = null;
+          }}
+          onTouchCancel={() => {
+            if (longPressTimer.current)
+              window.clearTimeout(longPressTimer.current);
+            longPressTimer.current = null;
+            touchStartPoint.current = null;
+          }}
+        >
           {renderContent()}
           <span className="text-xs sm:text-sm text-gray-500 absolute left-0 sm:right-0 -bottom-5 sm:-bottom-6 text-nowrap">
             {formatDistanceToNow(message.timestamp, {
@@ -470,6 +545,45 @@ export default function MessageBox({ message, className }: MessageBoxProps) {
             })}
           </span>
           {/*<Ellipsis size={18} className="absolute top-1 -right-6" />*/}
+          {contextMenu.open && (
+            <div
+              className="fixed z-50 w-fit rounded-md border border-gray-200 bg-white p-1 shadow-lg"
+              style={{ left: contextMenu.x, top: contextMenu.y }}
+            >
+              <button
+                className="w-full text-left px-1 py-2 text-sm rounded hover:bg-gray-100"
+                onClick={() => {
+                  if (message.content)
+                    navigator.clipboard
+                      .writeText(String(message.content))
+                      .catch(() => {});
+                  setContextMenu((s) => ({ ...s, open: false }));
+                }}
+              >
+                Copier
+              </button>
+              <button
+                className="w-full text-left px-1 py-2 text-sm rounded hover:bg-gray-100 text-red-600"
+                onClick={async () => {
+                  // Placeholder: hook up to delete action from parent if needed
+                  if (isGroup) {
+                    try {
+                      await deleteOneGroupMessage(message.room, message.id);
+                    } catch (error) {
+                      console.error("Error deleting group message:", error);
+                      toast.error("Erreur lors de la suppression du message");
+                    }
+                    if (setReload) {
+                      setReload(new Date().toString());
+                    }
+                  }
+                  setContextMenu((s) => ({ ...s, open: false }));
+                }}
+              >
+                Supprimer
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>

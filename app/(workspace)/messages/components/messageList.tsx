@@ -4,10 +4,7 @@
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useWebSocket } from "@/hooks/useWebSocket";
 import { useGroupWebSocket } from "@/hooks/useGroupWebSocket";
-import {
-  getMessages,
-  getGroupMessages,
-} from "@/lib/api/message";
+import { getMessages, getGroupMessages } from "@/lib/api/message";
 import { WebSocketMessage } from "@/lib/types/websocket";
 import { useMessageStore } from "@/store/message";
 import { useIntersection } from "@mantine/hooks";
@@ -73,9 +70,7 @@ export default function MessageList() {
     }
   };
 
-
-
- /* const normalizeApiMessage = (
+  /* const normalizeApiMessage = (
     msg: Message
   ): WebSocketMessage => {
     // Use a type guard to safely distinguish between message types
@@ -151,6 +146,10 @@ export default function MessageList() {
     [activeConversation?.id, activeGroup?.id, hasMore, isLoading, isGroup]
   );
 
+
+  const [reload, setReload] = useState("");
+
+
   useEffect(() => {
     setMessages([]);
     setPage(1);
@@ -158,7 +157,7 @@ export default function MessageList() {
     if (activeConversation?.id) {
       fetchMessages(1);
     }
-  }, [activeConversation?.id]);
+  }, [activeConversation?.id, reload]);
 
   useEffect(() => {
     setMessages([]);
@@ -167,7 +166,8 @@ export default function MessageList() {
     if (activeGroup?.id) {
       fetchMessages(1);
     }
-  }, [activeGroup?.id]);
+  }, [activeGroup?.id, reload]);
+
 
   useEffect(() => {
     const shouldLoadMore =
@@ -197,7 +197,11 @@ export default function MessageList() {
   return (
     <div className="flex flex-col w-full h-[calc(100vh-5rem)]">
       <div className="flex-grow">
-        <ScrollArea className="h-[calc(100vh-20rem)]" ref={scrollAreaRef} scrollHideDelay={0}>
+        <ScrollArea
+          className="h-[calc(100vh-20rem)]"
+          ref={scrollAreaRef}
+          scrollHideDelay={0}
+        >
           {hasMore && !isGroup && (
             <div ref={ref} className="flex justify-center py-2">
               <Loader2 className="h-6 w-6 text-gray-400 animate-spin" />
@@ -209,9 +213,13 @@ export default function MessageList() {
               return (
                 <MessageBox
                   key={`${message.timestamp}-${index}`}
-                  message={message}
+                  message={{
+                    ...message,
+                    room: activeConversation?.id || activeGroup?.id || 0,
+                  }}
                   isLast={index === messages.length - 1}
                   isGroup={!!isGroup}
+                  setReload={setReload}
                 />
               );
             })}

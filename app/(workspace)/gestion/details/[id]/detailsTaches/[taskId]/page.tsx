@@ -12,6 +12,10 @@ import {
   Task,
   updateCompteRendu,
   updateTask,
+  createComment,
+  updateComment,
+  deleteComment,
+  getComments,
 } from "@/lib/api/tache";
 import { MessageType } from "@/lib/types";
 import { Plus, Users } from "lucide-react";
@@ -19,6 +23,7 @@ import { use, useEffect, useState } from "react";
 import { toast } from "sonner";
 import ParticipantComponent from "../../../details_de_la_tache/components/participants";
 import GoBack from "@/app/_components/goback";
+import CommentSection from "@/app/_components/comment";
 
 export default function DetailTache({
   params,
@@ -31,7 +36,6 @@ export default function DetailTache({
   const [refresh2, setRefresh2] = useState(false);
   const [refresh3, setRefresh3] = useState(false);
   const [compteRenduText, setCompteRenduText] = useState<string>("");
- 
 
   useEffect(() => {
     const fetchData = async () => {
@@ -44,7 +48,7 @@ export default function DetailTache({
       }
     };
     fetchData();
-  }, [taskId, refresh, refresh2, refresh3]);
+  }, [taskId, refresh, refresh2, refresh3 ]);
 
   const handleAddMembers = async (users: number[]): Promise<void> => {
     if (!task) return;
@@ -87,8 +91,6 @@ export default function DetailTache({
       throw error;
     }
   };
-
-
 
   return (
     <div className="flex flex-col gap-4">
@@ -152,7 +154,7 @@ export default function DetailTache({
                   email: participant.email,
                   nom_complet:
                     participant.first_name + " " + participant.last_name,
-                  photo: participant?.image || "/userProfile-img.png",
+                  photo: participant?.photo || "/userProfile-img.png",
                 }}
                 handleDelete={async () => {
                   try {
@@ -237,18 +239,31 @@ export default function DetailTache({
       </div>
 
       {/* Compte Rendu Section */}
-      {task && <CompteRendu
-        handleSubmiting={async (text: string) => {
-          if (!task) return;
-          console.log("text", text);
-          const res = await updateCompteRendu(task.id, text);
-          console.log("compte rendu", res);
-          setTask((prevTask) =>
-            prevTask ? { ...prevTask, compte_rendu: text } : undefined
-          );
-        }}
-        initialCompteRendu={compteRenduText || task.compte_rendu || ""}
-      />}
+      {task && (
+        <CompteRendu
+          handleSubmiting={async (text: string) => {
+            if (!task) return;
+            console.log("text", text);
+            const res = await updateCompteRendu(task.id, text);
+            console.log("compte rendu", res);
+            setTask((prevTask) =>
+              prevTask ? { ...prevTask, compte_rendu: text } : undefined
+            );
+          }}
+          initialCompteRendu={compteRenduText || task.compte_rendu || ""}
+        />
+      )}
+      <div>
+        <CommentSection
+          reunionId={parseInt(taskId)}
+          currentUserId={1} // TODO: Replace with actual current user ID from auth context
+          getComments={getComments}
+          createComment={createComment}
+          updateComment={updateComment}
+          deleteComment={deleteComment}
+          type="tache"
+        />
+      </div>
     </div>
   );
 }

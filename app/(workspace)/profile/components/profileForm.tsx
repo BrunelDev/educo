@@ -18,6 +18,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 import { getUser, User } from "@/lib/api/users";
+import { getCookies } from "@/lib/utils/cookies";
 
 const formSchema = z.object({
   first_name: z.string().optional(),
@@ -66,11 +67,16 @@ export function ProfileForm() {
         });
       } catch (error) {
         console.error("Fetch user error:", error);
-        toast.error("Erreur lors de la récupération des informations utilisateur.");
+        toast.error(
+          "Erreur lors de la récupération des informations utilisateur."
+        );
       }
     };
     fetchUser();
   }, [form]);
+
+  const user: User = JSON.parse(getCookies("userInfo") || "{}");
+  console.log(user);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);

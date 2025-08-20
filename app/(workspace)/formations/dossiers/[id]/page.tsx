@@ -1,14 +1,15 @@
+"use client";
 import { getRessources, RessourcesResponse } from "@/lib/api/formations";
 import { useEffect, useState } from "react";
+import { RessourceCard } from "../../components/RessourceCards";
 import EmptyState from "@/app/_components/EmptyState";
-import FolderCard from "./folder";
 import {
   getDossiers as getFileDossiers,
   Dossier as FileDossier,
 } from "@/lib/api/formations";
 export default function ResourceContent() {
   const [ressources, setRessources] = useState<RessourcesResponse>();
-  const [folders, setFolders] = useState<FileDossier[]>([]);
+  const [, setFolders] = useState<FileDossier[]>([]);
   useEffect(() => {
     const fetchData = async () => {
       const [resData, foldersData] = await Promise.all([
@@ -27,12 +28,10 @@ export default function ResourceContent() {
   }
   return (
     <div>
-      <div className="flex flex-wrap gap-3 mb-4">
-        {folders &&
-          folders.length > 0 &&
-          folders.map((folder) => (
-            <FolderCard key={folder.id} folder={folder} />
-          ))}
+      <div className="flex flex-wrap gap-3">
+        {ressources?.results.map((ressource, index) => (
+          <RessourceCard ressource={ressource} key={ressource.id + index} />
+        ))}
       </div>
     </div>
   );

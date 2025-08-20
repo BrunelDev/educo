@@ -180,8 +180,17 @@ export const deleteMessage = async (id: number): Promise<void> => {
 
 export const deleteGroupMessage = async (
   groupe_id: number,
-  id: number
 ): Promise<void> => {
+  try {
+    await api.delete(`messagerie/groupes-fermes/${groupe_id}/clear_messages/`);
+  } catch (error) {
+    console.error("Error deleting group message:", error);
+    throw error;
+  }
+};
+
+
+export const deleteOneGroupMessage = async(groupe_id: number, id: number): Promise<void> => {
   try {
     await api.delete(`messagerie/groupes-fermes/${groupe_id}/messages/${id}/`);
   } catch (error) {

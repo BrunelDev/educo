@@ -34,17 +34,18 @@ export default function ConversationsList({
           <div
             key={`group-${group.id}`}
             className={cn(
-              "flex items-center gap-3 p-2 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800",
-              (selectedItem?.id === group.id) && view === 'groups' && "bg-gray-200 dark:bg-gray-700"
+              "flex items-center gap-3 p-2 rounded-lg cursor-pointer hover:bg-crimson-100",
+              (selectedItem?.id === group.id) && view === 'groups' && "bg-crimson-100"
             )}
             onClick={() => {
               onSelectGroup(group);
               setView('groups');
             }}
           >
+            
             <Avatar>
               {/* Assuming groups don't have images for now */}
-              <AvatarFallback>{group.nom.charAt(0)}</AvatarFallback>
+              <AvatarFallback className="bg-gradient-to-r from-coral-400 to-crimson-400 text-white text-sm font-medium">{group.nom.charAt(0)}</AvatarFallback>
             </Avatar>
             <div className="flex-1">
               <p className="font-semibold text-sm">{group.nom}</p>
@@ -69,7 +70,7 @@ export default function ConversationsList({
           >
             <Avatar>
               <AvatarImage src={conversation.participants?.filter((participant) => participant.id !== user.id)[0]?.image || undefined} alt={conversation.participants?.[0]?.name} />
-              <AvatarFallback>{conversation.participants?.filter((participant) => participant.id !== user.id)[0]?.name.charAt(0)}</AvatarFallback>
+              <AvatarFallback className="bg-gradient-to-r from-coral-400 to-crimson-400 text-white text-sm font-medium">{conversation.participants?.filter((participant) => participant.id !== user.id)[0]?.name.charAt(0)}</AvatarFallback>
             </Avatar>
             <div className="flex-1">
               <p className="font-semibold text-sm">{conversation.participants?.filter((participant) => participant.id !== user.id)[0]?.name}</p>
