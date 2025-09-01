@@ -53,6 +53,7 @@ export interface Conversation {
   title: string;
   messages: Message[];
   unread_count: number;
+  is_last_message_read: boolean;
   derniere_activite: string;
   participants: Participant[];
 }
@@ -62,13 +63,14 @@ export interface Group {
   nom: string;
   description: string | null;
   membres: Sender[];
-  dernier_message: GroupMessage | null;
+  last_message?: GroupMessage | null;
+  is_last_message_read?: boolean;
 }
 
 export interface GroupMessage {
   id: number;
-  contenu: string;
-  auteur: Sender;
+  content: string;
+  sender: Sender;
   timestamp: string;
 }
 
@@ -129,6 +131,44 @@ export const getConversationById = async (
   }
 };
 
+export const markLastMessageAsRead = async (
+  id: number,
+  is_last_message_read: boolean
+): Promise<Conversation> => {
+  try {
+    const response = await api.patch(`${endpoints.messagerie.base}${id}/`, {
+      is_last_message_read,
+    });
+    console.log("mark last message as read", response.data);
+    return response.data;
+  } catch (error: unknown) {
+    console.error(
+      "Error marking last message as read",
+      (error as Error).message
+    );
+    throw error;
+  }
+};
+
+export const markGroupLastMessageAsRead = async (
+  id: number,
+  is_last_message_read: boolean
+): Promise<Group> => {
+  try {
+    const response = await api.patch(`${endpoints.messagerie.groupes}${id}/`, {
+      is_last_message_read,
+    });
+    console.log("mark last group message as read", response.data);
+    return response.data;
+  } catch (error: unknown) {
+    console.error(
+      "Error marking last message as read",
+      (error as Error).message
+    );
+    throw error;
+  }
+};
+
 export const createConversation = async (
   id_1: number,
   id_2: number
@@ -178,9 +218,7 @@ export const deleteMessage = async (id: number): Promise<void> => {
   }
 };
 
-export const deleteGroupMessage = async (
-  groupe_id: number,
-): Promise<void> => {
+export const deleteGroupMessage = async (groupe_id: number): Promise<void> => {
   try {
     await api.delete(`messagerie/groupes-fermes/${groupe_id}/clear_messages/`);
   } catch (error) {
@@ -189,8 +227,10 @@ export const deleteGroupMessage = async (
   }
 };
 
-
-export const deleteOneGroupMessage = async(groupe_id: number, id: number): Promise<void> => {
+export const deleteOneGroupMessage = async (
+  groupe_id: number,
+  id: number
+): Promise<void> => {
   try {
     await api.delete(`messagerie/groupes-fermes/${groupe_id}/messages/${id}/`);
   } catch (error) {

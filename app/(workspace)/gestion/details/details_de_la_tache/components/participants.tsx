@@ -1,6 +1,4 @@
-import React from "react";
-import Image from "next/image";
-import { Minus } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogClose,
@@ -10,7 +8,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import { Minus } from "lucide-react";
+import Image from "next/image";
+import React from "react";
 import { toast } from "sonner";
 interface ParticipantComponentProps {
   participant: {
@@ -39,13 +39,13 @@ export default function ParticipantComponent({
         className="rounded-full"
       />
       <div className="flex flex-col gap-1">
-      <h6 className="w-[150px] truncate">
-        {participant.nom_complet !== " " && participant.nom_complet !== ""
-          ? participant.nom_complet
-          : participant.email}
-      </h6>
-      <p className="text-xs text-coral-400">{label}</p>
-      </div>  
+        <h6 className="w-[150px] truncate">
+          {participant.nom_complet !== " " && participant.nom_complet !== ""
+            ? participant.nom_complet
+            : participant.email}
+        </h6>
+        <p className="text-xs text-coral-400">{label}</p>
+      </div>
       <div
         className="cursor-pointer hover:bg-gray-100 p-2 rounded-[4px]"
         onClick={() => setIsDeleteDialogOpen(true)}

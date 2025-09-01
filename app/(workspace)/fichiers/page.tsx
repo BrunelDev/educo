@@ -17,6 +17,7 @@ export default function FichiersPage() {
   useEffect(() => {
     const fun = async () => {
       const response = await getDossiers();
+      console.log(response)
       setFolders(response);
     };
     fun();
@@ -46,7 +47,7 @@ export default function FichiersPage() {
         )) : <div className="col-span-full flex justify-center items-center py-8">
         <EmptyState title={"Aucun dossier pour le moment."} description={"Veuillez créez un dossier."}/></div>}
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-5">
         {folders && folders.length > 0 ? folders.filter((folder) => folder.type_dossier !== "DEFAULT").map((folder, index) => (
           <FolderCard key={folder.id + index} folder={folder} fetchDossiers={() => {setRefresh(!refresh)}} />
         )) : <div className="col-span-full flex justify-center items-center py-8">

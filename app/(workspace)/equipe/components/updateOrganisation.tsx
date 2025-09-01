@@ -77,7 +77,8 @@ export default function UpdateOrganisationForm({
         toast.success("Le logo a été chargé avec succès");
       } catch (error) {
         toast.error("Nous n'avons pas réussi à charger votre logo.");
-        console.error(error);
+        throw error;
+        //console.error(error);
       }
     }
   };

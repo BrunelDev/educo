@@ -8,6 +8,7 @@ import {
   getOrganisationMembers,
   OrganizationMember,
 } from "@/lib/api/organisation";
+import { isAxiosError } from "axios";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -134,20 +135,28 @@ export default function AddMemberDialog({
               setStatus("loading");
               if (handleEmailSubmission) {
                 console.log(emails.split(",").map((email) => email.trim()));
-                await handleEmailSubmission(
-                  emails.split(",").map((email) => email.trim())
-                );
+                if (emails.trim()) {
+                  await handleEmailSubmission(
+                    emails.split(",").map((email) => email.trim())
+                  );
+                }
               }
               console.log("selectedUsers", selectedUsers);
               await handleSubmission(selectedUsers);
               toast.dismiss();
+              toast.success("Participants ajoutés avec succès");
+              setEmails("");
               setStatus("success");
             } catch (error: unknown) {
               console.error(
                 "Error adding members to team:",
                 (error as Error).message
               );
-              toast.error("Une erreur est survenue lors de l'ajout.");
+              if (isAxiosError(error) && error.response?.status === 403) {
+                toast.error(error.response.data.detail);
+              } else {
+                toast.error("Erreur lors de l'enregistrement du compte rendu.");
+              }
               setStatus("error");
             }
           }

@@ -32,7 +32,7 @@ export default function FolderCard({
   if (folder.type_dossier === "DEFAULT")
     return (
       <Link href={`/fichiers/dossiers/${folder.id}`}>
-        <div className="w-[186px] flex flex-col gap-2 justify-center items-center group hover:bg-[#ffffffb7] duration-200 rounded-[8px] relative">
+        <div className="w-[186px] flex flex-col gap-2 justify-center items-center group hover:bg-[#ffffffdf] duration-200 rounded-[8px] relative">
           <Image
             src={"/folder-icon.svg"}
             width={100}
@@ -45,7 +45,7 @@ export default function FolderCard({
     );
   else {
     return (
-      <div className="relative hover:bg-[#ffffffb7] duration-200 rounded-[8px]">
+      <div className="relative hover:bg-white duration-200 rounded-[8px]">
         {" "}
         <Link
           href={`/fichiers/dossiers/${folder.id}`}
@@ -67,9 +67,7 @@ export default function FolderCard({
               <PopoverContent folder={folder} fetchDossiers={fetchDossiers} />
             }
             PopoverTrigger={
-              <div
-                className="w-6 h-6 flex justify-center rounded-sm cursor-pointer hover:bg-coral-50  duration-200"
-              >
+              <div className="w-6 h-6 flex justify-center rounded-sm cursor-pointer hover:bg-coral-50  duration-200">
                 <MoreHorizontal className="" size={18} />
               </div>
             }

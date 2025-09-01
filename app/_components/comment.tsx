@@ -1,43 +1,42 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
-import { formatDistanceToNow } from "date-fns";
-import { fr } from "date-fns/locale";
-import {
-  MessageCircle,
-  //Heart,
-  MoreHorizontal,
-  Edit,
-  Trash2,
-  Send,
-  MessageCircleMore,
-  //FilePenLine,
-  //Ellipsis,
-} from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { toast } from "sonner";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Comment,
+  CommentsListResponse,
   CreateCommentDto,
   UpdateCommentDto,
-  CommentsListResponse,
 } from "@/lib/api/reunion";
 import { getUser, User } from "@/lib/api/users";
+import { isAxiosError } from "axios";
+import { formatDistanceToNow } from "date-fns";
+import { fr } from "date-fns/locale";
+import {
+  Edit,
+  MessageCircle,
+  MessageCircleMore,
+  //Heart,
+  MoreHorizontal,
+  Send,
+  Trash2,
+} from "lucide-react";
+import React, { useCallback, useEffect, useState } from "react";
+import { toast } from "sonner";
 
 // Props interfaces
 interface CommentItemProps {
@@ -371,8 +370,12 @@ export const CommentForm: React.FC<CommentFormProps> = ({
       }
       setContent("");
       toast.success("Commentaire ajouté avec succès");
-    } catch {
-      toast.error("Erreur lors de l'ajout du commentaire");
+    } catch (error: unknown) {
+      if (isAxiosError(error) && error.response?.status === 400) {
+        toast.error(error.response.data.tache);
+      } else {
+        toast.error("Erreur lors de l'ajout du commentaire");
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -478,7 +481,7 @@ export const CommentList: React.FC<CommentListProps> = ({
       fetchComments();
     } else {
       // This is a new top-level comment
-      setComments((prev) => [newComment, ...prev]);
+      setComments((prev) => [...prev, newComment]);
     }
   };
 
@@ -572,18 +575,20 @@ export const CommentList: React.FC<CommentListProps> = ({
             </p>
           </div>
         ) : (
-          comments.map((comment) => (
-            <CommentItem
-              key={comment.id}
-              comment={comment}
-              currentUserId={currentUserId}
-              onReply={handleReply}
-              onEdit={handleEditComment}
-              onDelete={handleDeleteComment}
-              deleteComment={deleteComment}
-              createComment={createComment}
-            />
-          ))
+          comments
+            .filter((comment) => comment.parent === null)
+            .map((comment) => (
+              <CommentItem
+                key={comment.id}
+                comment={comment}
+                currentUserId={currentUserId}
+                onReply={handleReply}
+                onEdit={handleEditComment}
+                onDelete={handleDeleteComment}
+                deleteComment={deleteComment}
+                createComment={createComment}
+              />
+            ))
         )}
       </div>
 

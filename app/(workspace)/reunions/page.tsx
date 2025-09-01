@@ -12,7 +12,9 @@ import EmptyState from "@/app/_components/EmptyState";
 export default function Reunions() {
   const [filterValue, setFilterValue] = useState<string>("all");
   const { meetings, setMeetings } = useMeetingStore();
-  const [upcomingMeetings, setUpcomingMeetings] = useState<Meeting[] | null>(null);
+  const [upcomingMeetings, setUpcomingMeetings] = useState<Meeting[] | null>(
+    null
+  );
   const [pastMeetings, setPastMeetings] = useState<Meeting[] | null>(null);
 
   type FilterType = "all" | MeetingType;
@@ -25,17 +27,17 @@ export default function Reunions() {
 
     const now = new Date();
 
-    const typeFilteredMeetings = 
+    const typeFilteredMeetings =
       !filter || filter === "all"
         ? meetings
         : meetings.filter((meeting) => meeting.type_reunion === filter);
 
-    const upcoming = typeFilteredMeetings.filter(meeting => {
+    const upcoming = typeFilteredMeetings.filter((meeting) => {
       const meetingDate = new Date(meeting.date_heure_debut);
       return meetingDate > now;
     });
 
-    const past = typeFilteredMeetings.filter(meeting => {
+    const past = typeFilteredMeetings.filter((meeting) => {
       const meetingDate = new Date(meeting.date_heure_debut);
       return meetingDate <= now;
     });
@@ -58,7 +60,6 @@ export default function Reunions() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [meetings, filterValue]); // Note: processMeetings is stable if meetings/filterValue are its only deps indirectly
 
-
   // Fetch meetings on component mount
   useEffect(() => {
     const fetchMeetings = async () => {
@@ -72,8 +73,6 @@ export default function Reunions() {
     };
     fetchMeetings();
   }, [setMeetings]);
-
- 
 
   return (
     <div className="flex flex-col gap-5 relative">
@@ -155,10 +154,12 @@ export default function Reunions() {
               />
             ))
           ) : (
-              <div className="w-full flex justify-center items-center">
-                <EmptyState title={"Aucune réunion à venir"} description={"Veuillez patienter"}/>
-              </div>
-            
+            <div className="w-full flex justify-center items-center">
+              <EmptyState
+                title={"Aucune réunion à venir"}
+                description={"Veuillez patienter"}
+              />
+            </div>
           )}
         </div>
       </div>
@@ -171,10 +172,11 @@ export default function Reunions() {
             ))
           ) : (
             <div className="w-full flex justify-center items-center">
-              
-                <EmptyState title={"Aucun historique de réunion"} description={"Veuillez patienter"} />
-        </div>
-                
+              <EmptyState
+                title={"Aucun historique de réunion"}
+                description={"Veuillez patienter"}
+              />
+            </div>
           )}
         </div>
       </div>

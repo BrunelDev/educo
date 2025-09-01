@@ -228,7 +228,7 @@ Le CSE doit être informé et consulté avant toute opération de ce type.`,
       ],
     },
     {
-      consultationType: ConsultationType.Accord, // Mapping PSE to Accord as per enum
+      consultationType: ConsultationType.Accord,
       description: `🚨 Plan de sauvegarde de l’emploi (PSE)
 
 Quand un licenciement économique collectif est prévu, l’employeur doit consulter le CSE.`,
@@ -272,7 +272,7 @@ Avant toute création ou modification du règlement, le CSE doit être consulté
       ],
     },
     {
-      consultationType: ConsultationType.Accord, // Mapping Accord collectif to Accord
+      consultationType: ConsultationType.AccordsCollectif,
       description: `🤝 Accord collectif (temps de travail, égalité…)
 
 Le CSE est informé ou consulté sur certains accords selon leur nature.`,
@@ -385,7 +385,17 @@ Le CSE est systématiquement consulté sur les mesures liées à la sécurité, 
             }
             key={consultationTitle.title + index}
             dialoTrigger={
-              <div className="w-full sm:w-[300px]" onClick={() => setCurrentIndex(index)}>
+              <div
+                className="w-full sm:w-[300px]"
+                onClick={() => {
+                  console.log("index", index);
+                  console.log(
+                    "Content",
+                    consultationList[index].consultationType
+                  );
+                  setCurrentIndex(index);
+                }}
+              >
                 <ConsultationTitle
                   title={consultationTitle.title}
                   barNumber={consultationTitle.barNumber}

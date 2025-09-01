@@ -1,12 +1,12 @@
 "use client";
-import ProjectCard from "./components/project";
+import { DialogComponent } from "@/app/_components/dialogComponent";
+import EmptyState from "@/app/_components/EmptyState";
+import { Button } from "@/components/ui/button";
+import { getOrganization } from "@/lib/api/organisation";
 import { getProjects, Project } from "@/lib/api/projets";
 import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { DialogComponent } from "@/app/_components/dialogComponent";
+import ProjectCard from "./components/project";
 import ProjectForm from "./components/projectForm";
-import { getOrganization } from "@/lib/api/organisation";
-import EmptyState from "@/app/_components/EmptyState";
 
 export default function ProjectPage() {
   const [projects, setProjects] = useState<Project[]>();
@@ -52,19 +52,46 @@ export default function ProjectPage() {
       </div>
 
       <div className="flex gap-4 flex-wrap">
-        {projects && projects.length > 0 ? (
-          projects.map((project, index) => (
-            <ProjectCard
-              key={index}
-              project={project}
-              onSubmitProject={() => setRefresh(!refresh)}
-            />
-          ))
+        {projects &&
+        projects.filter((project) => project.status !== "termine").length >
+          0 ? (
+          projects
+            .filter((project) => project.status !== "termine")
+            .map((project, index) => (
+              <ProjectCard
+                key={index}
+                project={project}
+                onSubmitProject={() => setRefresh(!refresh)}
+              />
+            ))
         ) : (
           <div className="w-full flex justify-center items-center py-10">
             <EmptyState
-              title={"Votre organisation n'a aucun projet pour le moment."}
+              title={"Votre organisation n'a aucun projet actif pour le moment."}
               description={"Créez un projet pour commencer"}
+            />
+          </div>
+        )}
+      </div>
+      <h6 className="text-xl font-semibold my-6">Projets achevés</h6>
+      <div className="flex gap-4 flex-wrap">
+        {projects &&
+        projects.filter((project) => project.status === "termine").length >
+          0 ? (
+          projects
+            .filter((project) => project.status === "termine")
+            .map((project, index) => (
+              <ProjectCard
+                key={index}
+                project={project}
+                onSubmitProject={() => setRefresh(!refresh)}
+              />
+            ))
+        ) : (
+          <div className="w-full flex justify-center items-center py-10">
+            <EmptyState
+              title={"Votre organisation n'a aucun projet achevé pour le moment."}
+              description={"Vos projet achevés apparaîtront ici."}
             />
           </div>
         )}

@@ -9,7 +9,7 @@ import {
 } from "@/lib/api/message";
 import { useMessageStore } from "@/store/message";
 import { useGroupMessageStore } from "@/store/group-message";
-import ConversationsList from "./components/conversationsList";
+import {ConversationsList} from "./components/conversationsList";
 
 export default function MessageLayout({
   children,
@@ -23,6 +23,7 @@ export default function MessageLayout({
   const [groups, setGroups] = useState<Group[]>([]);
   const [view, setView] = useState<"conversations" | "groups">("conversations");
   const [isMobileView, setIsMobileView] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -33,12 +34,14 @@ export default function MessageLayout({
         const groupResponse = await getGroups();
         console.log(groupResponse);
         setGroups(groupResponse?.results || []);
+        setIsRefreshing(false);
       } catch (error) {
         console.error("Failed to fetch conversations or groups:", error);
+        setIsRefreshing(false);
       }
     };
     fetchData();
-  }, [isLoading]);
+  }, [isLoading, isRefreshing]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -58,11 +61,13 @@ export default function MessageLayout({
   const handleSelectConversation = (conversation: Conversation) => {
     setActiveConversation(conversation);
     setActiveGroup(null);
+    setIsRefreshing(true);
   };
 
   const handleSelectGroup = (group: Group) => {
     setActiveGroup(group);
     setActiveConversation(null);
+    setIsRefreshing(true);
   };
 
   const selectedItem =
@@ -80,7 +85,7 @@ export default function MessageLayout({
           <h1 className="text-xl font-bold">Messages</h1>
         </div>
 
-        <ConversationsList
+        {<ConversationsList
           conversations={conversations}
           groups={groups}
           selectedItem={selectedItem}
@@ -88,7 +93,7 @@ export default function MessageLayout({
           onSelectGroup={handleSelectGroup}
           view={view}
           setView={setView}
-        />
+        />}
       </div>
       <div
         className={`

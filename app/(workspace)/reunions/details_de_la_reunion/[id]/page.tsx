@@ -346,7 +346,7 @@ const Box = ({ meeting }: { meeting: Meeting }) => {
         </div>
       )}
       {meeting.lien_reunion ? (
-        <Link href={meeting.lien_reunion}>
+        <Link href={meeting.lien_reunion} target="_blank">
           <h6 className="underline text-coral-500">Lien de la réunion</h6>
         </Link>
       ) : null}

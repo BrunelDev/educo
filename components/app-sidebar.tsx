@@ -13,7 +13,6 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 
-import { User } from "@/lib/api/users";
 import {
   Sidebar,
   SidebarContent,
@@ -24,10 +23,10 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { getUser, User } from "@/lib/api/users";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { getUser } from "@/lib/api/users";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 // Menu items.
 const items = [
   {
@@ -109,7 +108,7 @@ export function AppSidebar() {
           <SidebarGroupContent className="">
             <SidebarMenu className="gap-4 px-2yy w-full pb-4 border-b my-5">
               {items.map((item, index) => (
-                <SidebarMenuItem key={item.title + index}>
+                <SidebarMenuItem key={item.title + index} className="relative">
                   <SidebarMenuButton
                     key={item.title + index}
                     asChild
@@ -132,6 +131,11 @@ export function AppSidebar() {
                       <span>{item.title}</span>
                     </a>
                   </SidebarMenuButton>
+                  {item.title === "Messages5" && (
+                    <div className=" absolute h-5 w-5 right-2 top-1/2 -translate-y-1/2 bg-red-500 rounded-full text-white text-xs flex justify-center items-center">
+                      3
+                    </div>
+                  )}
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>

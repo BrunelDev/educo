@@ -5,8 +5,8 @@ export interface Ressource {
   titre: string;
   type_ressource: string;
   url: string;
-  webinaire: number;
-  utilisateur: number;
+  webinaire?: number;
+  utilisateur?: number;
   date_creation: string;
   date_modification: string;
   description: string;
@@ -166,7 +166,7 @@ export interface Dossier {
   id: number;
   nom: string;
   description: string | null;
-  parent: number | { id: number; nom: string } | null;
+  parent: number ;
   ressources: DossierRessource[];
   utilisateur?: number | DossierUtilisateur;
   date_creation: string;

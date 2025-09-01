@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { isAxiosError } from "axios";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -24,7 +25,11 @@ export function CompteRendu({
     } catch (error) {
       console.error("Erreur lors de l'enregistrement du compte rendu:", error);
       toast.dismiss();
-      toast.error("Erreur lors de l'enregistrement du compte rendu.");
+      if (isAxiosError(error) && error.response?.status === 403) {
+        toast.error(error.response.data.detail);
+      } else {
+        toast.error("Erreur lors de l'enregistrement du compte rendu.");
+      }
     }
   };
 

@@ -52,7 +52,6 @@ export default function DetailTache({
 
   const handleAddMembers = async (users: number[]): Promise<void> => {
     if (!task) return;
-    toast.loading("Ajout des participants...");
 
     try {
       await updateTask(task.id, {
@@ -60,13 +59,11 @@ export default function DetailTache({
       });
       const updatedTask = await getTaskById(parseInt(taskId));
       setTask(updatedTask);
-      toast.dismiss();
-      toast.success("Participants ajoutés avec succès");
+      
       setRefresh((v) => !v);
     } catch (error) {
       console.error("Error adding members:", error);
       toast.dismiss();
-      toast.error("Erreur lors de l'ajout des participants");
       throw error;
     }
   };
@@ -80,6 +77,7 @@ export default function DetailTache({
         fichiers_urls: [fileUrl],
       });
       const updatedTask = await getTaskById(parseInt(taskId));
+      console.log("updatedTask", updatedTask);
       setTask(updatedTask);
       setRefresh3((v) => !v);
       toast.dismiss();
@@ -161,7 +159,6 @@ export default function DetailTache({
                     await removeMemberFromTask(task.id, participant.id);
                     setRefresh3((v) => !v);
                     toast.dismiss();
-                    toast.success("Participant supprimé avec succès");
                   } catch (error) {
                     console.error("Error removing member:", error);
                     toast.dismiss();

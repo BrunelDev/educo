@@ -258,9 +258,12 @@ export const createComment = async (
   commentData: CreateCommentDto
 ): Promise<Comment> => {
   try {
-    console.log("payload", commentData)
-    const response = await api.post("/reunion/commentaires/creer/", commentData);
-    console.log("--------------el f2-----------------",response.data);
+    console.log("payload", commentData);
+    const response = await api.post(
+      "/reunion/commentaires/creer/",
+      commentData
+    );
+    console.log("--------------el f2-----------------", response.data);
     return response.data;
   } catch (error) {
     console.error("Error creating comment:", error);
@@ -277,7 +280,9 @@ export const getMeetingComments = async (
   reunionId: number
 ): Promise<CommentsListResponse> => {
   try {
-    const response = await api.get(`/reunion/reunions/${reunionId}/commentaires/`);
+    const response = await api.get(
+      `/reunion/reunions/${reunionId}/commentaires/`
+    );
     return response.data;
   } catch (error) {
     console.error("Error fetching meeting comments:", error);
@@ -341,7 +346,9 @@ export const deleteComment = async (commentId: number): Promise<void> => {
  * @param reunionId The ID of the meeting
  * @returns The meeting data including comments
  */
-export const getMeetingWithComments = async (reunionId: number): Promise<Meeting> => {
+export const getMeetingWithComments = async (
+  reunionId: number
+): Promise<Meeting> => {
   try {
     const response = await api.get(`/reunion/reunions/${reunionId}/`);
     return response.data;

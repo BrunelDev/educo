@@ -9,7 +9,11 @@ export async function GET(request: NextRequest) {
   }
 
   // Vérification basique de sécurité
-  if (!audioUrl.startsWith("https://cse-impact.s3.eu-north-1.amazonaws.com/")) {
+  if (
+    !audioUrl.startsWith(
+      "https://impact-cse-prod-paris-storage.s3.fr-par.scw.cloud/"
+    )
+  ) {
     return new NextResponse("URL non autorisée", { status: 403 });
   }
 

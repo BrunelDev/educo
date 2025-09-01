@@ -22,6 +22,14 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 type Disponibilite = "PRESENT" | "ABSENT";
 
@@ -46,6 +54,7 @@ export default function ConfirmationPresence() {
   >("idle");
   const router = useRouter();
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [confirmOpen, setConfirmOpen] = useState<boolean>(false);
 
   const handleConfirmPresence = useCallback(async () => {
     try {
@@ -81,8 +90,9 @@ export default function ConfirmationPresence() {
   }, [disponible, email, reunion_id, router, token, user_id]);
 
   useEffect(() => {
-    handleConfirmPresence();
-  }, [handleConfirmPresence]);
+    // Open confirmation dialog on mount
+    setConfirmOpen(true);
+  }, []);
 
   const isPresent = disponible === "PRESENT";
 
@@ -98,6 +108,40 @@ export default function ConfirmationPresence() {
           </CardDescription>
         </CardHeader>
         <CardContent>
+          {/* Confirmation Dialog */}
+          <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Confirmer votre choix</DialogTitle>
+                <DialogDescription>
+                  {isPresent
+                    ? "Êtes-vous sûr de confirmer votre présence ?"
+                    : "Êtes-vous sûr de confirmer votre absence ?"}
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setConfirmOpen(false);
+                    // Optionally redirect back if user cancels
+                  }}
+                >
+                  Annuler
+                </Button>
+                <Button
+                  className="bg-coral-600 hover:bg-coral-700"
+                  onClick={() => {
+                    setConfirmOpen(false);
+                    handleConfirmPresence();
+                  }}
+                >
+                  Confirmer
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+
           {/* Status Block */}
           {status === "loading" && (
             <div className="flex flex-col items-center gap-4 py-6">
@@ -140,7 +184,7 @@ export default function ConfirmationPresence() {
                 <Button
                   variant="outline"
                   className="w-full border-coral-300 text-coral-700 hover:bg-coral-50"
-                  onClick={handleConfirmPresence}
+                  onClick={() => setConfirmOpen(true)}
                 >
                   <RefreshCw className="mr-2 h-4 w-4" />
                   Reconfirmer
@@ -176,7 +220,7 @@ export default function ConfirmationPresence() {
               <div className="mt-2 grid w-full grid-cols-1 gap-3 sm:grid-cols-2">
                 <Button
                   className="w-full bg-crimson-400 hover:bg-crimson-500"
-                  onClick={handleConfirmPresence}
+                  onClick={() => setConfirmOpen(true)}
                 >
                   Réessayer
                 </Button>

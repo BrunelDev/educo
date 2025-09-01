@@ -1,7 +1,7 @@
 "use client";
+import GoBack from "@/app/_components/goback";
 import { getProjectById, Project } from "@/lib/api/projets";
-import { use, useEffect, useState } from "react";
-import ProjectsTodo from "../components/projectsTodo";
+import { TaskType, updateTask } from "@/lib/api/tache";
 import {
   DndContext,
   DragEndEvent,
@@ -11,15 +11,19 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import { TaskType, updateTask } from "@/lib/api/tache";
+import { use, useEffect, useState } from "react";
 import { toast } from "sonner";
 import TaskCard from "../components/project";
-import GoBack from "@/app/_components/goback";
+import ProjectsTodo from "../components/projectsTodo";
 
 // Define a cleaner type for a single task, based on the Project type
 type Task = Project["taches"][0];
 
-export default function Detail({ params }: { params: Promise<{ id: string }> }) {
+export default function Detail({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const { id } = use(params);
   const [projectDetails, setProjectDetails] = useState<Project>();
   const [refresh, setRefresh] = useState(false);
@@ -70,7 +74,7 @@ export default function Detail({ params }: { params: Promise<{ id: string }> }) 
         toast.success("Tâche déplacée avec succès !");
         setRefresh((v) => !v);
       } catch (error) {
-        toast.error("Erreur lors du déplacement de la tâche.");
+        toast.error("Vous devez être assigné à la tâche pour la déplacer.");
         console.error("Failed to update task:", error);
       }
     }

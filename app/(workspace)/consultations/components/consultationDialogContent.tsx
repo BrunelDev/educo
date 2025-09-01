@@ -37,7 +37,7 @@ export default function ConsultationDialogContent({
   const consultationList: ConsultationDialogProps[] = [
     {
       consultationType: ConsultationType.Orientation, // Changed from Accord to Orientation for the first example, assuming it was a placeholder
-      description: `🟢 Comment ça se passe ?
+      description: `
 Cette réunion a lieu une fois par an. L’employeur présente la vision stratégique de l’entreprise à moyen terme (généralement sur 3 ans). Le CSE rend un avis consultatif, même s’il n’a pas de pouvoir de blocage.
 `,
       process: [
@@ -48,8 +48,7 @@ Cette réunion a lieu une fois par an. L’employeur présente la vision straté
         `📄 Documents à demander à l’employeur
 - Plan stratégique (présentation ou rapport).
 - Projets d’investissement, de réorganisation, d’innovation.
-- Données économiques, prévisions d’emploi, politique RH.
-`,
+- Données économiques, prévisions d’emploi, politique RH.`,
         `
 🧠 Attitude à adopter
 - Lire les documents en amont, préparer des questions.
@@ -64,7 +63,7 @@ Cette réunion a lieu une fois par an. L’employeur présente la vision straté
     {
       consultationType: ConsultationType.Situation,
       description: `📊 Réunion sur la situation économique et financière
-🟢 Comment ça se passe ?
+
 Réunion annuelle pour examiner les comptes, résultats et perspectives économiques. Elle permet aux élus de comprendre la santé de l’entreprise.`,
       process: [
         `📌 Enjeux pour les élus
@@ -88,7 +87,7 @@ Réunion annuelle pour examiner les comptes, résultats et perspectives économi
     {
       consultationType: ConsultationType.Politique,
       description: `👥 Réunion sur la politique sociale, l’emploi et les conditions de travail
-🟢 Comment ça se passe ?
+
 Réunion annuelle pour faire le point sur les pratiques RH. L’objectif est de détecter les difficultés et faire avancer les droits sociaux.`,
       process: [
         `📌 Enjeux pour les élus
@@ -112,7 +111,7 @@ Réunion annuelle pour faire le point sur les pratiques RH. L’objectif est de 
     {
       consultationType: ConsultationType.Introduction,
       description: `🖥 Introduction de nouvelles technologies
-🟢 Comment ça se passe ?
+
 Le CSE doit être consulté avant toute mise en place de nouvelles technologies (logiciels, machines, IA, etc.).`,
       process: [
         `📌 Enjeux pour les élus
@@ -135,7 +134,7 @@ Le CSE doit être consulté avant toute mise en place de nouvelles technologies 
     {
       consultationType: ConsultationType.Modification,
       description: `🔄 Modification des conditions de travail
-🟢 Comment ça se passe ?
+
 Toute modification importante (horaires, lieu, organisation) impose une consultation du CSE.`,
       process: [
         `📌 Enjeux pour les élus
@@ -158,7 +157,7 @@ Toute modification importante (horaires, lieu, organisation) impose une consulta
     {
       consultationType: ConsultationType.Fusion,
       description: `🔗 Fusions, cessions, acquisitions
-🟢 Comment ça se passe ?
+
 Le CSE doit être informé et consulté avant toute opération de ce type.`,
       process: [
         `📌 Enjeux pour les élus
@@ -179,9 +178,9 @@ Le CSE doit être informé et consulté avant toute opération de ce type.`,
       ],
     },
     {
-      consultationType: ConsultationType.Accord, // Mapping PSE to Accord as per enum
+      consultationType: ConsultationType.Accord,
       description: `🚨 Plan de sauvegarde de l’emploi (PSE)
-🟢 Comment ça se passe ?
+
 Quand un licenciement économique collectif est prévu, l’employeur doit consulter le CSE.`,
       process: [
         `📌 Enjeux pour les élus
@@ -204,7 +203,7 @@ Quand un licenciement économique collectif est prévu, l’employeur doit consu
     {
       consultationType: ConsultationType.ReglementInterieur,
       description: `📜 Règlement intérieur
-🟢 Comment ça se passe ?
+
 Avant toute création ou modification du règlement, le CSE doit être consulté.`,
       process: [
         `📌 Enjeux pour les élus
@@ -225,7 +224,7 @@ Avant toute création ou modification du règlement, le CSE doit être consulté
     {
       consultationType: ConsultationType.AccordsCollectif, // Mapping Accord collectif to Accord
       description: `🤝 Accord collectif (temps de travail, égalité…)
-🟢 Comment ça se passe ?
+
 Le CSE est informé ou consulté sur certains accords selon leur nature.`,
       process: [
         `📌 Enjeux pour les élus
@@ -247,7 +246,7 @@ Le CSE est informé ou consulté sur certains accords selon leur nature.`,
     {
       consultationType: ConsultationType.ActivitePartielle,
       description: `⏳ Activité partielle (chômage partiel)
-🟢 Comment ça se passe ?
+
 Avant toute demande d’activité partielle, l’employeur doit consulter le CSE.`,
       process: [
         `📌 Enjeux pour les élus
@@ -270,7 +269,7 @@ Avant toute demande d’activité partielle, l’employeur doit consulter le CSE
     {
       consultationType: ConsultationType.DemenagementReorganisationSite,
       description: `📦 Déménagement ou réorganisation de site
-🟢 Comment ça se passe ?
+
 Tout projet ayant un impact sur l’organisation du travail nécessite une consultation.`,
       process: [
         `📌 Enjeux pour les élus
@@ -292,7 +291,7 @@ Tout projet ayant un impact sur l’organisation du travail nécessite une consu
     {
       consultationType: ConsultationType.RisquesProfessionnels,
       description: `⚠️ Risques professionnels / santé / sécurité
-🟢 Comment ça se passe ?
+
 Le CSE est systématiquement consulté sur les mesures liées à la sécurité, au DUERP, et à la prévention.`,
       process: [
         `📌 Enjeux pour les élus
@@ -368,12 +367,15 @@ Le CSE est systématiquement consulté sur les mesures liées à la sécurité, 
       }
 
       const data = {
-        type_consultation: consultation.consultationType,
+        type_consultation: value,
         statut: "En attente",
-        description: consultation.description,
+        description: consultationList.filter(
+          (c) => c.consultationType === value
+        )[0].description,
         date_requise: formattedDate,
         participants: [],
       };
+      console.log(data);
 
       await createConsultation(data);
       toast.dismiss();

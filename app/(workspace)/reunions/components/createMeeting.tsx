@@ -290,6 +290,7 @@ const StepOne = ({
           defaultValue={MeetingType.Ordinary}
           onValueChange={(value: MeetingType) => {
             setLocalMeetingType(value);
+            setLocalMeetingTitle(value);
             if (value === MeetingType.Others) {
               setLocalMeetingTitle("");
             }
