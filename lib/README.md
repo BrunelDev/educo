@@ -4,7 +4,7 @@ Ce document fournit une brève explication du fichier `s3-upload.ts`.
 
 ## Objectif
 
-Le module `s3-upload.ts` est responsable de l'envoi de fichiers vers un bucket S3 compatible, spécifiquement configuré pour Scaleway Object Storage. Il est conçu pour être utilisé côté serveur (`"use server"`).
+Le module `s3-upload.ts` est responsable de l'envoi de fichiers vers un bucket S3 compatible, spécifiquement configuré pour Scaleway Object Storage. Il est conçu pour être utilisé côté serveur.
 
 ## Configuration
 
