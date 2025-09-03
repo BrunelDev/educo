@@ -14,6 +14,7 @@ export interface User {
   date_creation: string;
   date_modification: string;
   is_active: boolean;
+  is_last_message_read?: boolean;
 }
 
 export interface UserApiResponse {
@@ -64,6 +65,7 @@ interface UserToPatch {
   date_creation?: string;
   date_modification?: string;
   is_active?: boolean;
+  is_last_message_read?: boolean;
 }
 interface UpdateUserResponse {
   message: string;

@@ -23,7 +23,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { getUser, User } from "@/lib/api/users";
+import { getUser, updateProfile, User } from "@/lib/api/users";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -81,10 +81,14 @@ export function AppSidebar() {
   useEffect(() => {
     const fun = async () => {
       const userInfoResponse: User = await getUser();
+      console.log(
+        "--------is last message read-------",
+        userInfoResponse.is_last_message_read
+      );
       setUserInfo(userInfoResponse);
     };
     fun();
-  }, []);
+  }, [updateProfile]);
   const pathname = usePathname();
   console.log(pathname);
   console.log(items);
@@ -118,7 +122,25 @@ export function AppSidebar() {
                         : ""
                     } hover:from-[#FFDDE3] hover:to-[#FFDDE300] w-full py-2 px-3`}
                   >
-                    <a href={item.url} className="flex items-center gap-3">
+                    <a
+                      href={item.url}
+                      className="flex items-center gap-3"
+                      onClick={async (e) => {
+                        if (
+                          item.title === "Messages" && userInfo &&
+                          !userInfo?.is_last_message_read
+                        ) {
+                          e.preventDefault();
+                          await updateProfile({ is_last_message_read: true });
+                          setUserInfo((prev) =>
+                            prev
+                              ? { ...prev, is_last_message_read: true }
+                              : prev
+                          );
+                          window.location.href = item.url;
+                        }
+                      }}
+                    >
                       <div
                         className={`h-6 w-1 absolute left-0 top-1/2 -translate-y-1/2 bg-red-500 opacity-0 group-hover/item:opacity-100 group-hover/item:animate-slide-in`}
                       ></div>
@@ -131,11 +153,10 @@ export function AppSidebar() {
                       <span>{item.title}</span>
                     </a>
                   </SidebarMenuButton>
-                  {item.title === "Messages5" && (
-                    <div className=" absolute h-5 w-5 right-2 top-1/2 -translate-y-1/2 bg-red-500 rounded-full text-white text-xs flex justify-center items-center">
-                      3
-                    </div>
-                  )}
+                  {item.title === "Messages" && userInfo &&
+                    !userInfo?.is_last_message_read && (
+                      <div className="absolute h-2 w-2 right-2 top-1/2 -translate-y-1/2 bg-red-500 rounded-full text-white text-xs flex justify-center items-center"></div>
+                    )}
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
