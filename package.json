@@ -36,6 +36,8 @@
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
     "emoji-picker-react": "^4.12.2",
+    "file-saver": "^2.0.5",
+    "html-to-docx": "^1.8.0",
     "install": "^0.13.0",
     "jwt-decode": "^4.0.0",
     "lexical": "^0.29.0",

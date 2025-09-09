@@ -157,7 +157,7 @@ const editorConfig = {
   theme: ExampleTheme,
 };
 
-export default function Editor({disabled = false, _editorStateJSON}: {disabled?: boolean, _editorStateJSON?: string}) {
+export default function Editor( {disabled = false, _editorStateJSON}: {disabled?: boolean, _editorStateJSON?: string}) {
   const { updateStep4 } = useMeetingForm();
   const [editorStateJSON, setEditorStateJSON] = useState(_editorStateJSON || "");
   

@@ -17,6 +17,7 @@ import { ArrowLeft, Plus, Users } from "lucide-react";
 import { use, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { CompteRendu } from "@/app/_components/compteRendu";
+import { RenderDocFirstPage } from "@/lib/utils/renderDocFirstPage";
 export default function ConsultationDetail({
   params,
 }: {
@@ -240,6 +241,7 @@ export default function ConsultationDetail({
           </div>
         </div>
         <CompteRendu
+          firstPage={RenderDocFirstPage()}
           handleSubmiting={async (text: string) => {
             await updateConsultation(consultation.id, { compte_rendu: text });
             await fetchConsultationData();

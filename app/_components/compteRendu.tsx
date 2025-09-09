@@ -1,14 +1,20 @@
+import "@/app/_components/editorPlugins/style.css";
 import { Button } from "@/components/ui/button";
+import { useMeetingForm } from "@/store/meetingForm";
 import { isAxiosError } from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import Editor from "./editor";
+import { convertLexicalJsonToHtml } from "./lexicalViewer";
 
 export function CompteRendu({
   handleSubmiting,
   initialCompteRendu,
+  firstPage,
 }: {
   handleSubmiting: (text: string) => Promise<void>;
   initialCompteRendu: string;
+  firstPage: string;
 }) {
   const [isEditingCompteRendu, setIsEditingCompteRendu] =
     useState<boolean>(false);
@@ -30,6 +36,70 @@ export function CompteRendu({
       } else {
         toast.error("Erreur lors de l'enregistrement du compte rendu.");
       }
+    }
+  };
+
+  const formData = useMeetingForm();
+  useEffect(() => {
+    console.log(formData.ordre_du_jour);
+  }, [formData]);
+  const handleDownload = async () => {
+    try {
+      console.log("Downloading...");
+      const htmlString = convertLexicalJsonToHtml(
+        formData?.ordre_du_jour[0]?.description || ""
+      );
+      console.log("First page HTML:", firstPage);
+      console.log("Downloading...", htmlString);
+
+      console.log("Generated HTML string:", htmlString);
+      console.log("Form data:", formData?.ordre_du_jour[0]?.description);
+
+      let finalHtmlString = firstPage + htmlString;
+      if (!htmlString || htmlString.trim() === "" || htmlString === "<p></p>") {
+        // Use fallback content if no valid HTML is generated
+        finalHtmlString = `
+          <h1>Compte Rendu de Réunion</h1>
+          <p><strong>Date:</strong> ${new Date().toLocaleDateString(
+            "fr-FR"
+          )}</p>
+          <h2>Ordre du jour</h2>
+          <p>${
+            formData?.ordre_du_jour[0]?.description ||
+            "Aucun contenu disponible"
+          }</p>
+          <h2>Compte rendu</h2>
+          <p>${compteRenduText || "Aucun compte rendu disponible"}</p>
+        `;
+      }
+
+      const response = await fetch("/api/export-docx", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ htmlString: finalHtmlString }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Export failed");
+      }
+
+      // Create blob and download the file
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "compte-rendu.docx";
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
+      toast.success("Compte rendu téléchargé avec succès.");
+    } catch (error) {
+      console.error("Error downloading docx:", error);
+      toast.error("Erreur lors du téléchargement du compte rendu.");
     }
   };
 
@@ -68,6 +138,12 @@ export function CompteRendu({
             {compteRenduText || "Aucun compte rendu pour le moment."}
           </div>
         )}
+      </div>
+      <Editor />
+      <div>
+        <Button className="sm:ml-auto" onClick={handleDownload}>
+          Télécharger
+        </Button>
       </div>
     </div>
   );

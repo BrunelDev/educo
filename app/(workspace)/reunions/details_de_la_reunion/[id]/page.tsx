@@ -1,32 +1,33 @@
 "use client";
 import ParticipantComponent from "@/app/(workspace)/gestion/details/details_de_la_tache/components/participants";
-import { CompteRendu } from "@/app/_components/compteRendu";
 import { CommentSection } from "@/app/_components/comment";
+import { CompteRendu } from "@/app/_components/compteRendu";
 import { DialogComponent } from "@/app/_components/dialogComponent";
 import DocumentComponent from "@/app/_components/document";
 import EmptyState from "@/app/_components/EmptyState";
+import GoBack from "@/app/_components/goback";
 import LexicalView from "@/app/_components/LexicalView";
+import { deleteExternalMemberPresence } from "@/lib/api/organisation";
 import {
   addDocument,
   addMemberToMeeting,
+  createComment,
+  deleteComment,
   deleteParticipantFromMeeting,
+  getMeetingComments,
   getOneMeting,
   removeDocumentFromMeeting,
-  updateMeeting,
-  getMeetingComments,
-  createComment,
   updateComment,
-  deleteComment,
+  updateMeeting,
 } from "@/lib/api/reunion";
 import { formatDateToFrench } from "@/lib/functions";
 import { Meeting } from "@/lib/types";
+import { RenderDocFirstPage } from "@/lib/utils/renderDocFirstPage";
 import { Calendar, Plus, Users } from "lucide-react";
 import Link from "next/link";
 import { use, useEffect, useState } from "react";
 import AddDocument from "../components/addDocument";
 import AddMemberDialog from "../components/addParticipant";
-import GoBack from "@/app/_components/goback";
-import { deleteExternalMemberPresence } from "@/lib/api/organisation";
 //import { deleteExternalMemberPresence } from "@/lib/api/organisation";
 
 export default function Detail({
@@ -37,6 +38,7 @@ export default function Detail({
   const { id } = use(params);
   const [meeting, setMeeting] = useState<Meeting>();
   const [refresh, setRefresh] = useState(false);
+
   useEffect(() => {
     const fetchMeeting = async () => {
       const response = await getOneMeting(parseInt(id));
@@ -45,6 +47,7 @@ export default function Detail({
     };
     fetchMeeting();
   }, [id, refresh]);
+
   const [dialogOpen1, setDialogOpen1] = useState(false);
   const [dialogOpen2, setDialogOpen2] = useState(false);
   if (meeting) {
@@ -308,6 +311,23 @@ export default function Detail({
           </div>
         </div>
         <CompteRendu
+          firstPage={RenderDocFirstPage({
+            title: meeting.titre,
+            object: meeting.objet,
+            date: formatDateToFrench(
+              meeting.date_heure_debut.toLocaleString("fr-FR"), false
+            ),
+            startTime: formatDateToFrench(
+              meeting.date_heure_debut.toLocaleString("fr-FR"), true
+            ).split(" à ")[1],
+            participants: meeting.participants.map(
+              (p) => p.utilisateur_details.nom_complet
+            ),
+            absentees: meeting.participants
+              .filter((p) => p.disponible === "ABSENT")
+              .map((p) => p.utilisateur_details.nom_complet),
+            agenda: meeting.ordre_du_jour[0]?.description || "",
+          })}
           handleSubmiting={async (text: string) => {
             await updateMeeting(meeting.id, { compte_rendu: text });
           }}
