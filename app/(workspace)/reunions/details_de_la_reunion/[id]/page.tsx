@@ -7,6 +7,7 @@ import DocumentComponent from "@/app/_components/document";
 import EmptyState from "@/app/_components/EmptyState";
 import GoBack from "@/app/_components/goback";
 import LexicalView from "@/app/_components/LexicalView";
+import { convertLexicalJsonToHtml } from "@/app/_components/lexicalViewer";
 import { deleteExternalMemberPresence } from "@/lib/api/organisation";
 import {
   addDocument,
@@ -315,10 +316,12 @@ export default function Detail({
             title: meeting.titre,
             object: meeting.objet,
             date: formatDateToFrench(
-              meeting.date_heure_debut.toLocaleString("fr-FR"), false
+              meeting.date_heure_debut.toLocaleString("fr-FR"),
+              false
             ),
             startTime: formatDateToFrench(
-              meeting.date_heure_debut.toLocaleString("fr-FR"), true
+              meeting.date_heure_debut.toLocaleString("fr-FR"),
+              true
             ).split(" à ")[1],
             participants: meeting.participants.map(
               (p) => p.utilisateur_details.nom_complet
@@ -326,7 +329,9 @@ export default function Detail({
             absentees: meeting.participants
               .filter((p) => p.disponible === "ABSENT")
               .map((p) => p.utilisateur_details.nom_complet),
-            agenda: meeting.ordre_du_jour[0]?.description || "",
+            agenda:
+              convertLexicalJsonToHtml(meeting.ordre_du_jour[0]?.description) ||
+              "",
           })}
           handleSubmiting={async (text: string) => {
             await updateMeeting(meeting.id, { compte_rendu: text });

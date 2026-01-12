@@ -2,9 +2,11 @@
 import ParticipantComponent from "@/app/(workspace)/gestion/details/details_de_la_tache/components/participants";
 import AddDocument from "@/app/(workspace)/reunions/details_de_la_reunion/components/addDocument";
 import AddMemberDialog from "@/app/(workspace)/reunions/details_de_la_reunion/components/addParticipant";
+import { CompteRendu } from "@/app/_components/compteRendu";
 import { DialogComponent } from "@/app/_components/dialogComponent";
 import DocumentComponent from "@/app/_components/document";
 import EmptyState from "@/app/_components/EmptyState";
+import { convertLexicalJsonToHtml } from "@/app/_components/lexicalViewer";
 import {
   addDocument,
   Consultation,
@@ -13,11 +15,26 @@ import {
   removeMemberFromConsultation,
   updateConsultation,
 } from "@/lib/api/consultation";
-import { ArrowLeft, Plus, Users } from "lucide-react";
-import { use, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { CompteRendu } from "@/app/_components/compteRendu";
 import { RenderDocFirstPage } from "@/lib/utils/renderDocFirstPage";
+import { ArrowLeft, Plus, Users } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { use, useEffect, useState } from "react";
+
+// Helper function to format date
+const formatDateToFrench = (dateString: string, timeOnly: boolean = false) => {
+  const date = new Date(dateString);
+  if (timeOnly) {
+    return date.toLocaleTimeString("fr-FR", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  }
+  return date.toLocaleDateString("fr-FR", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+};
 export default function ConsultationDetail({
   params,
 }: {
@@ -241,13 +258,36 @@ export default function ConsultationDetail({
           </div>
         </div>
         <CompteRendu
-          firstPage={RenderDocFirstPage()}
+          firstPage={RenderDocFirstPage({
+            title: consultation.type_consultation_display || "Consultation",
+            object:
+              consultation.description || "Description de la consultation",
+            date: formatDateToFrench(
+              consultation.date_creation
+                ? new Date(consultation.date_creation).toLocaleString("fr-FR")
+                : new Date().toLocaleString("fr-FR"),
+              false
+            ),
+            startTime: formatDateToFrench(
+              consultation.date_creation
+                ? new Date(consultation.date_creation).toLocaleString("fr-FR")
+                : new Date().toLocaleString("fr-FR"),
+              true
+            ),
+            participants:
+              consultation.participants_details?.map(
+                (participant) => participant.utilisateur_details.nom_complet
+              ) || [],
+            absentees: [], // Consultations don't track absent participants
+            agenda:
+              convertLexicalJsonToHtml(consultation.description || "") || "",
+          })}
           handleSubmiting={async (text: string) => {
             await updateConsultation(consultation.id, { compte_rendu: text });
             await fetchConsultationData();
             setRefresh(!refresh);
           }}
-          initialCompteRendu={consultation.compte_rendu!}
+          initialCompteRendu={consultation.compte_rendu || ""}
         />
       </div>
     );

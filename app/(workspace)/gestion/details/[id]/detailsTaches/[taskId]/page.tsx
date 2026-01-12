@@ -1,29 +1,47 @@
 "use client";
 import AddDocument from "@/app/(workspace)/reunions/details_de_la_reunion/components/addDocument";
 import AddMemberDialog from "@/app/(workspace)/reunions/details_de_la_reunion/components/addParticipant";
+import CommentSection from "@/app/_components/comment";
 import { CompteRendu } from "@/app/_components/compteRendu";
 import { DialogComponent } from "@/app/_components/dialogComponent";
 import DocumentComponent from "@/app/_components/document";
 import EmptyState from "@/app/_components/EmptyState";
+import GoBack from "@/app/_components/goback";
+import { convertLexicalJsonToHtml } from "@/app/_components/lexicalViewer";
 import {
+  createComment,
+  deleteComment,
+  getComments,
   getTaskById,
   removeDocumentFromTask,
   removeMemberFromTask,
   Task,
+  updateComment,
   updateCompteRendu,
   updateTask,
-  createComment,
-  updateComment,
-  deleteComment,
-  getComments,
 } from "@/lib/api/tache";
 import { MessageType } from "@/lib/types";
+import { RenderDocFirstPage } from "@/lib/utils/renderDocFirstPage";
 import { Plus, Users } from "lucide-react";
 import { use, useEffect, useState } from "react";
 import { toast } from "sonner";
 import ParticipantComponent from "../../../details_de_la_tache/components/participants";
-import GoBack from "@/app/_components/goback";
-import CommentSection from "@/app/_components/comment";
+
+// Helper function to format date
+const formatDateToFrench = (dateString: string, timeOnly: boolean = false) => {
+  const date = new Date(dateString);
+  if (timeOnly) {
+    return date.toLocaleTimeString("fr-FR", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  }
+  return date.toLocaleDateString("fr-FR", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+};
 
 export default function DetailTache({
   params,
@@ -48,7 +66,7 @@ export default function DetailTache({
       }
     };
     fetchData();
-  }, [taskId, refresh, refresh2, refresh3 ]);
+  }, [taskId, refresh, refresh2, refresh3]);
 
   const handleAddMembers = async (users: number[]): Promise<void> => {
     if (!task) return;
@@ -59,7 +77,7 @@ export default function DetailTache({
       });
       const updatedTask = await getTaskById(parseInt(taskId));
       setTask(updatedTask);
-      
+
       setRefresh((v) => !v);
     } catch (error) {
       console.error("Error adding members:", error);
@@ -238,6 +256,21 @@ export default function DetailTache({
       {/* Compte Rendu Section */}
       {task && (
         <CompteRendu
+          firstPage={RenderDocFirstPage({
+            title: task.title || "Tâche",
+            object: task.description || "Description de la tâche",
+            date: formatDateToFrench(new Date().toLocaleString("fr-FR"), false),
+            startTime: formatDateToFrench(
+              new Date().toLocaleString("fr-FR"),
+              true
+            ),
+            participants:
+              task.assigned_members?.map(
+                (member) => `${member.first_name} ${member.last_name}`
+              ) || [],
+            absentees: [], // Tasks don't have absent members, so empty array
+            agenda: convertLexicalJsonToHtml(task.description || "") || "",
+          })}
           handleSubmiting={async (text: string) => {
             if (!task) return;
             console.log("text", text);

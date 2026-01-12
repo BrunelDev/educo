@@ -8,10 +8,7 @@ export interface RenderDocFirstPageProps {
   agenda: string;
 }
 
-export const RenderDocFirstPage = (
-  data
-: 
-   RenderDocFirstPageProps) => {
+export const RenderDocFirstPage = (data: RenderDocFirstPageProps) => {
   return `
   <div style="text-align: center; border-bottom: 3px solid #1e40af; padding-bottom: 16px; margin-bottom: 32px;">
     <p style="font-size: 24px; color: #1e40af; font-weight: bold; margin: 0; font-family: Arial, sans-serif; letter-spacing: 0.5px;">
@@ -24,7 +21,9 @@ export const RenderDocFirstPage = (
   
   <div style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); border-left: 5px solid #1e40af; padding: 20px; margin: 0 0 24px 0; border-radius: 0 8px 8px 0;">
     <p style="font-size: 20px; color: #0f172a; font-weight: bold; margin: 0; font-family: Arial, sans-serif; line-height: 1.3;">
-      <span style="white-space: pre-wrap;">${data.title} ${data.object}</span>
+      <span style="white-space: pre-wrap;">Titre : ${data.title}</span>
+      <br>
+      <span style="white-space: pre-wrap;">Objet : ${data.object}</span>
     </p>
     <p style="color: #475569; margin: 8px 0 0 0; font-family: Arial, sans-serif; font-size: 14px; font-style: italic;">
       <span style="white-space: pre-wrap;">Séance du </span><strong style="color: #1e40af;">${
@@ -87,7 +86,7 @@ export const RenderDocFirstPage = (
                 ? data.participants
                     .map(
                       (participant) =>
-                        `<span style="display: inline-block; padding: 6px 14px; border: 2px solid #22c55e; border-radius: 20px; font-size: 13px; margin: 4px 6px 4px 0; background: #f0fdf4; color: #166534; font-family: Arial, sans-serif; font-weight: 500;">${participant}</span>`
+                        `<span style="display: inline-block; padding: 6px 14px; border: 2px solid #22c55e; border-radius: 20px; font-size: 13px; margin: 4px 6px 4px 0; background: #f0fdf4; color: #166534; font-family: Arial, sans-serif; font-weight: 500;">- ${participant}</span>`
                     )
                     .join("")
                 : '<span style="color: #6b7280; font-style: italic; font-family: Arial, sans-serif;">Aucun participant présent</span>'
@@ -107,7 +106,7 @@ export const RenderDocFirstPage = (
                 ? data.absentees
                     .map(
                       (absentee) =>
-                        `<span style="display: inline-block; padding: 6px 14px; border: 2px solid #f59e0b; border-radius: 20px; font-size: 13px; margin: 4px 6px 4px 0; background: #fffbeb; color: #92400e; font-family: Arial, sans-serif; font-weight: 500;">${absentee}</span>`
+                        `<span style="display: inline-block; padding: 6px 14px; border: 2px solid #f59e0b; border-radius: 20px; font-size: 13px; margin: 4px 6px 4px 0; background: #fffbeb; color: #92400e; font-family: Arial, sans-serif; font-weight: 500;">- ${absentee}</span>`
                     )
                     .join("")
                 : '<span style="color: #6b7280; font-style: italic; font-family: Arial, sans-serif;">Aucun absent</span>'
@@ -130,7 +129,7 @@ export const RenderDocFirstPage = (
       <div style="display: table-row;">
         <div style="display: table-cell; width: 50%; font-size: 13px; color: #475569; font-family: Arial, sans-serif; vertical-align: top;">
           <p style="margin: 0 0 8px 0; font-weight: 600;">
-            <span style="white-space: pre-wrap;">📅 Document rédigé le : </span><strong style="color: #1e40af;">${new Date().toLocaleDateString(
+            <span style="white-space: pre-wrap;">Document rédigé le : </span><strong style="color: #1e40af;">${new Date().toLocaleDateString(
               "fr-FR"
             )}</strong>
           </p>
@@ -140,7 +139,7 @@ export const RenderDocFirstPage = (
         </div>
         <div style="display: table-cell; width: 50%; text-align: right; font-size: 13px; color: #475569; font-family: Arial, sans-serif; vertical-align: top;">
           <p style="margin: 0 0 8px 0; font-weight: 600;">
-            <span style="white-space: pre-wrap;">✅ Validation et signature :</span>
+            <span style="white-space: pre-wrap;">Validation et signature :</span>
           </p>
           <p style="margin: 0; font-size: 12px; color: #64748b;">
             <span style="white-space: pre-wrap;">Président(e) : ________________________</span>
@@ -151,7 +150,7 @@ export const RenderDocFirstPage = (
     
     <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid #cbd5e1; text-align: center;">
       <p style="margin: 0; font-size: 11px; color: #64748b; font-family: Arial, sans-serif; font-style: italic;">
-        <span style="white-space: pre-wrap;">────────────────────────────────────────────────────────────────</span>
+        <span style="white-space: pre-wrap;">──────────────────────────────────────────────────────</span>
       </p>
     
     </div>
