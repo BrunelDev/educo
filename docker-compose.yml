@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  backend:
+    image: bruneldev/impact-cse-backend:0.5
+    container_name: impact-cse-backend
+    ports:
+      - "8000:8000"
+      - "8001:8001"
+    volumes:
+      # Volume pour la base de données SQLite
+      - backend-data:/CSE_Backend-1/db
+      # Volume pour les logs
+      - backend-logs:/CSE_Backend-1/logs
+      # Volume pour les fichiers statiques si nécessaire
+      - backend-static:/CSE_Backend-1/staticfiles
+      # Volume pour les fichiers media si nécessaire
+      - backend-media:/CSE_Backend-1/media
+    environment:
+      - PYTHONUNBUFFERED=1
+      - NODE_ENV=production
+    networks:
+      - impact-cse-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  frontend:
+    image: bruneldev/impact-cse:0.5
+    container_name: impact-cse-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_TELEMETRY_DISABLED=1
+      # Ajoutez l'URL du backend si nécessaire
+      - NEXT_PUBLIC_API_URL=http://backend:8000
+    networks:
+      - impact-cse-network
+    depends_on:
+      - backend
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  backend-data:
+    driver: local
+  backend-logs:
+    driver: local
+  backend-static:
+    driver: local
+  backend-media:
+    driver: local
+
+networks:
+  impact-cse-network:
+    driver: bridge
