@@ -1,11 +1,11 @@
 import Image from "next/image";
 export default function Suggestions() {
   const suggestions = [
-    "Quels sont les droits et obligations du CSE en matière de santé et sécurité ?",
-    "Comment rédiger un procès-verbal de réunion CSE ?",
-    "Quelles sont les étapes pour organiser une consultation des salariés ?",
-    "Comment gérer les budgets de fonctionnement et ASC du CSE ?",
-    "Quels recours en cas de litige avec l’employeur ?",
+    "Quelles sont les bonnes pratiques pour organiser une réunion pédagogique efficace ?",
+    "Comment rédiger un procès-verbal de conseil de département ?",
+    "Quelles sont les étapes pour organiser une évaluation des enseignements ?",
+    "Comment gérer les ressources académiques et le budget du département ?",
+    "Quels recours en cas de litige avec l'administration universitaire ?",
   ];
   return (
     <div className="bg-[#FFFFFF99] p-5 flex flex-col rounded-[12px] gap-3 relative w-full">

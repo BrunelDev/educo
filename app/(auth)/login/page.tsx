@@ -17,8 +17,8 @@ export default function LoginPage() {
         </div>
 
         <p className="text-2xl font-bold text-white-50">
-          Retrouvez votre espace dédié aux élus : réunions, formations,
-          documents et assistance en un seul endroit.
+          Retrouvez votre espace dédié au personnel académique : réunions,
+          formations, documents et assistance en un seul endroit.
         </p>
         <Image
           width={230}

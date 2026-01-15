@@ -2,10 +2,18 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
-  updateOrganisation,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   getOrganization,
   OrganizationResponse,
+  updateOrganisation,
 } from "@/lib/api/organisation";
 import { uploadToS3 } from "@/lib/s3-upload";
 import { FileInputChangeEvent } from "@/lib/types";
@@ -15,7 +23,16 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
-import { ScrollArea } from "@/components/ui/scroll-area";
+
+const institutionTypes = [
+  "Université publique",
+  "Université privée",
+  "Grande École",
+  "Institut de recherche",
+  "Lycée technique",
+  "Centre de formation",
+  "Autre établissement d'enseignement",
+] as const;
 
 export default function UpdateOrganisationForm({
   orgId,
@@ -34,7 +51,7 @@ export default function UpdateOrganisationForm({
   const organisationSchema = z.object({
     nom_entreprise: z
       .string()
-      .min(1, "Le nom de l'entreprise est requis")
+      .min(1, "Le nom de l'établissement est requis")
       .optional(),
     secteur_activite: z
       .string()
@@ -187,7 +204,7 @@ export default function UpdateOrganisationForm({
             console.log("Submitting:", organizationData);
             await updateOrganisation(orgId, organizationData);
 
-            toast.success(`L'organisation a été modifiée avec succès`);
+            toast.success(`L'établissement a été modifié avec succès`);
             handleClose();
           } catch (error) {
             if (error instanceof z.ZodError) {
@@ -203,7 +220,7 @@ export default function UpdateOrganisationForm({
               });
             }
             if (error instanceof AxiosError) {
-              toast.error("Erreur lors de la modification de l'organisation", {
+              toast.error("Erreur lors de la modification de l'établissement", {
                 description: error?.response?.data.detail,
               });
               throw error;
@@ -212,7 +229,7 @@ export default function UpdateOrganisationForm({
         }}
       >
         <div className="flex flex-col gap-3">
-          <Label htmlFor="nom_entreprise">Nom de l&apos;entreprise</Label>
+          <Label htmlFor="nom_entreprise">Nom de l&apos;établissement</Label>
           <Input
             defaultValue={organization?.organisation.nom_entreprise}
             id="nom_entreprise"
@@ -227,13 +244,22 @@ export default function UpdateOrganisationForm({
         </div>
         <div className="flex flex-col sm:flex-row sm:justify-between gap-5">
           <div className="flex flex-col gap-3 w-full sm:w-[48%]">
-            <Label htmlFor="secteur_activite">Secteur d&apos;activité</Label>
-            <Input
-              defaultValue={organization?.organisation.secteur_activite}
-              id="secteur_activite"
+            <Label htmlFor="secteur_activite">Type d&apos;établissement</Label>
+            <Select
               name="secteur_activite"
-              className="h-[36px]"
-            />
+              defaultValue={organization?.organisation.secteur_activite}
+            >
+              <SelectTrigger className="h-[36px]">
+                <SelectValue placeholder="Sélectionnez un type" />
+              </SelectTrigger>
+              <SelectContent>
+                {institutionTypes.map((type) => (
+                  <SelectItem key={type} value={type}>
+                    {type}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             {errors.secteur_activite && (
               <span className="text-red-500 text-xs">
                 {errors.secteur_activite}
@@ -241,14 +267,14 @@ export default function UpdateOrganisationForm({
             )}
           </div>
           <div className="flex flex-col gap-3 w-full sm:w-[48%]">
-            <Label htmlFor="taille">Nombre de salariés</Label>
+            <Label htmlFor="taille">Effectif du personnel</Label>
             <Input
               defaultValue={organization?.organisation.taille}
               type="number"
               id="taille"
               name="taille"
               className="h-[36px]"
-              placeholder="Entrez le nombre de salariés"
+              placeholder="Entrez le nombre d'enseignants"
             />
             {errors.taille && (
               <span className="text-red-500 text-xs">{errors.taille}</span>
@@ -256,7 +282,7 @@ export default function UpdateOrganisationForm({
           </div>
         </div>
         <div className="flex flex-col gap-3">
-          <Label htmlFor="adresse_siege">Addresse du siège</Label>
+          <Label htmlFor="adresse_siege">Adresse du campus</Label>
           <Input
             defaultValue={organization?.organisation.adresse_siege}
             id="adresse_siege"
@@ -295,7 +321,7 @@ export default function UpdateOrganisationForm({
           </div>
         </div>
         <div className="flex flex-col gap-3">
-          <Label htmlFor="annee_election">Dernière année d’élection</Label>
+          <Label htmlFor="annee_election">Année académique de référence</Label>
           <Input
             id="annee_election"
             name="annee_election"
@@ -311,12 +337,12 @@ export default function UpdateOrganisationForm({
           )}
         </div>
         <div className="flex flex-col gap-3">
-          <Label htmlFor="convention_collective">Convention collective</Label>
+          <Label htmlFor="convention_collective">Département</Label>
           <Input
             id="convention_collective"
             name="convention_collective"
             className="h-[36px]"
-            placeholder="Entrez la convention collective"
+            placeholder="Entrez le nom du département"
             defaultValue={organization?.organisation.collective || ""}
           />
           {errors.convention_collective && (
@@ -327,7 +353,7 @@ export default function UpdateOrganisationForm({
         </div>
         <div className="flex flex-col gap-3">
           <Label htmlFor="membres_cse_invites">
-            Invitez les membres CSE (emails séparés par virgule)
+            Invitez le personnel académique (emails séparés par virgule)
           </Label>
           <Input
             id="membres_cse_invites"
@@ -343,14 +369,14 @@ export default function UpdateOrganisationForm({
         </div>
         <div>
           <label className="font-medium text-white-800 text-xs">
-            Logo de l&apos;entreprise
+            Logo de l&apos;établissement
           </label>
           <div
             className={`relative rounded-[8px] overflow-hidden border border-dashed border-white-300 w-full h-[136px] ${
               logoUrl ? "border-none" : ""
             } flex justify-center items-center`}
           >
-            {logoUrl  ? (
+            {logoUrl ? (
               <div className="relative w-full h-full">
                 <Image
                   src={logoUrl}

@@ -3,16 +3,33 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { createOrganization } from "@/lib/api/organisation";
 import { uploadToS3 } from "@/lib/s3-upload";
 import { FileInputChangeEvent } from "@/lib/types";
 import { AxiosError } from "axios";
 import { ChevronRight, CirclePlus, X } from "lucide-react";
+import Image from "next/image";
 import { useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import Image from "next/image";
+
+const institutionTypes = [
+  "Université publique",
+  "Université privée",
+  "Grande École",
+  "Institut de recherche",
+  "Lycée technique",
+  "Centre de formation",
+  "Autre établissement d'enseignement",
+] as const;
 
 interface AddOrganisationProps {
   handleClose?: () => void;
@@ -24,7 +41,7 @@ export default function AddOrganisation({ handleClose }: AddOrganisationProps) {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const organisationSchema = z.object({
-    nom_entreprise: z.string().min(1, "Le nom de l'entreprise est requis"),
+    nom_entreprise: z.string().min(1, "Le nom de l'établissement est requis"),
     secteur_activite: z.string().min(1, "Le secteur d'activité est requis"),
     taille: z
       .string()
@@ -89,7 +106,7 @@ export default function AddOrganisation({ handleClose }: AddOrganisationProps) {
 
             if (!logoUrl) {
               toast.error("Erreur", {
-                description: "Veuillez ajouter un logo d'entreprise",
+                description: "Veuillez ajouter un logo d'établissement",
               });
               return;
             }
@@ -115,7 +132,7 @@ export default function AddOrganisation({ handleClose }: AddOrganisationProps) {
             console.log("there", organizationData);
             await createOrganization(organizationData);
 
-            toast.success(`L'organisation a été créée avec succès`);
+            toast.success(`L'établissement a été créé avec succès`);
             handleClose?.();
           } catch (error) {
             if (error instanceof z.ZodError) {
@@ -131,7 +148,7 @@ export default function AddOrganisation({ handleClose }: AddOrganisationProps) {
               });
             }
             if (error instanceof AxiosError) {
-              toast.error("Erreur lors de la création de l'organisation", {
+              toast.error("Erreur lors de la création de l'établissement", {
                 description: error?.response?.data.detail,
               });
               throw error;
@@ -140,7 +157,7 @@ export default function AddOrganisation({ handleClose }: AddOrganisationProps) {
         }}
       >
         <div className="flex flex-col gap-3">
-          <Label htmlFor="nom_entreprise">Nom de l&apos;entreprise</Label>
+          <Label htmlFor="nom_entreprise">Nom de l&apos;établissement</Label>
           <Input
             id="nom_entreprise"
             name="nom_entreprise"
@@ -154,12 +171,19 @@ export default function AddOrganisation({ handleClose }: AddOrganisationProps) {
         </div>
         <div className="flex flex-col sm:flex-row sm:justify-between gap-5">
           <div className="flex flex-col gap-3 w-full sm:w-[48%]">
-            <Label htmlFor="secteur_activite">Secteur d&apos;activité</Label>
-            <Input
-              id="secteur_activite"
-              name="secteur_activite"
-              className="h-[36px]"
-            />
+            <Label htmlFor="secteur_activite">Type d&apos;établissement</Label>
+            <Select name="secteur_activite">
+              <SelectTrigger className="h-[36px]">
+                <SelectValue placeholder="Sélectionnez un type" />
+              </SelectTrigger>
+              <SelectContent>
+                {institutionTypes.map((type) => (
+                  <SelectItem key={type} value={type}>
+                    {type}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             {errors.secteur_activite && (
               <span className="text-red-500 text-xs">
                 {errors.secteur_activite}
@@ -167,13 +191,13 @@ export default function AddOrganisation({ handleClose }: AddOrganisationProps) {
             )}
           </div>
           <div className="flex flex-col gap-3 w-full sm:w-[48%]">
-            <Label htmlFor="taille">Taille</Label>
+            <Label htmlFor="taille">Effectif du personnel</Label>
             <Input
               type="number"
               id="taille"
               name="taille"
               className="h-[36px]"
-              placeholder="Entrez la taille"
+              placeholder="Entrez le nombre d'enseignants"
             />
             {errors.taille && (
               <span className="text-red-500 text-xs">{errors.taille}</span>
@@ -181,7 +205,7 @@ export default function AddOrganisation({ handleClose }: AddOrganisationProps) {
           </div>
         </div>
         <div className="flex flex-col gap-3">
-          <Label htmlFor="adresse_siege">Addresse du siège</Label>
+          <Label htmlFor="adresse_siege">Adresse du campus</Label>
           <Input
             id="adresse_siege"
             name="adresse_siege"
@@ -225,14 +249,14 @@ export default function AddOrganisation({ handleClose }: AddOrganisationProps) {
           )}
         </div>
 
-        {/* Convention collective */}
+        {/* Département */}
         <div className="flex flex-col gap-3">
-          <Label htmlFor="convention_collective">Convention collective</Label>
+          <Label htmlFor="convention_collective">Département</Label>
           <Input
             id="convention_collective"
             name="convention_collective"
             className="h-[36px]"
-            placeholder="Entrez la convention collective"
+            placeholder="Entrez le nom du département"
           />
           {errors.convention_collective && (
             <span className="text-red-500 text-xs">
@@ -241,10 +265,10 @@ export default function AddOrganisation({ handleClose }: AddOrganisationProps) {
           )}
         </div>
 
-        {/* Invitez les membres CSE */}
+        {/* Invitez le personnel académique */}
         <div className="flex flex-col gap-3">
           <Label htmlFor="membres_cse_invites">
-            Invitez les membres CSE (emails séparés par virgule)
+            Invitez le personnel académique (emails séparés par virgule)
           </Label>
           <Input
             id="membres_cse_invites"
@@ -261,7 +285,7 @@ export default function AddOrganisation({ handleClose }: AddOrganisationProps) {
 
         <div>
           <label className="font-medium text-white-800 text-xs">
-            Logo de l&apos;entreprise
+            Logo de l&apos;établissement
           </label>
           <div
             className={`relative rounded-[8px] overflow-hidden border border-dashed border-white-300 w-full h-[136px] ${
@@ -339,7 +363,7 @@ export function AddOrganisationAfterLogin({
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const organisationSchema = z.object({
-    nom_entreprise: z.string().min(1, "Le nom de l'entreprise est requis"),
+    nom_entreprise: z.string().min(1, "Le nom de l'établissement est requis"),
     secteur_activite: z.string().min(1, "Le secteur d'activité est requis"),
     taille: z
       .string()
@@ -404,7 +428,7 @@ export function AddOrganisationAfterLogin({
 
             if (!logoUrl) {
               toast.error("Erreur", {
-                description: "Veuillez ajouter un logo d'entreprise",
+                description: "Veuillez ajouter un logo d'établissement",
               });
               return;
             }
@@ -432,7 +456,7 @@ export function AddOrganisationAfterLogin({
             const res = await createOrganization(organizationData);
             console.log("reponse", res);
 
-            toast.success(`L'organisation a été créée avec succès`);
+            toast.success(`L'établissement a été créé avec succès`);
             onComplete();
             //onComplete(); // Call onComplete on success
           } catch (error) {
@@ -448,14 +472,14 @@ export function AddOrganisationAfterLogin({
                 description: "Veuillez corriger les erreurs dans le formulaire",
               });
             } else if (error instanceof AxiosError) {
-              toast.error("Erreur lors de la création de l'organisation", {
+              toast.error("Erreur lors de la création de l'établissement", {
                 description:
                   error?.response?.data?.detail ||
                   "Une erreur serveur est survenue.",
               });
             } else {
               toast.error(
-                "Une erreur inattendue est survenue lors de la création de l'organisation."
+                "Une erreur inattendue est survenue lors de la création de l'établissement."
               );
               console.error("Unexpected error creating organization:", error);
             }
@@ -463,7 +487,7 @@ export function AddOrganisationAfterLogin({
         }}
       >
         <div className="flex flex-col gap-3">
-          <Label htmlFor="nom_entreprise">Nom de l&apos;entreprise</Label>
+          <Label htmlFor="nom_entreprise">Nom de l&apos;établissement</Label>
           <Input
             id="nom_entreprise"
             name="nom_entreprise"
@@ -477,12 +501,19 @@ export function AddOrganisationAfterLogin({
         </div>
         <div className="flex flex-col sm:flex-row sm:justify-between gap-5">
           <div className="flex flex-col gap-3 w-full sm:w-[48%]">
-            <Label htmlFor="secteur_activite">Secteur d&apos;activité</Label>
-            <Input
-              id="secteur_activite"
-              name="secteur_activite"
-              className="h-[36px]"
-            />
+            <Label htmlFor="secteur_activite">Type d&apos;établissement</Label>
+            <Select name="secteur_activite">
+              <SelectTrigger className="h-[36px]">
+                <SelectValue placeholder="Sélectionnez un type" />
+              </SelectTrigger>
+              <SelectContent>
+                {institutionTypes.map((type) => (
+                  <SelectItem key={type} value={type}>
+                    {type}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             {errors.secteur_activite && (
               <span className="text-red-500 text-xs">
                 {errors.secteur_activite}
@@ -490,13 +521,13 @@ export function AddOrganisationAfterLogin({
             )}
           </div>
           <div className="flex flex-col gap-3 w-full sm:w-[48%]">
-            <Label htmlFor="taille">Nombre de salariés</Label>
+            <Label htmlFor="taille">Effectif du personnel</Label>
             <Input
               type="number"
               id="taille"
               name="taille"
               className="h-[36px]"
-              placeholder="Entrez le nombre de salariés"
+              placeholder="Entrez le nombre d'enseignants"
             />
             {errors.taille && (
               <span className="text-red-500 text-xs">{errors.taille}</span>
@@ -504,7 +535,7 @@ export function AddOrganisationAfterLogin({
           </div>
         </div>
         <div className="flex flex-col gap-3">
-          <Label htmlFor="adresse_siege">Addresse du siège</Label>
+          <Label htmlFor="adresse_siege">Adresse du campus</Label>
           <Input
             id="adresse_siege"
             name="adresse_siege"
@@ -547,12 +578,12 @@ export function AddOrganisationAfterLogin({
           )}
         </div>
         <div className="flex flex-col gap-3">
-          <Label htmlFor="convention_collective">Convention collective</Label>
+          <Label htmlFor="convention_collective">Département</Label>
           <Input
             id="convention_collective"
             name="convention_collective"
             className="h-[36px]"
-            placeholder="Entrez la convention collective"
+            placeholder="Entrez le nom du département"
           />
           {errors.convention_collective && (
             <span className="text-red-500 text-xs">
@@ -562,7 +593,7 @@ export function AddOrganisationAfterLogin({
         </div>
         <div className="flex flex-col gap-3">
           <Label htmlFor="membres_cse_invites">
-            Invitez les membres CSE (emails séparés par virgule)
+            Invitez le personnel académique (emails séparés par virgule)
           </Label>
           <Input
             id="membres_cse_invites"
@@ -578,7 +609,7 @@ export function AddOrganisationAfterLogin({
         </div>
         <div>
           <label className="font-medium text-white-800 text-xs">
-            Logo de l&apos;entreprise
+            Logo de l&apos;établissement
           </label>
           <div
             className={`relative rounded-[8px] overflow-hidden border border-dashed border-white-300 w-full h-[136px] ${
@@ -646,7 +677,7 @@ export function AddOrganisationAfterLogin({
             type="submit"
             className="bg-gradient-to-r from-[#FE6539] to-crimson-400 w-full sm:w-auto flex items-center gap-2"
           >
-            <h6>Créer l&apos;organisation</h6>
+            <h6>Créer l&apos;établissement</h6>
             <ChevronRight />
           </Button>
         </div>

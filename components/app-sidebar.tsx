@@ -45,7 +45,7 @@ const items = [
     icon: Users,
   },
   {
-    title: "Consultations CSE",
+    title: "Consultations académiques",
     url: "/consultations",
     icon: NotepadText,
   },
@@ -127,7 +127,8 @@ export function AppSidebar() {
                       className="flex items-center gap-3"
                       onClick={async (e) => {
                         if (
-                          item.title === "Messages" && userInfo &&
+                          item.title === "Messages" &&
+                          userInfo &&
                           !userInfo?.is_last_message_read
                         ) {
                           e.preventDefault();
@@ -153,7 +154,8 @@ export function AppSidebar() {
                       <span>{item.title}</span>
                     </a>
                   </SidebarMenuButton>
-                  {item.title === "Messages" && userInfo &&
+                  {item.title === "Messages" &&
+                    userInfo &&
                     !userInfo?.is_last_message_read && (
                       <div className="absolute h-2 w-2 right-2 top-1/2 -translate-y-1/2 bg-red-500 rounded-full text-white text-xs flex justify-center items-center"></div>
                     )}

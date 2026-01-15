@@ -22,11 +22,11 @@ export default function RegisterPage({
           />
         </div>
         <p className=" font-extrabold text-3xl text-white-50">
-          Votre CSE, plus simple, plus efficace !
+          Educo, la gestion académique simplifiée !
         </p>
         <p className="text-white-50">
-          Accédez à toutes les fonctionnalités essentielles pour gérer réunions,
-          documents, formations et bien plus encore.
+          Accédez à toutes les fonctionnalités essentielles pour gérer réunions
+          pédagogiques, documents, formations et bien plus encore.
         </p>
         <Image
           width={1429.123515884542}

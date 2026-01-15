@@ -168,10 +168,10 @@ export function LoginForm() {
       <Dialog open={showAddOrgDialog} onOpenChange={setShowAddOrgDialog}>
         <DialogContent className="sm:max-w-[768px]">
           <DialogHeader>
-            <DialogTitle>Ajouter votre organisation</DialogTitle>
+            <DialogTitle>Ajouter votre établissement</DialogTitle>
             <DialogDescription>
               Pour accéder à toutes les fonctionnalités, veuillez enregistrer
-              les informations de votre organisation.
+              les informations de votre établissement.
             </DialogDescription>
           </DialogHeader>
           <AddOrganisationAfterLogin onComplete={handleOrgDialogComplete} />

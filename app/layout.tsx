@@ -14,8 +14,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CSE Impact",
-  description: "Votre CSE, plus simple, plus efficace !",
+  title: "Educo",
+  description:
+    "La plateforme collaborative pour la gestion académique universitaire",
 };
 
 export default function RootLayout({

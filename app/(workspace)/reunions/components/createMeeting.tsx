@@ -11,6 +11,7 @@ import { StepProgress } from "./stepProgress";
 
 import Editor from "@/app/_components/editor";
 import { handleFileUpload } from "@/app/actions/actions";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -31,7 +32,6 @@ import { Error1, Error2, FileInputChangeEvent, MeetingType } from "@/lib/types";
 import { getCookies } from "@/lib/utils/cookies";
 import { useFileStore } from "@/store/files";
 import { useMeetingForm } from "@/store/meetingForm";
-import { Checkbox } from "@/components/ui/checkbox";
 import Image from "next/image";
 import FileComponent from "./fileComponent";
 
@@ -349,7 +349,7 @@ const StepOne = ({
           onChange={(e) => {
             setLocalMeetingPurpose(e.target.value);
           }}
-          placeholder="Ex : Suivi des activités du CSE"
+          placeholder="Ex : Conseil pédagogique mensuel"
           className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
         />
         {errors.purpose && (

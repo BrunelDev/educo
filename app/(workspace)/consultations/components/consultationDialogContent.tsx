@@ -1,14 +1,14 @@
 "use client";
 import { Select } from "@/app/_components/select";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { createConsultation } from "@/lib/api/consultation";
 import { ConsultationDialogProps, ConsultationType } from "@/lib/types";
 import { format } from "date-fns";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
 
 export default function ConsultationDialogContent({
   consultation,
@@ -36,252 +36,252 @@ export default function ConsultationDialogContent({
 
   const consultationList: ConsultationDialogProps[] = [
     {
-      consultationType: ConsultationType.Orientation, // Changed from Accord to Orientation for the first example, assuming it was a placeholder
+      consultationType: ConsultationType.Orientation,
       description: `
-Cette réunion a lieu une fois par an. L’employeur présente la vision stratégique de l’entreprise à moyen terme (généralement sur 3 ans). Le CSE rend un avis consultatif, même s’il n’a pas de pouvoir de blocage.
+Cette réunion a lieu une fois par an. La direction académique présente la vision pédagogique du département à moyen terme (généralement sur 3 ans). Le conseil pédagogique rend un avis consultatif pour orienter les décisions.
 `,
       process: [
-        `📌 Enjeux pour les élus
-- Anticiper les conséquences sur l’emploi, les métiers, les implantations.
-- Comprendre les risques liés à l’automatisation, à la réorganisation ou à la stratégie de croissance.
-- Proposer des mesures d’accompagnement ou de formation.`,
-        `📄 Documents à demander à l’employeur
-- Plan stratégique (présentation ou rapport).
-- Projets d’investissement, de réorganisation, d’innovation.
-- Données économiques, prévisions d’emploi, politique RH.`,
+        `📌 Enjeux pour le personnel académique
+- Anticiper les évolutions des programmes, des méthodes pédagogiques.
+- Comprendre les orientations stratégiques de l'université.
+- Proposer des mesures d'accompagnement ou de formation.`,
+        `📄 Documents à demander à l'administration
+- Plan pédagogique (présentation ou rapport).
+- Projets d'innovation, de réorganisation des cursus.
+- Données sur les effectifs étudiants, besoins en ressources.`,
         `
 🧠 Attitude à adopter
 - Lire les documents en amont, préparer des questions.
-- Demander une expertise si nécessaire (art. L2315-87).
+- Demander des clarifications si nécessaire.
 - Donner un avis écrit, même critique.`,
         `🧩 Bonnes pratiques
 ✔ Anticipez la réunion en demandant les documents.
-✔ Préparez une position commune.
+✔ Préparez une position commune avec vos collègues.
 ✔ Comparez les annonces aux réalités du terrain.`,
       ],
     },
     {
       consultationType: ConsultationType.Situation,
-      description: `📊 Réunion sur la situation économique et financière
+      description: `📊 Réunion sur le budget et les ressources académiques
 
-Réunion annuelle pour examiner les comptes, résultats et perspectives économiques. Elle permet aux élus de comprendre la santé de l’entreprise.`,
+Réunion annuelle pour examiner les ressources, résultats et perspectives budgétaires. Elle permet au personnel académique de comprendre la situation financière du département.`,
       process: [
-        `📌 Enjeux pour les élus
-- Identifier les marges de manœuvre financières.
-- Détecter les signaux faibles de difficultés ou opportunités.
-- Poser les bases d'une stratégie sociale.`,
-        `📄 Documents à demander à l’employeur
-- Bilans, comptes de résultats, rapports du commissaire aux comptes.
-- Budget prévisionnel.
+        `📌 Enjeux pour le personnel académique
+- Identifier les ressources disponibles pour l'enseignement.
+- Détecter les besoins prioritaires ou les opportunités.
+- Poser les bases d'une stratégie pédagogique efficace.`,
+        `📄 Documents à demander à l'administration
+- Budget départemental, allocations de ressources.
+- Prévisions budgétaires.
 - Présentation financière de la direction.`,
         `🧠 Attitude à adopter
-- Demander une présentation pédagogique.
+- Demander une présentation pédagogique des chiffres.
 - Comparer avec les années précédentes.
-- Appuyer sur les écarts et les risques.`,
+- Mettre en avant les écarts et les besoins.`,
         `🧩 Bonnes pratiques
 ✔ Demander les documents 8 jours avant.
-✔ S'appuyer sur un expert-comptable si besoin.
-✔ Proposer des alternatives.`,
+✔ Proposer des priorités pour l'allocation des ressources.
+✔ Suggérer des alternatives si nécessaire.`,
       ],
     },
     {
       consultationType: ConsultationType.Politique,
-      description: `👥 Réunion sur la politique sociale, l’emploi et les conditions de travail
+      description: `👥 Réunion sur la politique de formation et les conditions d'enseignement
 
-Réunion annuelle pour faire le point sur les pratiques RH. L’objectif est de détecter les difficultés et faire avancer les droits sociaux.`,
+Réunion annuelle pour faire le point sur les pratiques pédagogiques. L'objectif est de détecter les difficultés et améliorer les conditions d'enseignement.`,
       process: [
-        `📌 Enjeux pour les élus
-- Suivre l’évolution des effectifs, contrats, égalité, absentéisme.
-- Identifier les risques sociaux et tensions organisationnelles.
+        `📌 Enjeux pour le personnel académique
+- Suivre l'évolution des effectifs, des programmes, de la qualité.
+- Identifier les tensions organisationnelles.
 - Proposer des actions correctives.`,
-        `📄 Documents à demander à l’employeur
-- Bilan social ou base de données économiques et sociales (BDES).
-- Données sur les salaires, temps de travail, santé, égalité professionnelle.
-- Plan de formation.`,
+        `📄 Documents à demander à l'administration
+- Bilan pédagogique du département.
+- Données sur les résultats étudiants, taux de réussite.
+- Plan de développement des compétences.`,
         `🧠 Attitude à adopter
-- Croiser les chiffres avec les remontées terrain.
+- Croiser les chiffres avec les retours terrain.
 - Poser des questions concrètes.
-- Mettre en avant les besoins des salariés.`,
+- Mettre en avant les besoins des enseignants et étudiants.`,
         `🧩 Bonnes pratiques
-✔ Organiser une relecture à plusieurs élus.
-✔ Proposer des priorités d’action.
-✔ Ne pas hésiter à relancer l’employeur après la réunion.`,
+✔ Organiser une relecture à plusieurs collègues.
+✔ Proposer des priorités d'action.
+✔ Ne pas hésiter à relancer l'administration après la réunion.`,
       ],
     },
     {
       consultationType: ConsultationType.Introduction,
-      description: `🖥 Introduction de nouvelles technologies
+      description: `🖥 Intégration de nouvelles technologies pédagogiques
 
-Le CSE doit être consulté avant toute mise en place de nouvelles technologies (logiciels, machines, IA, etc.).`,
+Le conseil pédagogique doit être consulté avant toute mise en place de nouveaux outils numériques (plateformes, logiciels pédagogiques, IA, etc.).`,
       process: [
-        `📌 Enjeux pour les élus
-- Anticiper les conséquences sur l’emploi, les compétences, la charge mentale.
-- Évaluer les impacts sur les conditions de travail et la sécurité.`,
-        `📄 Documents à demander à l’employeur
+        `📌 Enjeux pour le personnel académique
+- Anticiper les conséquences sur les méthodes d'enseignement.
+- Évaluer les impacts sur la qualité pédagogique.`,
+        `📄 Documents à demander à l'administration
 - Description des outils ou technologies.
 - Objectifs visés, planning de déploiement.
-- Évaluation des impacts sociaux.`,
+- Plan de formation prévu.`,
         `🧠 Attitude à adopter
-- Demander une simulation ou un test pilote.
+- Demander une phase pilote ou un test.
 - Proposer des accompagnements.
-- S'appuyer sur une expertise si besoin.`,
+- S'appuyer sur l'expertise des collègues.`,
         `🧩 Bonnes pratiques
-✔ Rappeler que la consultation est obligatoire.
+✔ Rappeler que la consultation est importante.
 ✔ Vérifier que la formation est prévue.
 ✔ Proposer une évaluation post-déploiement.`,
       ],
     },
     {
       consultationType: ConsultationType.Modification,
-      description: `🔄 Modification des conditions de travail
+      description: `🔄 Modification des programmes d'enseignement
 
-Toute modification importante (horaires, lieu, organisation) impose une consultation du CSE.`,
+Toute modification importante des curricula ou des méthodes pédagogiques nécessite une consultation du conseil pédagogique.`,
       process: [
-        `📌 Enjeux pour les élus
-- Préserver la santé des salariés.
-- Éviter les désorganisations ou tensions.`,
-        `📄 Documents à demander à l’employeur
-- Projet de changement.
-- Justification, calendrier, impact RH.
-- Mesures d’accompagnement.`,
+        `📌 Enjeux pour le personnel académique
+- Préserver la qualité de l'enseignement.
+- Éviter les perturbations pour les étudiants.`,
+        `📄 Documents à demander à l'administration
+- Projet de changement de programme.
+- Justification, calendrier, impact sur les cours.
+- Mesures d'accompagnement.`,
         `🧠 Attitude à adopter
-- Interroger les services ou métiers impactés.
-- Vérifier la cohérence avec les accords existants.
+- Interroger les enseignants des matières impactées.
+- Vérifier la cohérence avec les cursus existants.
 - Proposer des ajustements.`,
         `🧩 Bonnes pratiques
-✔ Faire des visites terrain si besoin.
-✔ Prévoir une période d’expérimentation.
-✔ Être vigilant sur les horaires et amplitudes.`,
+✔ Consulter les retours des étudiants.
+✔ Prévoir une période de transition.
+✔ Être vigilant sur la charge de travail.`,
       ],
     },
     {
       consultationType: ConsultationType.Fusion,
-      description: `🔗 Fusions, cessions, acquisitions
+      description: `🔗 Partenariats et coopérations universitaires
 
-Le CSE doit être informé et consulté avant toute opération de ce type.`,
+Le conseil pédagogique doit être informé et consulté avant tout nouveau partenariat ou coopération inter-universitaire.`,
       process: [
-        `📌 Enjeux pour les élus
-- Identifier les risques pour l’emploi, les statuts, les sites.
-- Obtenir des garanties.`,
-        `📄 Documents à demander à l’employeur
-- Note de présentation du projet.
-- Conséquences sociales et organisationnelles.
+        `📌 Enjeux pour le personnel académique
+- Identifier les opportunités et risques pour le département.
+- Obtenir des informations sur les modalités.`,
+        `📄 Documents à demander à l'administration
+- Note de présentation du partenariat.
+- Conséquences pédagogiques et organisationnelles.
 - Planning prévisionnel.`,
         `🧠 Attitude à adopter
-- Poser des questions sur l’impact réel.
-- Demander une expertise économique.
-- Interpeller sur les engagements sociaux.`,
+- Poser des questions sur l'impact réel.
+- Demander des précisions sur les échanges prévus.
+- S'informer sur les engagements mutuels.`,
         `🧩 Bonnes pratiques
 ✔ Demander des garanties écrites.
-✔ S’informer sur l’entreprise repreneuse.
-✔ Mobiliser les salariés si besoin.`,
+✔ S'informer sur l'université partenaire.
+✔ Impliquer les collègues concernés.`,
       ],
     },
     {
       consultationType: ConsultationType.Accord,
-      description: `🚨 Plan de sauvegarde de l’emploi (PSE)
+      description: `📚 Plan de développement des compétences
 
-Quand un licenciement économique collectif est prévu, l’employeur doit consulter le CSE.`,
+Pour tout plan de formation ou développement professionnel du personnel académique, une consultation est nécessaire.`,
       process: [
-        `📌 Enjeux pour les élus
-- Sauvegarder un maximum d’emplois.
-- Améliorer les mesures de reclassement.`,
-        `📄 Documents à demander à l’employeur
-- Projet de licenciement et PSE.
-- Critères d’ordre, mesures d’accompagnement.
-- Données économiques justifiant le plan.`,
+        `📌 Enjeux pour le personnel académique
+- Améliorer les compétences pédagogiques.
+- Faciliter le développement professionnel.`,
+        `📄 Documents à demander à l'administration
+- Projet de plan de formation.
+- Critères de sélection, mesures d'accompagnement.
+- Budget alloué.`,
         `🧠 Attitude à adopter
-- Contester les suppressions injustifiées.
+- Identifier les besoins prioritaires.
 - Proposer des alternatives.
-- Travailler avec un expert.`,
+- Travailler en équipe.`,
         `🧩 Bonnes pratiques
 ✔ Suivre un calendrier précis.
-✔ Impliquer les salariés dans la défense de leurs postes.
-✔ Exiger des comptes-rendus réguliers.`,
+✔ Impliquer les collègues dans l'identification des besoins.
+✔ Exiger des suivis réguliers.`,
       ],
     },
     {
       consultationType: ConsultationType.ReglementInterieur,
-      description: `📜 Règlement intérieur
+      description: `📜 Règlement intérieur académique
 
-Avant toute création ou modification du règlement, le CSE doit être consulté.`,
+Avant toute création ou modification du règlement académique, le conseil pédagogique doit être consulté.`,
       process: [
-        `📌 Enjeux pour les élus
-- Prévenir les abus disciplinaires.
-- Garantir des règles claires et légales.`,
-        `📄 Documents à demander à l’employeur
+        `📌 Enjeux pour le personnel académique
+- Prévenir les règles injustes.
+- Garantir des procédures claires et équitables.`,
+        `📄 Documents à demander à l'administration
 - Projet de règlement ou modification.
 - Motifs et objectifs de chaque règle.`,
         `🧠 Attitude à adopter
 - Lire chaque article en détail.
-- Comparer avec le Code du travail.
-- S’opposer aux clauses abusives.`,
+- Comparer avec les pratiques existantes.
+- S'opposer aux clauses problématiques.`,
         `🧩 Bonnes pratiques
 ✔ Proposer des formulations alternatives.
-✔ Vérifier la cohérence avec les usages de l’entreprise.`,
+✔ Vérifier la cohérence avec les usages du département.`,
       ],
     },
     {
-      consultationType: ConsultationType.AccordsCollectif, // Mapping Accord collectif to Accord
-      description: `🤝 Accord collectif (temps de travail, égalité…)
+      consultationType: ConsultationType.AccordsCollectif,
+      description: `🤝 Conventions et accords pédagogiques
 
-Le CSE est informé ou consulté sur certains accords selon leur nature.`,
+Le conseil pédagogique est informé ou consulté sur les conventions et accords avec d'autres institutions.`,
       process: [
-        `📌 Enjeux pour les élus
-- Éviter les reculs sociaux.
-- Protéger les équilibres vie pro/perso.`,
-        `📄 Documents à demander à l’employeur
-- Projet d’accord.
-- Étude d’impact si existante.
+        `📌 Enjeux pour le personnel académique
+- Éviter les engagements défavorables.
+- Protéger les intérêts pédagogiques.`,
+        `📄 Documents à demander à l'administration
+- Projet de convention.
+- Étude d'impact si existante.
 - Position de la direction.`,
         `🧠 Attitude à adopter
-- Lire l’accord ligne par ligne.
-- Demander des précisions sur chaque changement.
+- Lire la convention en détail.
+- Demander des précisions sur chaque engagement.
 - Rédiger un avis argumenté.`,
         `🧩 Bonnes pratiques
-✔ Comparer avec l’accord précédent.
-✔ Échanger avec les salariés concernés.`,
+✔ Comparer avec les conventions précédentes.
+✔ Échanger avec les collègues concernés.`,
       ],
     },
     {
       consultationType: ConsultationType.ActivitePartielle,
-      description: `⏳ Activité partielle (chômage partiel)
+      description: `📝 Organisation des examens et évaluations
 
-Avant toute demande d’activité partielle, l’employeur doit consulter le CSE.`,
+Avant toute modification significative de l'organisation des examens, le conseil pédagogique doit être consulté.`,
       process: [
-        `📌 Enjeux pour les élus
-- Comprendre les causes réelles.
-- Limiter les pertes de revenus.
-- Suivre les engagements pris.`,
-        `📄 Documents à demander à l’employeur
-- Demande d’activité partielle.
-- Catégories concernées, période visée.
-- Engagements de maintien de l’emploi.`,
+        `📌 Enjeux pour le personnel académique
+- Comprendre les changements proposés.
+- Assurer l'équité pour les étudiants.
+- Suivre les bonnes pratiques.`,
+        `📄 Documents à demander à l'administration
+- Nouveau calendrier des examens.
+- Modalités d'évaluation proposées.
+- Mesures pour les cas particuliers.`,
         `🧠 Attitude à adopter
-- Vérifier les justifications.
+- Vérifier la faisabilité pratique.
 - Demander un suivi régulier.
 - Proposer des solutions alternatives.`,
         `🧩 Bonnes pratiques
-✔ S’assurer que tous les services sont traités équitablement.
-✔ Veiller à la durée et aux conditions de reprise.`,
+✔ S'assurer que tous les étudiants sont traités équitablement.
+✔ Veiller aux délais et aux conditions de passation.`,
       ],
     },
     {
       consultationType: ConsultationType.DemenagementReorganisationSite,
-      description: `📦 Déménagement ou réorganisation de site
+      description: `📦 Aménagement des espaces d'enseignement
 
-Tout projet ayant un impact sur l’organisation du travail nécessite une consultation.`,
+Tout projet ayant un impact sur l'organisation des salles de cours nécessite une consultation.`,
       process: [
-        `📌 Enjeux pour les élus
-- Anticiper les risques de désorganisation.
-- Négocier des compensations.`,
-        `📄 Documents à demander à l’employeur
-- Projet de réorganisation.
-- Cartographie des impacts RH.
+        `📌 Enjeux pour le personnel académique
+- Anticiper les perturbations.
+- Négocier des améliorations.`,
+        `📄 Documents à demander à l'administration
+- Projet d'aménagement.
+- Cartographie des impacts.
 - Planning prévu.`,
         `🧠 Attitude à adopter
-- Demander des garanties logistiques (temps de trajet, adaptation…).
-- Impliquer les salariés.
+- Demander des garanties logistiques (équipement, accessibilité…).
+- Impliquer les enseignants concernés.
 - Proposer une phase test.`,
         `🧩 Bonnes pratiques
 ✔ Vérifier les mesures de transition.
@@ -290,22 +290,22 @@ Tout projet ayant un impact sur l’organisation du travail nécessite une consu
     },
     {
       consultationType: ConsultationType.RisquesProfessionnels,
-      description: `⚠️ Risques professionnels / santé / sécurité
+      description: `⚠️ Qualité de vie et conditions d'études
 
-Le CSE est systématiquement consulté sur les mesures liées à la sécurité, au DUERP, et à la prévention.`,
+Le conseil pédagogique est systématiquement consulté sur les mesures liées au bien-être des étudiants et du personnel.`,
       process: [
-        `📌 Enjeux pour les élus
-- Éviter les accidents et maladies professionnelles.
-- Protéger la santé physique et mentale.`,
-        `📄 Documents à demander à l’employeur
-- DUERP, plan de prévention, rapports AT/MP.
-- Fiches de poste, résultats des contrôles.`,
+        `📌 Enjeux pour le personnel académique
+- Améliorer les conditions d'études et de travail.
+- Protéger le bien-être de tous.`,
+        `📄 Documents à demander à l'administration
+- Enquêtes de satisfaction, rapports sur les conditions.
+- Plans d'amélioration prévus.`,
         `🧠 Attitude à adopter
-- Visiter les postes de travail.
+- Recueillir les retours du terrain.
 - Proposer des mesures concrètes.
-- Alerter si besoin.`,
+- Alerter si nécessaire.`,
         `🧩 Bonnes pratiques
-✔ Impliquer les salariés dans les retours terrain.
+✔ Impliquer les étudiants dans les retours.
 ✔ Vérifier la mise en œuvre réelle des mesures.`,
       ],
     },
