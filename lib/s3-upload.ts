@@ -1,15 +1,23 @@
 "use server";
-import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { createClient } from "@supabase/supabase-js";
 
-const s3Client = new S3Client({
-  region: process.env.SCALEWAY_REGION!,
-  endpoint: `https://s3.${process.env.SCALEWAY_REGION}.scw.cloud`,
-  credentials: {
-    accessKeyId: process.env.SCALEWAY_ACCESS_KEY_ID!,
-    secretAccessKey: process.env.SCALEWAY_SECRET_ACCESS_KEY!,
-  },
-});
+// Initialize Supabase client with service role key for server-side uploads
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  {
+    auth: { persistSession: false },
+  }
+);
 
+const BUCKET_NAME = process.env.SUPABASE_BUCKET_NAME || "educo-prod-storage";
+
+/**
+ * Upload files to Supabase Storage
+ * Function name kept as "uploadToS3" for backward compatibility
+ * @param files - Array of File objects to upload
+ * @returns Promise<string[]> - Array of public URLs for uploaded files
+ */
 export async function uploadToS3(files: File[]): Promise<string[]> {
   if (!files || files.length === 0) return [];
 
@@ -20,17 +28,23 @@ export async function uploadToS3(files: File[]): Promise<string[]> {
       // Convert File to ArrayBuffer
       const fileBuffer = await file.arrayBuffer();
 
-      await s3Client.send(
-        new PutObjectCommand({
-          Bucket: process.env.SCALEWAY_BUCKET_NAME!,
-          Key: fileKey,
-          Body: Buffer.from(fileBuffer), // Convert ArrayBuffer to Buffer
-          ContentType: file.type,
-        })
-      );
-      const url = `https://${process.env.SCALEWAY_BUCKET_NAME}.s3.${process.env.SCALEWAY_REGION}.scw.cloud/${fileKey}`;
-      //encode url
-      const encodedUrl = encodeURI(url);
+      // Upload to Supabase Storage
+      const { data, error } = await supabase.storage
+        .from(BUCKET_NAME)
+        .upload(fileKey, fileBuffer, {
+          contentType: file.type,
+          upsert: false, // Don't overwrite existing files
+        });
+
+      if (error) throw error;
+
+      // Get public URL for the uploaded file
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from(BUCKET_NAME).getPublicUrl(fileKey);
+
+      // Encode URL to handle special characters
+      const encodedUrl = encodeURI(publicUrl);
       return encodedUrl;
     } catch (error) {
       console.error("Error uploading file:", error);

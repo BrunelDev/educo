@@ -26,10 +26,6 @@ const getHostFromUrl = (url: string) => {
 const API_HOST = getHostFromUrl(API_URL);
 const WS_HOST = getHostFromUrl(WS_URL);
 
-// Get S3 bucket name from environment
-const S3_BUCKET = process.env.NEXT_PUBLIC_SCALEWAY_BUCKET_NAME || "cse-impact";
-const S3_REGION = process.env.NEXT_PUBLIC_SCALEWAY_REGION || "eu-north-1";
-
 // Security headers object for reuse
 const SECURITY_HEADERS = {
   "X-Content-Type-Options": "nosniff",
@@ -38,8 +34,8 @@ const SECURITY_HEADERS = {
   "Referrer-Policy": "strict-origin-when-cross-origin",
   "Content-Security-Policy": `
     default-src 'self';
-    connect-src 'self' ${API_HOST} ${WS_HOST} *.amazonaws.com *.scw.cloud ${S3_BUCKET}.s3.${S3_REGION}.amazonaws.com;
-    img-src 'self' data: https: *.amazonaws.com *.scw.cloud ${S3_BUCKET}.s3.${S3_REGION}.amazonaws.com ${S3_BUCKET}.s3.${S3_REGION}.scw.cloud;
+    connect-src 'self' ${API_HOST} ${WS_HOST} *.supabase.co;
+    img-src 'self' data: https: *.supabase.co;
     script-src 'self' 'unsafe-inline';
     style-src 'self' 'unsafe-inline';
   `

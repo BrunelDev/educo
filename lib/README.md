@@ -1,23 +1,36 @@
-# Documentation du module d'upload S3
+# Fichiers de la bibliothèque (lib/)
 
-Ce document fournit une brève explication du fichier `s3-upload.ts`.
+Ce dossier contient les utilitaires, fonctions et configurations partagés dans toute l'application.
 
-## Objectif
+## Module d'Upload de Fichiers: `s3-upload.ts`
 
-Le module `s3-upload.ts` est responsable de l'envoi de fichiers vers un bucket S3 compatible, spécifiquement configuré pour Scaleway Object Storage. Il est conçu pour être utilisé côté serveur.
+Le module `s3-upload.ts` est responsable de l'envoi de fichiers vers Supabase Storage. Il est conçu pour être utilisé côté serveur.
 
-## Configuration
+### Variables d'environnement requises
 
-Ce module nécessite les variables d'environnement suivantes pour fonctionner correctement :
+Avant d'utiliser ce module, configurez les variables d'environnement suivantes dans votre fichier `.env.local`:
 
-- `SCALEWAY_REGION`: La région de votre bucket Scaleway (ex: `fr-par`).
-- `SCALEWAY_ACCESS_KEY_ID`: Votre clé d'accès Scaleway.
-- `SCALEWAY_SECRET_ACCESS_KEY`: Votre clé d'accès secrète Scaleway.
-- `SCALEWAY_BUCKET_NAME`: Le nom de votre bucket sur Scaleway.
+- `NEXT_PUBLIC_SUPABASE_URL`: L'URL de votre projet Supabase (ex: `https://xxxxx.supabase.co`)
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Votre clé publique Supabase
+- `SUPABASE_SERVICE_ROLE_KEY`: Votre clé service role Supabase (⚠️ gardez-la secrète!)
+- `SUPABASE_BUCKET_NAME`: Le nom de votre bucket sur Supabase (défaut: `educo-prod-storage`)
 
-Ces variables sont utilisées pour configurer le client S3.
+**Note**: Pour obtenir ces identifiants, consultez le guide de configuration: `SUPABASE_STORAGE_SETUP.md`
 
-## Fonction `uploadToS3`
+### Utilisation
+
+```typescript
+import { uploadToS3 } from "@/lib/s3-upload";
+
+// Upload un ou plusieurs fichiers
+const files: File[] = [file1, file2];
+const urls: string[] = await uploadToS3(files);
+
+console.log("Fichiers uploadés:", urls);
+// URLs publiques des fichiers uploadés sur Supabase Storage
+```
+
+### Fonction `uploadToS3`
 
 ### Signature
 
@@ -39,9 +52,6 @@ Cette fonction asynchrone prend un tableau d'objets `File` et les téléverse su
 
 ### Fonctionnement
 
-1.  **Initialisation du client S3** : Un client S3 est créé avec les informations d'identification et de région de Scaleway.
-2.  **Gestion des fichiers** : La fonction `uploadToS3` mappe chaque fichier du tableau d'entrée.
-3.  **Génération de la clé** : Pour chaque fichier, une clé unique est générée en utilisant le timestamp actuel et le nom original du fichier pour éviter les collisions. Le préfixe `web-impact-cse/` est ajouté.
 4.  **Téléversement** : Le contenu du fichier est lu en tant que `ArrayBuffer`, puis converti en `Buffer` et envoyé au bucket S3 via la commande `PutObjectCommand`. Le `ContentType` (type MIME) du fichier est également défini.
 5.  **Génération de l'URL** : Après un téléversement réussi, l'URL publique du fichier est construite.
 6.  **Encodage de l'URL** : L'URL est encodée avec `encodeURI` pour s'assurer qu'elle est valide.
