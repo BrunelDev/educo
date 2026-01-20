@@ -243,7 +243,7 @@ Pour tout plan de formation ou développement professionnel du personnel académ
         `🧠 Attitude à adopter
 - Identifier les besoins prioritaires.
 - Proposer des alternatives.
-- Travailler en équipe.`,
+- Travailler en groupe.`,
         `🧩 Bonnes pratiques
 ✔ Suivre un calendrier précis.
 ✔ Impliquer les collègues dans l'identification des besoins.

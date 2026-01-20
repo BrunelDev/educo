@@ -45,11 +45,11 @@ export default function Equipe() {
       <div className="flex flex-col sm:flex-row justify-between gap-4 sm:gap-0">
         {users?.membres ? (
           <h6 className="text-lg font-medium">
-            {users.membres?.length - 1} associé
+            {users.membres?.length - 1} membres
             {users.membres?.length - 1 > 1 ? "s" : ""}
           </h6>
         ) : (
-          <h6 className="text-lg font-medium">Aucune équipe liée.</h6>
+          <h6 className="text-lg font-medium">Aucun groupe liée.</h6>
         )}
 
         {/* Actions container with responsive adjustments */}

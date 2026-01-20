@@ -49,7 +49,7 @@ export default function MessagePage() {
                 Créer une Nouvelle Conversation de groupe
               </DialogTitle>
               <DialogDescription>
-                Sélectionnez les membres de votre équipe pour les ajouter au
+                Sélectionnez les membres de votre groupe pour les ajouter au
                 nouveau groupe.
               </DialogDescription>
             </DialogHeader>
