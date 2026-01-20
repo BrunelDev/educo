@@ -16,7 +16,7 @@ export default function RenouvellerMotDePassePage({
           <Image
             width={230}
             height={230}
-            src="/logo.svg"
+            src="/logo.png"
             alt="impact cse"
             className="self-center"
           />

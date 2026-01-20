@@ -6,7 +6,7 @@ export default function Navbar() {
   return (
     <nav className="w-full rounded-full bg-white/10 backdrop-blur-md border border-white/20 py-3 px-4 sm:px-6 flex items-center justify-between shadow-lg">
       <Image
-        src="/logo.svg"
+        src="/logo.png"
         width={167}
         height={48}
         alt="The logo"
@@ -19,22 +19,34 @@ export default function Navbar() {
           </Link>
         </li>
         <li>
-          <Link href="#about-us" className="hover:text-coral-500 transition-colors">
+          <Link
+            href="#about-us"
+            className="hover:text-coral-500 transition-colors"
+          >
             Qui sommes-nous ?
           </Link>
         </li>
         <li>
-          <Link href="#solution" className="hover:text-coral-500 transition-colors">
+          <Link
+            href="#solution"
+            className="hover:text-coral-500 transition-colors"
+          >
             Notre solution
           </Link>
         </li>
         <li>
-          <Link href="#tarif" className="hover:text-coral-500 transition-colors">
+          <Link
+            href="#tarif"
+            className="hover:text-coral-500 transition-colors"
+          >
             Tarif
           </Link>
         </li>
         <li>
-          <Link href="#contact" className="hover:text-coral-500 transition-colors">
+          <Link
+            href="#contact"
+            className="hover:text-coral-500 transition-colors"
+          >
             Contactez nous
           </Link>
         </li>

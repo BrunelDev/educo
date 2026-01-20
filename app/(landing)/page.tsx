@@ -1,22 +1,29 @@
-import React from "react";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import Image from "next/image";
 import {
-  Users,
-  Calendar,
-  MessageSquare,
-  FileText,
   BarChart3,
   BookOpen,
-  Video,
   CheckCircle2,
   Menu,
+  MessageSquare,
+  Users,
 } from "lucide-react";
+import Image from "next/image";
+import React from "react";
 
-function FeatureCard({ imageUrl, title, description, index }: { imageUrl: string; title: React.ReactNode; description: string; index: number }) {
+function FeatureCard({
+  imageUrl,
+  title,
+  description,
+  index,
+}: {
+  imageUrl: string;
+  title: React.ReactNode;
+  description: string;
+  index: number;
+}) {
   return (
     <Card className="group border-0 shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 bg-white/50 backdrop-blur-sm">
       <CardContent className="p-0">
@@ -36,14 +43,19 @@ function FeatureCard({ imageUrl, title, description, index }: { imageUrl: string
             <div className="w-10 h-10 bg-gradient-to-br from-coral-500 to-crimson-500 rounded-full flex items-center justify-center text-white font-bold text-lg">
               {index + 1}
             </div>
-            <Badge variant="secondary" className="bg-coral-100 text-coral-700 hover:bg-coral-200">
+            <Badge
+              variant="secondary"
+              className="bg-coral-100 text-coral-700 hover:bg-coral-200"
+            >
               Fonctionnalité
             </Badge>
           </div>
           <h3 className="text-2xl font-bold text-gray-900 mb-4 leading-tight group-hover:text-coral-600 transition-colors">
             {title}
           </h3>
-          <p className="text-gray-600 leading-relaxed text-base">{description}</p>
+          <p className="text-gray-600 leading-relaxed text-base">
+            {description}
+          </p>
         </div>
       </CardContent>
     </Card>
@@ -56,10 +68,14 @@ function Navbar() {
       <div className="container mx-auto px-6 lg:px-20">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-coral-500 to-crimson-500 rounded-xl flex items-center justify-center shadow-lg">
-              <BookOpen className="w-6 h-6 text-white" />
-            </div>
-            <span className="text-2xl font-bold text-gray-900">EduCollab</span>
+            <Image
+              width={80}
+              height={40}
+              src="/logo.png"
+              alt="impact cse"
+              className="self-center"
+            />
+            <span className="text-2xl font-bold text-gray-900">Educo</span>
           </div>
 
           {/* Desktop Menu */}
@@ -241,7 +257,10 @@ export default function LandingPage() {
               <Button className="bg-gradient-to-r from-coral-500 to-crimson-500 hover:from-coral-600 hover:to-crimson-600 text-white px-8 lg:px-12 py-4 text-lg rounded-full shadow-2xl hover:shadow-3xl hover:scale-105 transition-all duration-300 font-semibold">
                 Demander une démo
               </Button>
-              <Button variant="outline" className="px-8 lg:px-12 py-4 text-lg rounded-full hover:shadow-xl transition-all duration-300 font-semibold border-2 border-gray-300 hover:border-coral-300">
+              <Button
+                variant="outline"
+                className="px-8 lg:px-12 py-4 text-lg rounded-full hover:shadow-xl transition-all duration-300 font-semibold border-2 border-gray-300 hover:border-coral-300"
+              >
                 En savoir plus
               </Button>
             </div>
@@ -269,9 +288,16 @@ export default function LandingPage() {
               { value: "500+", label: "Établissements", icon: Users },
               { value: "50K+", label: "Utilisateurs actifs", icon: BarChart3 },
               { value: "99.9%", label: "Disponibilité", icon: CheckCircle2 },
-              { value: "24/7", label: "Support technique", icon: MessageSquare },
+              {
+                value: "24/7",
+                label: "Support technique",
+                icon: MessageSquare,
+              },
             ].map((stat, i) => (
-              <div key={i} className="text-center space-y-4 group hover:scale-105 transition-transform duration-300">
+              <div
+                key={i}
+                className="text-center space-y-4 group hover:scale-105 transition-transform duration-300"
+              >
                 <stat.icon className="w-12 h-12 text-coral-500 mx-auto group-hover:scale-110 transition-transform" />
                 <div className="text-4xl lg:text-5xl font-black text-coral-500">
                   {stat.value}
@@ -336,7 +362,10 @@ export default function LandingPage() {
                   <Button className="bg-white text-coral-600 hover:bg-gray-50 px-8 lg:px-12 py-4 text-lg rounded-full font-semibold shadow-lg hover:shadow-xl transition-all">
                     Ouvrir un compte
                   </Button>
-                  <Button variant="outline" className="bg-coral-600/30 backdrop-blur-sm text-white hover:bg-coral-600/40 px-8 lg:px-12 py-4 text-lg rounded-full font-semibold border-2 border-white/30 transition-all">
+                  <Button
+                    variant="outline"
+                    className="bg-coral-600/30 backdrop-blur-sm text-white hover:bg-coral-600/40 px-8 lg:px-12 py-4 text-lg rounded-full font-semibold border-2 border-white/30 transition-all"
+                  >
                     Prendre rendez-vous
                   </Button>
                 </div>
@@ -358,14 +387,14 @@ export default function LandingPage() {
                 Qui sommes-nous ?
               </h2>
               <p className="text-xl lg:text-2xl font-semibold text-coral-500 leading-relaxed">
-                EduCollab : Transformer la collaboration éducative avec
+                Educo : Transformer la collaboration éducative avec
                 innovation et engagement
               </p>
             </div>
 
             <div className="space-y-6 text-lg text-gray-600 leading-relaxed">
               <p>
-                Créée en 2020, EduCollab est née d'un constat simple : les
+                Créée en 2020, Educo est née d'un constat simple : les
                 établissements scolaires méritent des outils de collaboration
                 aussi performants que ceux des grandes entreprises, mais adaptés
                 à leurs besoins spécifiques.
@@ -409,7 +438,7 @@ export default function LandingPage() {
                 <div className="w-10 h-10 bg-gradient-to-br from-coral-500 to-crimson-500 rounded-xl flex items-center justify-center shadow-lg">
                   <BookOpen className="w-6 h-6 text-white" />
                 </div>
-                <span className="text-xl font-bold text-white">EduCollab</span>
+                <span className="text-xl font-bold text-white">Educo</span>
               </div>
               <p className="text-gray-400 leading-relaxed">
                 La plateforme collaborative pour l'éducation moderne
@@ -510,7 +539,7 @@ export default function LandingPage() {
           </div>
 
           <div className="border-t border-gray-800 pt-8 text-center text-gray-400">
-            <p className="text-sm">© 2026 EduCollab. Tous droits réservés.</p>
+            <p className="text-sm">© 2026 Educo. Tous droits réservés.</p>
           </div>
         </div>
       </footer>

@@ -83,7 +83,7 @@ export function AppSidebar() {
       const userInfoResponse: User = await getUser();
       console.log(
         "--------is last message read-------",
-        userInfoResponse.is_last_message_read
+        userInfoResponse.is_last_message_read,
       );
       setUserInfo(userInfoResponse);
     };
@@ -102,7 +102,7 @@ export function AppSidebar() {
         <SidebarGroup>
           <div className="flex justify-center">
             <Image
-              src={"/original-logo.svg"}
+              src={"/logo.png"}
               width={169}
               height={59.3}
               alt="The logo"
@@ -117,9 +117,9 @@ export function AppSidebar() {
                     key={item.title + index}
                     asChild
                     className={`group/item relative hover:bg-gradient-to-r ${
-                      isActive(item.url)
-                        ? "bg-gradient-to-r from-[#FFDDE3] to-[#FFDDE300]"
-                        : ""
+                      isActive(item.url) ?
+                        "bg-gradient-to-r from-[#FFDDE3] to-[#FFDDE300]"
+                      : ""
                     } hover:from-[#FFDDE3] hover:to-[#FFDDE300] w-full py-2 px-3`}
                   >
                     <a
@@ -134,9 +134,9 @@ export function AppSidebar() {
                           e.preventDefault();
                           await updateProfile({ is_last_message_read: true });
                           setUserInfo((prev) =>
-                            prev
-                              ? { ...prev, is_last_message_read: true }
-                              : prev
+                            prev ?
+                              { ...prev, is_last_message_read: true }
+                            : prev,
                           );
                           window.location.href = item.url;
                         }

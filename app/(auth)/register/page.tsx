@@ -10,7 +10,7 @@ export default function RegisterPage() {
           <Image
             width={230}
             height={100}
-            src="/logo.svg"
+            src="/logo.png"
             alt="impact cse"
             className="self-center"
           />
