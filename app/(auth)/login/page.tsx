@@ -8,10 +8,10 @@ export default function LoginPage() {
       <div className="relative hidden md:flex px-20 py-8  md:flex-col md:justify-around">
         <div className="justify-self-start">
           <Image
-            width={230}
+            width={160}
             height={100}
             src="/logo.png"
-            alt="impact cse"
+            alt="educo"
             className="self-center"
           />
         </div>

@@ -103,8 +103,8 @@ export function AppSidebar() {
           <div className="flex justify-center">
             <Image
               src={"/logo.png"}
-              width={169}
-              height={59.3}
+              width={100}
+              height={50}
               alt="The logo"
               className="py-4 border-b border-white-200"
             />

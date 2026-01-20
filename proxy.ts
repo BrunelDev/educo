@@ -43,7 +43,7 @@ const SECURITY_HEADERS = {
     .trim(),
 };
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   // Get access token from request cookies (server-side)
   const accessToken = request.cookies.get("access_token")?.value;
   const response = NextResponse.next();

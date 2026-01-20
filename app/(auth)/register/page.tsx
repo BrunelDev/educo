@@ -8,10 +8,10 @@ export default function RegisterPage() {
       <div className="relative hidden md:flex pl-20 pr-5 pt-8  md:flex-col md:gap-5">
         <div className="justify-self-start">
           <Image
-            width={230}
+            width={160}
             height={100}
             src="/logo.png"
-            alt="impact cse"
+            alt="educo"
             className="self-center"
           />
         </div>
@@ -26,7 +26,7 @@ export default function RegisterPage() {
           width={1429.123515884542}
           height={870.1743657071188}
           src="/macBook.svg"
-          alt="impact cse"
+          alt="educo"
         />
       </div>
       <div className="flex items-center w-full bg-white p-6 md:p-24 rounded-tl-[28px] rounded-bl-[28px] h-screen overflow-hidden">

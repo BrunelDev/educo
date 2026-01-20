@@ -1,3 +1,4 @@
+"use client"
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -11,6 +12,7 @@ import {
   Users,
 } from "lucide-react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import React from "react";
 
 function FeatureCard({
@@ -63,6 +65,7 @@ function FeatureCard({
 }
 
 function Navbar() {
+  const router = useRouter();
   return (
     <nav className="bg-white/90 backdrop-blur-lg border-b border-gray-200/50 sticky top-0 z-50">
       <div className="container mx-auto px-6 lg:px-20">
@@ -72,7 +75,7 @@ function Navbar() {
               width={80}
               height={40}
               src="/logo.png"
-              alt="impact cse"
+              alt="educo"
               className="self-center"
             />
             <span className="text-2xl font-bold text-gray-900">Educo</span>
@@ -94,7 +97,8 @@ function Navbar() {
               À propos
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-coral-500 group-hover:w-full transition-all duration-300"></span>
             </a>
-            <Button className="bg-gradient-to-r from-coral-500 to-crimson-500 hover:from-coral-600 hover:to-crimson-600 text-white px-6 py-2 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 font-semibold">
+            <Button className="bg-gradient-to-r from-coral-500 to-crimson-500 hover:from-coral-600 hover:to-crimson-600 text-white px-6 py-2 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 font-semibold"
+            onClick={() => router.push("/login")}>
               Démarrer
             </Button>
           </div>
@@ -120,7 +124,8 @@ function Navbar() {
                 >
                   À propos
                 </a>
-                <Button className="bg-gradient-to-r from-coral-500 to-crimson-500 text-white rounded-full font-semibold mt-4">
+                <Button className="bg-gradient-to-r from-coral-500 to-crimson-500 text-white rounded-full font-semibold mt-4"
+                onClick={() => router.push("/login")}>
                   Démarrer
                 </Button>
               </div>
@@ -223,6 +228,7 @@ export default function LandingPage() {
         "Organisez cours en ligne, réunions virtuelles et sessions de tutorat directement depuis la plateforme. Enregistrement des séances, partage d'écran et outils pédagogiques interactifs inclus.",
     },
   ];
+  const router = useRouter();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-white">
@@ -387,8 +393,8 @@ export default function LandingPage() {
                 Qui sommes-nous ?
               </h2>
               <p className="text-xl lg:text-2xl font-semibold text-coral-500 leading-relaxed">
-                Educo : Transformer la collaboration éducative avec
-                innovation et engagement
+                Educo : Transformer la collaboration éducative avec innovation
+                et engagement
               </p>
             </div>
 
@@ -435,10 +441,12 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-4 gap-12 mb-12">
             <div className="space-y-4">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-coral-500 to-crimson-500 rounded-xl flex items-center justify-center shadow-lg">
-                  <BookOpen className="w-6 h-6 text-white" />
-                </div>
-                <span className="text-xl font-bold text-white">Educo</span>
+                <Image
+                  src="/logo.png"
+                  width={167}
+                  height={48}
+                  alt="The logo"
+                />
               </div>
               <p className="text-gray-400 leading-relaxed">
                 La plateforme collaborative pour l'éducation moderne
