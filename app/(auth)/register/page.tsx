@@ -22,12 +22,6 @@ export default function RegisterPage() {
           Accédez à toutes les fonctionnalités essentielles pour gérer réunions
           pédagogiques, documents, formations et bien plus encore.
         </p>
-        <Image
-          width={1429.123515884542}
-          height={870.1743657071188}
-          src="/macBook.svg"
-          alt="educo"
-        />
       </div>
       <div className="flex items-center w-full bg-white p-6 md:p-24 rounded-tl-[28px] rounded-bl-[28px] h-screen overflow-hidden">
         <div className="w-full">

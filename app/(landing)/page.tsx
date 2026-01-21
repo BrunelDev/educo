@@ -1,11 +1,10 @@
-"use client"
+"use client";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
   BarChart3,
-  BookOpen,
   CheckCircle2,
   Menu,
   MessageSquare,
@@ -97,8 +96,10 @@ function Navbar() {
               À propos
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-coral-500 group-hover:w-full transition-all duration-300"></span>
             </a>
-            <Button className="bg-gradient-to-r from-coral-500 to-crimson-500 hover:from-coral-600 hover:to-crimson-600 text-white px-6 py-2 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 font-semibold"
-            onClick={() => router.push("/login")}>
+            <Button
+              className="bg-gradient-to-r from-coral-500 to-crimson-500 hover:from-coral-600 hover:to-crimson-600 text-white px-6 py-2 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 font-semibold"
+              onClick={() => router.push("/login")}
+            >
               Démarrer
             </Button>
           </div>
@@ -124,8 +125,10 @@ function Navbar() {
                 >
                   À propos
                 </a>
-                <Button className="bg-gradient-to-r from-coral-500 to-crimson-500 text-white rounded-full font-semibold mt-4"
-                onClick={() => router.push("/login")}>
+                <Button
+                  className="bg-gradient-to-r from-coral-500 to-crimson-500 text-white rounded-full font-semibold mt-4"
+                  onClick={() => router.push("/login")}
+                >
                   Démarrer
                 </Button>
               </div>
@@ -270,18 +273,6 @@ export default function LandingPage() {
                 En savoir plus
               </Button>
             </div>
-
-            <div className="pt-16">
-              <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-gray-200/50">
-                <Image
-                  src="/macbook-home.png"
-                  height={503.5}
-                  width={827}
-                  alt="Dashboard preview"
-                  className="w-full h-auto hover:scale-105 transition-transform duration-700"
-                />
-              </div>
-            </div>
           </div>
         </div>
       </section>
@@ -365,7 +356,8 @@ export default function LandingPage() {
                   surpris par tout ce que nous pouvons vous offrir !
                 </p>
                 <div className="flex flex-col sm:flex-row gap-6 pt-4">
-                  <Button className="bg-white text-coral-600 hover:bg-gray-50 px-8 lg:px-12 py-4 text-lg rounded-full font-semibold shadow-lg hover:shadow-xl transition-all">
+                  <Button className="bg-white text-coral-600 hover:bg-gray-50 px-8 lg:px-12 py-4 text-lg rounded-full font-semibold shadow-lg hover:shadow-xl transition-all"
+                  onClick={() => router.push("/register")}>
                     Ouvrir un compte
                   </Button>
                   <Button
@@ -422,16 +414,6 @@ export default function LandingPage() {
               </p>
             </div>
           </div>
-
-          <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-gray-200/50">
-            <Image
-              src="/about_us-img.png"
-              height={700}
-              width={1160}
-              alt="Notre équipe"
-              className="w-full h-auto hover:scale-105 transition-transform duration-700"
-            />
-          </div>
         </div>
       </section>
 
@@ -441,12 +423,7 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-4 gap-12 mb-12">
             <div className="space-y-4">
               <div className="flex items-center gap-3">
-                <Image
-                  src="/logo.png"
-                  width={167}
-                  height={48}
-                  alt="The logo"
-                />
+                <Image src="/logo.png" width={167} height={48} alt="The logo" />
               </div>
               <p className="text-gray-400 leading-relaxed">
                 La plateforme collaborative pour l'éducation moderne
