@@ -5,10 +5,8 @@ module.exports = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "mongodb.com",
-        port: "",
-        pathname: "/**",
-        search: "",
+        hostname: "gktyodytvqurbcbyvnrj.supabase.co",
+        pathname: "/storage/v1/object/public/**",
       },
       {
         protocol: "https",

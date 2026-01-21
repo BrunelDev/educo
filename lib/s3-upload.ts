@@ -44,8 +44,7 @@ export async function uploadToS3(files: File[]): Promise<string[]> {
       } = supabase.storage.from(BUCKET_NAME).getPublicUrl(fileKey);
 
       // Encode URL to handle special characters
-      const encodedUrl = encodeURI(publicUrl);
-      return encodedUrl;
+      return publicUrl;
     } catch (error) {
       console.error("Error uploading file:", error);
       throw error;
