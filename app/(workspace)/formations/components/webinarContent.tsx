@@ -1,7 +1,7 @@
-import WebinarCard from "./webinarCard";
-import { useEffect, useState } from "react";
-import { getWebinaires, Webinaire } from "@/lib/api/formations";
 import EmptyState from "@/app/_components/EmptyState";
+import { getWebinaires, Webinaire } from "@/lib/api/formations";
+import { useEffect, useState } from "react";
+import WebinarCard from "./webinarCard";
 export default function WebinarContent() {
   const [allWebinars, setAllWebinars] = useState<Webinaire[]>([]);
   const [upcomingWebinars, setUpcomingWebinars] = useState<Webinaire[]>([]);
@@ -18,7 +18,7 @@ export default function WebinarContent() {
         const response = await getWebinaires();
         setAllWebinars(response.results || []);
       } catch (err: unknown) {
-        console.error("Error fetching webinars:", err);
+        ;
         setError("Impossible de charger les webinaires. Veuillez réessayer plus tard.");
       } finally {
         setLoading(false);

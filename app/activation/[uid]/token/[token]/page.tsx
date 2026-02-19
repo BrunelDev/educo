@@ -50,9 +50,10 @@ export default function ActivationPage({
           setMessage(data.message || "Échec de l'activation");
         }
       } catch (error) {
+console.error(error)
         setStatus("error");
         setMessage("Une erreur s'est produite lors de l'activation");
-        console.error("Erreur d'activation:", error);
+        ;
       }
     };
 

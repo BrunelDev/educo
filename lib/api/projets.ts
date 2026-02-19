@@ -45,7 +45,7 @@ export const getProjects = async (team_id?: number): Promise<Project[]> => {
     });
     return response.data;
   } catch (error: unknown) {
-    console.error("Erreur lors de la récupération des projets :", error);
+    console.error(error);
     return [];
   }
 };
@@ -60,13 +60,13 @@ export const createProject = async (
   project: createProjectParams
 ): Promise<Project> => {
   try {
-    console.log(project);
+    ;
     const response = await api.post<Project>(endpoints.projets.base, {
       ...project,
     });
     return response.data;
   } catch (error: unknown) {
-    console.error("Erreur lors de la création du projet :", error);
+    console.error(error);
     throw error;
   }
 };
@@ -76,7 +76,7 @@ export const getProjectById = async (id: number) => {
     const response = await api.get<Project>(`${endpoints.projets.base}${id}/`);
     return response.data;
   } catch (error: unknown) {
-    console.error("Erreur lors de la récupération du projet :", error);
+    console.error(error);
     throw error;
   }
 };
@@ -90,7 +90,7 @@ export const deleteProject = async (id: number): Promise<void> => {
   try {
     await api.delete(`${endpoints.projets.base}${id}/`);
   } catch (error: unknown) {
-    console.error("Erreur lors de la suppression du projet :", error);
+    console.error(error);
     throw error;
   }
 };
@@ -124,7 +124,7 @@ export const updateProject = async (
     );
     return response.data;
   } catch (error: unknown) {
-    console.error("Erreur lors de la mise à jour du projet :", error);
+    console.error(error);
     throw error;
   }
 };

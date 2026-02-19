@@ -3,12 +3,12 @@
 import EmptyState from "@/app/_components/EmptyState";
 import GoBack from "@/app/_components/goback";
 import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbPage,
+    BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Dossier, getDossierById } from "@/lib/api/formations";
 import { Fragment, use, useEffect, useState } from "react";
@@ -35,7 +35,8 @@ export default function DossierPage({
         const dossierData = await getDossierById(parseInt(id));
         setFolderContent(dossierData);
       } catch (error) {
-        console.error("Erreur lors de la récupération du dossier:", error);
+console.error(error)
+        ;
         setError("Impossible de charger le dossier.");
       } finally {
         setLoading(false);
@@ -59,7 +60,7 @@ export default function DossierPage({
           path.unshift(parentFolder); // Add parent to the beginning of the path
           parentIdToFetch = parentFolder.parent;
         } catch (err) {
-          console.error("Error fetching parent folder for breadcrumb:", err);
+          ;
           toast.error("Erreur lors de la construction du fil d'Ariane.");
           parentIdToFetch = null; // Stop if there's an error
         }

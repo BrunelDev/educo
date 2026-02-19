@@ -1,9 +1,9 @@
 "use client";
-import { use, useEffect, useState } from "react";
-import Image from "next/image";
-import { CalendarDays, UserCircle, Link as LinkIcon } from "lucide-react";
-import { getActualiteById } from "@/lib/api/actualites";
 import GoBack from "@/app/_components/goback";
+import { getActualiteById } from "@/lib/api/actualites";
+import { CalendarDays, Link as LinkIcon, UserCircle } from "lucide-react";
+import Image from "next/image";
+import { use, useEffect, useState } from "react";
 // Updated Actuality interface based on your schema
 interface Actuality {
   id: number;
@@ -34,7 +34,7 @@ export default function ActualityDetailPage({
       try {
         setLoading(true);
         const actualityData = await getActualiteById(id);
-        console.log("actualityData", actualityData);
+        ;
         setActuality(actualityData);
       } catch (err) {
         setError(
@@ -42,7 +42,7 @@ export default function ActualityDetailPage({
             ? err.message
             : "Une erreur est survenue lors de la récupération de l&apos;actualité"
         );
-        console.error(err);
+        ;
       } finally {
         setLoading(false);
       }

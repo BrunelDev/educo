@@ -139,7 +139,7 @@ export const markLastMessageAsRead = async (
     const response = await api.patch(`${endpoints.messagerie.base}${id}/`, {
       is_last_message_read,
     });
-    console.log("mark last message as read", response.data);
+    ;
     return response.data;
   } catch (error: unknown) {
     console.error(
@@ -158,7 +158,7 @@ export const markGroupLastMessageAsRead = async (
     const response = await api.patch(`${endpoints.messagerie.groupes}${id}/`, {
       is_last_message_read,
     });
-    console.log("mark last group message as read", response.data);
+    ;
     return response.data;
   } catch (error: unknown) {
     console.error(

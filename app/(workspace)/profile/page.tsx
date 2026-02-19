@@ -1,11 +1,10 @@
 "use client"
-import React from 'react'
-import { FirstBox, SecondBox, ThirdBox } from './components/box'
 import { Button } from '@/components/ui/button'
-import { logout, User, getUser } from '@/lib/api/users'
+import { getUser, logout, User } from '@/lib/api/users'
+import { getCookies } from '@/lib/utils/cookies'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { getCookies } from '@/lib/utils/cookies'
+import { FirstBox, SecondBox, ThirdBox } from './components/box'
 
 export default function Profile() {
   const userInfo: User = JSON.parse(getCookies("userInfo") || "{}");
@@ -16,7 +15,8 @@ export default function Profile() {
           const res = await getUser();
           setUser(res);
         } catch (error) {
-          console.error(error);
+console.error(error)
+          ;
         }
       };
       fetchUser();

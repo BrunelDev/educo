@@ -1,29 +1,29 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  getOrganisationMembers,
-  OrganizationMember,
-} from "@/lib/api/organisation";
+import { Textarea } from "@/components/ui/textarea";
 import { createGroup } from "@/lib/api/messagerie";
-import { toast } from "sonner";
+import {
+    getOrganisationMembers,
+    OrganizationMember,
+} from "@/lib/api/organisation";
+import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import * as z from "zod";
 
 interface CreateGroupFormProps {
   onGroupCreated: () => void;
@@ -63,7 +63,8 @@ export default function CreateGroupForm({
         // Filter out the current user
         setMembers(response.filter((member) => member.id !== currentUserId));
       } catch (error) {
-        console.error("Error fetching organization members:", error);
+console.error(error)
+        ;
         toast.error(
           "Erreur lors de la récupération des membres de l'organisation"
         );
@@ -88,7 +89,8 @@ export default function CreateGroupForm({
       onGroupCreated(); // Close the dialog and potentially refresh group list
       form.reset();
     } catch (error) {
-      console.error("Error creating group:", error);
+console.error(error)
+      ;
       toast.error("Échec de la création du groupe.");
     } finally {
       setIsLoading(false);

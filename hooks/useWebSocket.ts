@@ -1,9 +1,9 @@
 "use client";
 
+import { ConnectionState, WebSocketMessage } from "@/lib/types/websocket";
 import { getCookies } from "@/lib/utils/cookies";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { WebSocketMessage, ConnectionState } from "@/lib/types/websocket";
 /**
  * type: string;
     message: string;
@@ -32,14 +32,12 @@ export const useWebSocket = (conversationId: string) => {
   const maxReconnectAttempts = 5;
   const connectionTimeoutMs = 10000; // 10 seconds
 
-  // Function to establish WebSocket connection
   const connectWebSocket = useCallback(() => {
     if (!conversationId) {
       setConnectionState(ConnectionState.DISCONNECTED);
       return;
     }
 
-    // Clear any existing connection timeout
     if (connectionTimeoutRef.current) {
       clearTimeout(connectionTimeoutRef.current);
     }
@@ -60,10 +58,9 @@ export const useWebSocket = (conversationId: string) => {
         `${process.env.NEXT_PUBLIC_WEBSOCKET_URL}${conversationId}/?token=${token}`
       );
 
-      // Set connection timeout
       connectionTimeoutRef.current = setTimeout(() => {
         if (ws.readyState !== WebSocket.OPEN) {
-          console.error("WebSocket connection timeout");
+          ;
           setConnectionError("Connection timeout. Please try again later.");
           setConnectionState(ConnectionState.ERROR);
           ws.close();
@@ -71,7 +68,7 @@ export const useWebSocket = (conversationId: string) => {
       }, connectionTimeoutMs);
 
       ws.onopen = () => {
-        console.log("WebSocket Connected");
+        ;
         setIsConnected(true);
         setConnectionState(ConnectionState.CONNECTED);
         reconnectAttemptsRef.current = 0; // Reset reconnect attempts on successful connection
@@ -86,7 +83,7 @@ export const useWebSocket = (conversationId: string) => {
       ws.onmessage = (event) => {
         try {
           const data = JSON.parse(event.data);
-          console.log("Received message:", data);
+          ;
 
           if (data.type === "message") {
             const receivedMessage: WebSocketMessage = {
@@ -115,18 +112,19 @@ export const useWebSocket = (conversationId: string) => {
             });
           }
         } catch (error) {
-          console.error("Failed to parse message:", error);
+console.error(error)
+          ;
         }
       };
 
       ws.onerror = (error) => {
-        console.error("WebSocket Error:", error);
+        ;
         setConnectionError("Connection error. Please try again later.");
         setConnectionState(ConnectionState.ERROR);
       };
 
       ws.onclose = (event) => {
-        console.log("WebSocket Disconnected", event);
+        ;
         setIsConnected(false);
 
         // Mark messages as stale
@@ -171,7 +169,8 @@ export const useWebSocket = (conversationId: string) => {
 
       socketRef.current = ws;
     } catch (error) {
-      console.error("Error creating WebSocket:", error);
+console.error(error)
+      ;
       setConnectionError("Failed to create WebSocket connection");
       setConnectionState(ConnectionState.ERROR);
     }
@@ -198,7 +197,8 @@ export const useWebSocket = (conversationId: string) => {
           socketRef.current.close();
         }
       } catch (error) {
-        console.error("Error closing WebSocket:", error);
+console.error(error)
+        ;
       }
     }
 
@@ -227,28 +227,25 @@ export const useWebSocket = (conversationId: string) => {
     };
   }, [connectWebSocket, closeWebSocket]);
 
-  // Function to send messages
+ 
   const sendMessage = useCallback(
     (messageData: WebSocketSendMessage) => {
       if (socketRef.current?.readyState === WebSocket.OPEN) {
         try {
-          // Format message to match server expectations
           const formattedMessage = messageData;
 
-          console.log("Sending message:", formattedMessage);
+          ;
           socketRef.current.send(JSON.stringify(formattedMessage));
 
-          // Optionally add the sent message to the local state with a "sent" status
-          // This depends on your server's behavior - if it echoes back messages, you might not need this
         } catch (error) {
-          console.error("Failed to send message:", error);
+console.error(error)
+          ;
           toast.error("Erreur lors de l'envoi du message. Veuillez réessayer.");
         }
       } else {
-        console.warn("WebSocket is not connected");
+        ;
         toast.error("Non connecté. Message non envoyé.");
 
-        // Attempt to reconnect if disconnected
         if (connectionState === ConnectionState.DISCONNECTED) {
           reconnectAttemptsRef.current = 0;
           connectWebSocket();
@@ -258,7 +255,6 @@ export const useWebSocket = (conversationId: string) => {
     [connectionState, connectWebSocket]
   );
 
-  // Function to manually reconnect
   const reconnect = useCallback(() => {
     closeWebSocket();
     reconnectAttemptsRef.current = 0;

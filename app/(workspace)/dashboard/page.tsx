@@ -1,14 +1,13 @@
 "use client";
+import { User } from "@/lib/api/users";
 import { getCookies } from "@/lib/utils/cookies";
 import Actuality from "./components/actuality";
 import Formations from "./components/formations";
 import Reunions from "./components/reunions";
-import Suggestions from "./components/suggestions";
-import { User } from "@/lib/api/users";
 
 export default function DashboardPage() {
   const user: User = JSON.parse(getCookies("userInfo") || "{}");
-  console.log(user);
+  ;
   return (
     <div className="flex flex-col gap-4">
       <h1 className="text-2xl font-bold">Dashboard</h1>
@@ -20,7 +19,7 @@ export default function DashboardPage() {
       </h6>
       <div className="flex flex-col md:flex-row md:justify-between gap-6">
         <div className="w-full md:w-[60%] flex flex-col gap-6">
-          <Suggestions />
+          {/*<Suggestions />*/}
           <Formations />
           <Reunions />
         </div>

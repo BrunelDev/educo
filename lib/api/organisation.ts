@@ -39,7 +39,8 @@ export const getOrganization = async (): Promise<OrganizationResponse> => {
     );
     return response.data;
   } catch (error) {
-    console.error("Error fetching organization:", error);
+console.error(error)
+    ;
     throw error;
   }
 };
@@ -73,7 +74,8 @@ export const createOrganization = async (
 
     return response.data;
   } catch (error) {
-    console.error("Error creating organization:", error);
+console.error(error)
+    ;
     throw error;
   }
 };
@@ -83,10 +85,11 @@ export const getOrganisationMembers = async (): Promise<
 > => {
   try {
     const response = await getOrganization();
-    console.log("----------------payload", response);
+    ;
     return response.membres;
   } catch (error) {
-    console.error("Error fetching organization members:", error);
+console.error(error)
+    ;
     throw error;
   }
 };
@@ -99,10 +102,11 @@ export const addToOrganization = async (
       endpoints.organisation.base + `${orgId}/membres/`,
       { membre_ids }
     );
-    console.log(response.data);
+    ;
     return response.data;
   } catch (error) {
-    console.error("Error adding members to organization:", error);
+console.error(error)
+    ;
     throw error;
   }
 };
@@ -133,7 +137,8 @@ export const updateOrganisation = async (
 
     return response.data;
   } catch (error) {
-    console.error("Error creating organization:", error);
+console.error(error)
+    ;
     throw error;
   }
 };
@@ -170,7 +175,8 @@ export const confirmPresence = async ({
     });
     return response.data;
   } catch (error) {
-    console.error("Error confirming presence:", error);
+console.error(error)
+    ;
     throw error;
   }
 };
@@ -192,7 +198,8 @@ export const confirmPresenceExternalMember = async ({
     });
     return response.data;
   } catch (error) {
-    console.error("Error confirming presence:", error);
+console.error(error)
+    ;
     throw error;
   }
 };
@@ -213,7 +220,8 @@ export const deleteExternalMemberPresence = async ({
     });
     return response.data;
   } catch (error) {
-    console.error("Error confirming presence:", error);
+console.error(error)
+    ;
     throw error;
   }
 };

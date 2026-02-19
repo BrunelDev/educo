@@ -29,7 +29,8 @@ export function CompteRendu({
       toast.success("Compte rendu enregistré avec succès.");
       setIsEditingCompteRendu(false);
     } catch (error) {
-      console.error("Erreur lors de l'enregistrement du compte rendu:", error);
+console.error(error)
+      ;
       toast.dismiss();
       if (isAxiosError(error) && error.response?.status === 403) {
         toast.error(error.response.data.detail);
@@ -41,19 +42,19 @@ export function CompteRendu({
 
   const formData = useMeetingForm();
   useEffect(() => {
-    console.log(formData.ordre_du_jour);
+    ;
   }, [formData]);
   const handleDownload = async () => {
     try {
-      console.log("Downloading...");
+      ;
       const htmlString = convertLexicalJsonToHtml(
         formData?.ordre_du_jour[0]?.description || ""
       );
-      console.log("First page HTML:", firstPage);
-      console.log("Downloading...", htmlString);
+      ;
+      ;
 
-      console.log("Generated HTML string:", htmlString);
-      console.log("Form data:", formData?.ordre_du_jour[0]?.description);
+      ;
+      ;
 
       let finalHtmlString = firstPage + htmlString;
       if (!htmlString || htmlString.trim() === "" || htmlString === "<p></p>") {
@@ -98,7 +99,8 @@ export function CompteRendu({
 
       toast.success("Compte rendu téléchargé avec succès.");
     } catch (error) {
-      console.error("Error downloading docx:", error);
+console.error(error)
+      ;
       toast.error("Erreur lors du téléchargement du compte rendu.");
     }
   };

@@ -8,10 +8,9 @@ export async function GET(request: NextRequest) {
     return new NextResponse("URL audio manquante", { status: 400 });
   }
 
-  // Vérification basique de sécurité
   if (
     !audioUrl.startsWith(
-      "https://impact-cse-prod-paris-storage.s3.fr-par.scw.cloud/"
+      "https://gktyodytvqurbcbyvnrj.supabase.co/storage/v1/object/public/educo-prod-storage/web-educo/"
     )
   ) {
     return new NextResponse("URL non autorisée", { status: 403 });
@@ -41,7 +40,8 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("Erreur proxy audio:", error);
+console.error(error)
+    ;
     return new NextResponse(
       `Erreur de chargement: ${
         error instanceof Error ? error.message : "Erreur inconnue"

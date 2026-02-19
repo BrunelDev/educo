@@ -81,7 +81,8 @@ export async function proxy(request: NextRequest) {
 
     return response;
   } catch (error) {
-    console.error("Middleware error:", error);
+console.error(error)
+    ;
 
     // Create redirect response
     const loginRedirect = NextResponse.redirect(new URL("/login", request.url));

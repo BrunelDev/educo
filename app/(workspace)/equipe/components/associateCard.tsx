@@ -1,12 +1,12 @@
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
 } from "@/components/ui/dialog";
 import { removeFromTeam, User } from "@/lib/api/equipe";
 import { getCookies } from "@/lib/utils/cookies";
@@ -89,10 +89,10 @@ export default function AssociateCard({
               onClick={async () => {
                 try {
                   const res = await removeFromTeam(teamId, associate.id);
-                  console.log(res);
+                  ;
                   refresh();
                 } catch (error: unknown) {
-                  console.error("Failed to remove associate from team", error);
+                  ;
                 }
               }}
             >

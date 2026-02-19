@@ -1,27 +1,25 @@
 "use client";
 import {
-  ChevronRight,
-  CircleCheck,
-  FolderClosed,
-  GraduationCap,
-  LayoutGrid,
-  MessageSquareMore,
-  NotepadText,
-  Sparkles,
-  Users,
-  UsersRound,
+    ChevronRight,
+    CircleCheck,
+    FolderClosed,
+    GraduationCap,
+    LayoutGrid,
+    MessageSquareMore,
+    NotepadText, Users,
+    UsersRound
 } from "lucide-react";
 import Image from "next/image";
 
 import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
+    Sidebar,
+    SidebarContent,
+    SidebarFooter,
+    SidebarGroup,
+    SidebarGroupContent,
+    SidebarMenu,
+    SidebarMenuButton,
+    SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { getUser, updateProfile, User } from "@/lib/api/users";
 import Link from "next/link";
@@ -34,11 +32,11 @@ const items = [
     url: "/dashboard",
     icon: LayoutGrid,
   },
-  {
-    title: "Assistance IA",
-    url: "/assistance",
-    icon: Sparkles,
-  },
+  // {
+  //   title: "Assistance IA",
+  //   url: "/assistance",
+  //   icon: Sparkles,
+  // },
   {
     title: "Réunions",
     url: "/reunions",
@@ -70,7 +68,7 @@ const items = [
     icon: FolderClosed,
   },
   {
-    title: "Equipe",
+    title: "Groupe",
     url: "/equipe",
     icon: UsersRound,
   },
@@ -90,12 +88,12 @@ export function AppSidebar() {
     fun();
   }, [updateProfile]);
   const pathname = usePathname();
-  console.log(pathname);
-  console.log(items);
+  ;
+  ;
   const isActive = (path: string) => {
     return pathname.includes(path);
   };
-  console.log(pathname);
+  ;
   return (
     <Sidebar className="w-[210px]">
       <SidebarContent>
@@ -116,11 +114,10 @@ export function AppSidebar() {
                   <SidebarMenuButton
                     key={item.title + index}
                     asChild
-                    className={`group/item relative hover:bg-gradient-to-r ${
-                      isActive(item.url) ?
+                    className={`group/item relative hover:bg-gradient-to-r ${isActive(item.url) ?
                         "bg-gradient-to-r from-[#FFDDE3] to-[#FFDDE300]"
-                      : ""
-                    } hover:from-[#FFDDE3] hover:to-[#FFDDE300] w-full py-2 px-3`}
+                        : ""
+                      } hover:from-[#FFDDE3] hover:to-[#FFDDE300] w-full py-2 px-3`}
                   >
                     <a
                       href={item.url}
@@ -136,7 +133,7 @@ export function AppSidebar() {
                           setUserInfo((prev) =>
                             prev ?
                               { ...prev, is_last_message_read: true }
-                            : prev,
+                              : prev,
                           );
                           window.location.href = item.url;
                         }
@@ -168,9 +165,8 @@ export function AppSidebar() {
       <SidebarFooter>
         <Link
           href={"/profile"}
-          className={`flex justify-between items-center px-2 py-1 hover:pl-4 hover:bg-white-100 ${
-            isActive(pathname) ? "bg-white-100" : ""
-          } duration-200 rounded-[8px]`}
+          className={`flex justify-between items-center px-2 py-1 hover:pl-4 hover:bg-white-100 ${isActive(pathname) ? "bg-white-100" : ""
+            } duration-200 rounded-[8px]`}
         >
           <div className="flex items-center gap-5 ">
             <div className="relative h-[32px] w-[32px] rounded-full overflow-hidden bg-gray-100">
@@ -184,9 +180,8 @@ export function AppSidebar() {
             </div>
 
             <h6
-              className={`text-white-800 font-semibold text-sm ${
-                userInfo?.first_name ? "" : "truncate w-[100px]"
-              }`}
+              className={`text-white-800 font-semibold text-sm ${userInfo?.first_name ? "" : "truncate w-[100px]"
+                }`}
             >
               {userInfo?.first_name ? userInfo.first_name : userInfo?.email}{" "}
               {userInfo?.last_name ? userInfo.last_name : ""}

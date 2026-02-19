@@ -3,13 +3,13 @@ import GoBack from "@/app/_components/goback";
 import { getProjectById, Project } from "@/lib/api/projets";
 import { TaskType, updateTask } from "@/lib/api/tache";
 import {
-  DndContext,
-  DragEndEvent,
-  DragOverlay,
-  DragStartEvent,
-  PointerSensor,
-  useSensor,
-  useSensors,
+    DndContext,
+    DragEndEvent,
+    DragOverlay,
+    DragStartEvent,
+    PointerSensor,
+    useSensor,
+    useSensors,
 } from "@dnd-kit/core";
 import { use, useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -43,7 +43,8 @@ export default function Detail({
         const response = await getProjectById(parseInt(id));
         setProjectDetails(response);
       } catch (error) {
-        console.error("Error fetching data:", error);
+console.error(error)
+        ;
       }
     };
     if (id) {
@@ -74,8 +75,9 @@ export default function Detail({
         toast.success("Tâche déplacée avec succès !");
         setRefresh((v) => !v);
       } catch (error) {
+console.error(error)
         toast.error("Vous devez être assigné à la tâche pour la déplacer.");
-        console.error("Failed to update task:", error);
+        ;
       }
     }
     setActiveTask(null); // Clear the active task on drag end

@@ -1,11 +1,7 @@
-import { getRessources, RessourcesResponse } from "@/lib/api/formations";
-import { useEffect, useState } from "react";
 import EmptyState from "@/app/_components/EmptyState";
+import { Dossier as FileDossier, getDossiers as getFileDossiers, getRessources, RessourcesResponse } from "@/lib/api/formations";
+import { useEffect, useState } from "react";
 import FolderCard from "./folder";
-import {
-  getDossiers as getFileDossiers,
-  Dossier as FileDossier,
-} from "@/lib/api/formations";
 export default function ResourceContent() {
   const [ressources, setRessources] = useState<RessourcesResponse>();
   const [folders, setFolders] = useState<FileDossier[]>([]);
@@ -15,7 +11,7 @@ export default function ResourceContent() {
         getRessources(),
         getFileDossiers(),
       ]);
-      console.log("Les dossiers", foldersData);
+      ;
       setRessources(resData);
       setFolders(foldersData.results);
     };

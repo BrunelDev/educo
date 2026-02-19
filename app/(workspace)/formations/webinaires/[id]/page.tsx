@@ -1,10 +1,10 @@
 "use client";
 
-import { use, useEffect, useState } from "react";
-import { getWebinaireById, Webinaire } from "@/lib/api/formations";
-import Image from "next/image";
-import { Calendar, Clock } from "lucide-react";
 import GoBack from "@/app/_components/goback";
+import { getWebinaireById, Webinaire } from "@/lib/api/formations";
+import { Calendar, Clock } from "lucide-react";
+import Image from "next/image";
+import { use, useEffect, useState } from "react";
 
 export default function WebinarPage({
   params,
@@ -26,7 +26,7 @@ export default function WebinarPage({
         setError(
           "Une erreur est survenue lors de la récupération du webinaire"
         );
-        console.error(err);
+        ;
       } finally {
         setLoading(false);
       }

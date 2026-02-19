@@ -1,13 +1,13 @@
 "use client";
+import { DialogComponent } from "@/app/_components/dialogComponent";
+import EmptyState from "@/app/_components/EmptyState";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { createFolder, Dossier, getDossiers } from "@/lib/api/fichiers";
-import { useEffect, useState } from "react";
-import { DialogComponent } from "@/app/_components/dialogComponent";
-import FolderCard from "./components/folder";
-import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
 import { AxiosError } from "axios";
-import EmptyState from "@/app/_components/EmptyState";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import FolderCard from "./components/folder";
 
 export default function FichiersPage() {
   const [isCreateFolderDialogOpen, setIsCreateFolderDialogOpen] = useState(false);
@@ -17,7 +17,7 @@ export default function FichiersPage() {
   useEffect(() => {
     const fun = async () => {
       const response = await getDossiers();
-      console.log(response)
+      
       setFolders(response);
     };
     fun();
@@ -73,10 +73,11 @@ const CreateFolder = ({ handleClose }: { handleClose?: () => void }) => {
         toast.message("Dossier créé avec succès.")
       }
       handleClose?.();
-      console.log("Creating folder:", folderName);
+      ;
       
       
     } catch (error) {
+console.error(error)
       if (error instanceof AxiosError) {
         toast.error(error.response?.data?.detail);
         throw error

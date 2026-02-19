@@ -105,7 +105,7 @@ export const updateConsultation = async (
       `${endpoints.consultations.base}${id}/`,
       data
     );
-    console.log("res", response.data);
+    ;
     return response.data;
   } catch (error: unknown) {
     console.error("Error updating consultation", (error as Error).message);

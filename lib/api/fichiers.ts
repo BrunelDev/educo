@@ -42,7 +42,8 @@ export const getDossiers = async (page: number = 1): Promise<Dossier[]> => {
     });
     return response.data;
   } catch (error) {
-    console.error("Error fetching dossiers", error);
+console.error(error)
+    ;
     throw error;
   }
 };
@@ -52,7 +53,8 @@ export const getOneDossiers = async (id: string): Promise<Dossier> => {
     const response = await api.get(`${endpoint}${id}/`);
     return response.data;
   } catch (error) {
-    console.error("Error fetching dossier", error);
+console.error(error)
+    ;
     throw error;
   }
 };
@@ -65,7 +67,8 @@ export const createFolder = async (nom: string, parent: string | null) => {
     });
     return response.data;
   } catch (error) {
-    console.error("Error creating dossier", error);
+console.error(error)
+    ;
     throw error;
   }
 };
@@ -73,7 +76,8 @@ export const deleteDossier = async (id: number) => {
   try {
     await api.delete(`${endpoint}${id}/`);
   } catch (error) {
-    console.error("Error deleting dossier", error);
+console.error(error)
+    ;
   }
 };
 export const editDossier = async (id: number, nom?: string) => {
@@ -83,7 +87,8 @@ export const editDossier = async (id: number, nom?: string) => {
     });
     return response.data;
   } catch (error) {
-    console.error("Error editing dossier", error);
+console.error(error)
+    ;
   }
 };
 
@@ -106,7 +111,8 @@ export const extractFilenameFromUrl = (url: string): string => {
 
     return filename || "unknown_file";
   } catch (error) {
-    console.error("Error extracting filename:", error);
+console.error(error)
+    ;
     return "unknown_file";
   }
 };
@@ -130,7 +136,7 @@ export const getFile = async (id: number): Promise<Fichier> => {
     const response = await api.get(`${fileEndpoint}${id}/`);
     return response.data;
   } catch (error: unknown) {
-    console.error("Error fetching file:", error);
+    console.error(error);
     throw error;
   }
 };
@@ -140,7 +146,7 @@ export const createFile = async (fileData: CreateFilePayload) => {
     const response = await api.post(`${fileEndpoint}`, fileData);
     return response.data;
   } catch (error: unknown) {
-    console.error("Error creating file:", error);
+    console.error(error);
     throw error;
   }
 };
@@ -167,7 +173,7 @@ export const updateFile = async (id: number, fileData: UpdateFilePayload) => {
     const response = await api.patch(`${fileEndpoint}${id}/`, fileData);
     return response.data;
   } catch (error: unknown) {
-    console.error("Error updating file:", error);
+    console.error(error);
     throw error;
   }
 };
@@ -181,7 +187,7 @@ export const deleteFile = async (id: number): Promise<void> => {
   try {
     await api.delete(`${fileEndpoint}${id}/`);
   } catch (error: unknown) {
-    console.error("Error deleting file:", error);
+    console.error(error);
     throw error;
   }
 };
@@ -203,7 +209,8 @@ export const getFoldersList = async (page: number = 1): Promise<FoldersList> => 
     });
     return response.data;
   } catch (error) {
-    console.error("Error fetching folders list:", error);
+console.error(error)
+    ;
     throw error;
   }
 };
@@ -220,7 +227,8 @@ export const getFilesList = async (): Promise<FilesList> => {
     const response = await api.get("fichiers/fichiers/?page_size=1000");
     return response.data;
   } catch (error) {
-    console.error("Error fetching files list:", error);
+console.error(error)
+    ;
     throw error;
   }
 };
@@ -232,7 +240,7 @@ export const moveFolderToFolder = async (
   try {
     await api.patch(`fichiers/dossiers/${id}/`, { parent });
   } catch (error: unknown) {
-    console.error("Error moving folder:", error);
+    console.error(error);
     throw error;
   }
 };
@@ -244,7 +252,7 @@ export const moveFileToFolder = async (
   try {
     await api.patch(`fichiers/fichiers/${id}/`, { dossier });
   } catch (error: unknown) {
-    console.error("Error moving file:", error);
+    console.error(error);
     throw error;
   }
 };

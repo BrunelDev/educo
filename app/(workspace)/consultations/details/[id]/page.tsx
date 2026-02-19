@@ -8,12 +8,12 @@ import DocumentComponent from "@/app/_components/document";
 import EmptyState from "@/app/_components/EmptyState";
 import { convertLexicalJsonToHtml } from "@/app/_components/lexicalViewer";
 import {
-  addDocument,
-  Consultation,
-  getOneConsultation,
-  removeDocumentFromConsultation,
-  removeMemberFromConsultation,
-  updateConsultation,
+    addDocument,
+    Consultation,
+    getOneConsultation,
+    removeDocumentFromConsultation,
+    removeMemberFromConsultation,
+    updateConsultation,
 } from "@/lib/api/consultation";
 import { RenderDocFirstPage } from "@/lib/utils/renderDocFirstPage";
 import { ArrowLeft, Plus, Users } from "lucide-react";
@@ -50,7 +50,8 @@ export default function ConsultationDetail({
       const response = await getOneConsultation(parseInt(id));
       setConsultation(response);
     } catch (error) {
-      console.error("Error fetching consultation:", error);
+console.error(error)
+      ;
     }
   };
   const [openDialog, setOpenDialog] = useState(false);
@@ -61,7 +62,7 @@ export default function ConsultationDetail({
 
     try {
       // Update the consultation with the new participants
-      console.log(users);
+      ;
       await updateConsultation(consultation.id, {
         participants: users,
       });
@@ -72,7 +73,8 @@ export default function ConsultationDetail({
       // Reload the page to reflect changes
       //window.location.reload();
     } catch (error) {
-      console.error("Error adding members:", error);
+console.error(error)
+      ;
       throw error;
     } finally {
       setOpenDialog(false);
@@ -103,7 +105,8 @@ export default function ConsultationDetail({
       const updatedConsultation = await getOneConsultation(consultation.id);
       setConsultation(updatedConsultation);
     } catch (error) {
-      console.error("Error adding document:", error);
+console.error(error)
+      ;
       throw error;
     } finally {
       setOpenDocumentDialog(false);
@@ -117,7 +120,8 @@ export default function ConsultationDetail({
         const response = await getOneConsultation(parseInt(id));
         setConsultation(response);
       } catch (error) {
-        console.error("Error fetching consultation:", error);
+console.error(error)
+        ;
       }
     };
 

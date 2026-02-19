@@ -32,12 +32,13 @@ export function ForgotPasswordForm() {
     // Simulate API call
     try {
       const response = await requestPasswordReset(email);
-      console.log(response);
+      ;
       setIsLoading(false);
       toast.success("Un lien de réinitialisation a été envoyé à votre adresse e-mail");
     } catch (error) {
+console.error(error)
       setIsLoading(false);
-      console.error("Error requesting password reset", error);
+      ;
       toast.error("Veuillez vérifier votre adresse e-mail et réessayez");
     }
     setEmail(""); // Clear the input field

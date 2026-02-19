@@ -36,8 +36,9 @@ export default function AddDocument({
         setFileUrl(urls[0]);
         // Don't show success message here, wait until the document is added to the task
       } catch (error) {
+console.error(error)
         toast.error("Échec du téléchargement du document");
-        console.error(error);
+        ;
       }
     }
   };
@@ -56,8 +57,9 @@ export default function AddDocument({
       setFileUrl("");
       setFileName("");
     } catch (error) {
+console.error(error)
       toast.error("Échec de l'ajout du document");
-      console.error(error);
+      ;
     } finally {
       setIsSubmitting(false);
     }

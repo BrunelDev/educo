@@ -1,24 +1,23 @@
 "use client";
-import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { updateProfile } from "@/lib/api/users";
+import { getUser, updateProfile, User } from "@/lib/api/users";
 import { uploadToS3 } from "@/lib/s3-upload";
+import { getCookies } from "@/lib/utils/cookies";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useState, useRef } from "react";
+import Image from "next/image";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
-import { getUser, User } from "@/lib/api/users";
-import { getCookies } from "@/lib/utils/cookies";
 
 const formSchema = z.object({
   first_name: z.string().optional(),
@@ -66,7 +65,8 @@ export function ProfileForm() {
           image: user.image,
         });
       } catch (error) {
-        console.error("Fetch user error:", error);
+console.error(error)
+        ;
         toast.error(
           "Erreur lors de la récupération des informations utilisateur."
         );
@@ -76,7 +76,7 @@ export function ProfileForm() {
   }, [form]);
 
   const user: User = JSON.parse(getCookies("userInfo") || "{}");
-  console.log(user);
+  ;
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
@@ -89,7 +89,8 @@ export function ProfileForm() {
           imageUrl = res[0];
           toast.success("Photo de profil téléchargée avec succès.");
         } catch (error) {
-          console.error("Upload error:", error);
+console.error(error)
+          ;
           toast.error("Échec du téléchargement de la photo.");
           setIsSubmitting(false);
           return;
@@ -119,8 +120,9 @@ export function ProfileForm() {
         toast.info("Aucune modification à enregistrer.");
       }
     } catch (error) {
+console.error(error)
       toast.error("Échec de la mise à jour du profil.");
-      console.error(error);
+      ;
     } finally {
       setIsSubmitting(false);
     }

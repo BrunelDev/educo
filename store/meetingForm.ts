@@ -59,7 +59,7 @@ export interface MeetingFormState {
 }
 
 const initialState = {
-  type_reunion: MeetingType.Ordinary,
+  type_reunion: MeetingType.Course,
   titre: "",
   objet: "",
   emplacement: [],

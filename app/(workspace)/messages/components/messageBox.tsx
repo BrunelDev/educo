@@ -538,10 +538,11 @@ export default function MessageBox({
           }}
         >
           {renderContent()}
-          <span className="text-xs sm:text-sm text-gray-500 absolute left-0 sm:right-0 -bottom-5 sm:-bottom-6 text-nowrap">
+          <span className="text-xs sm:text-sm text-gray-500 absolute left-0 sm:right-0 -bottom-5 sm:-bottom-6 text-nowrap text-ellipsis">
             {formatDistanceToNow(message.timestamp, {
               locale: fr,
               addSuffix: true,
+              
             })}
           </span>
           {/*<Ellipsis size={18} className="absolute top-1 -right-6" />*/}

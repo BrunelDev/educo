@@ -10,16 +10,16 @@ import LexicalView from "@/app/_components/LexicalView";
 import { convertLexicalJsonToHtml } from "@/app/_components/lexicalViewer";
 import { deleteExternalMemberPresence } from "@/lib/api/organisation";
 import {
-  addDocument,
-  addMemberToMeeting,
-  createComment,
-  deleteComment,
-  deleteParticipantFromMeeting,
-  getMeetingComments,
-  getOneMeting,
-  removeDocumentFromMeeting,
-  updateComment,
-  updateMeeting,
+    addDocument,
+    addMemberToMeeting,
+    createComment,
+    deleteComment,
+    deleteParticipantFromMeeting,
+    getMeetingComments,
+    getOneMeting,
+    removeDocumentFromMeeting,
+    updateComment,
+    updateMeeting,
 } from "@/lib/api/reunion";
 import { formatDateToFrench } from "@/lib/functions";
 import { Meeting } from "@/lib/types";
@@ -44,7 +44,7 @@ export default function Detail({
     const fetchMeeting = async () => {
       const response = await getOneMeting(parseInt(id));
       setMeeting(response);
-      console.log("---External---", response.participants_externes);
+      ;
     };
     fetchMeeting();
   }, [id, refresh]);
@@ -91,7 +91,8 @@ export default function Detail({
                         await addMemberToMeeting(meeting.id, emails);
                         setDialogOpen1(false);
                       } catch (error) {
-                        console.error("Error adding participants:", error);
+console.error(error)
+                        ;
                         throw error;
                       }
                     }}
@@ -135,7 +136,8 @@ export default function Detail({
                         });
                         setDialogOpen1(false);
                       } catch (error) {
-                        console.error("Error adding participants:", error);
+console.error(error)
+                        ;
                         throw error;
                       }
                     }}
@@ -262,7 +264,8 @@ export default function Detail({
                         });
                         setDialogOpen2(false);
                       } catch (error) {
-                        console.error("Error adding document:", error);
+console.error(error)
+                        ;
                         throw error;
                       }
                     }}

@@ -19,7 +19,8 @@ export const getActualiteById = async (id: number | string): Promise<Actuality> 
     const response = await api.get<Actuality>(`actualites/${id}/`);
     return response.data;
   } catch (error) {
-    console.error(`Error fetching actuality with id ${id}:`, error);
+console.error(error)
+    ;
     throw error; // Re-throw the error to be handled by the caller
   }
 };

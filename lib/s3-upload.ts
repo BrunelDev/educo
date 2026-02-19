@@ -22,7 +22,7 @@ export async function uploadToS3(files: File[]): Promise<string[]> {
   if (!files || files.length === 0) return [];
 
   const uploadPromises = files.map(async (file) => {
-    const fileKey = `web-impact-cse/${Date.now()}-${file.name}`;
+    const fileKey = `web-educo/${Date.now()}-${file.name}`;
 
     try {
       // Convert File to ArrayBuffer
@@ -46,7 +46,8 @@ export async function uploadToS3(files: File[]): Promise<string[]> {
       // Encode URL to handle special characters
       return publicUrl;
     } catch (error) {
-      console.error("Error uploading file:", error);
+console.error(error)
+      ;
       throw error;
     }
   });

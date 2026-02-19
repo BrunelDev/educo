@@ -1,38 +1,38 @@
 import { Input } from "@/components/ui/input";
 import {
-  Dossier,
-  Fichier,
-  FoldersList,
-  deleteFile,
-  updateFile,
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import {
+    Dossier,
+    Fichier,
+    FoldersList,
+    deleteFile,
+    getFoldersList, moveFileToFolder,
+    updateFile,
 } from "@/lib/api/fichiers";
 import {
-  Download,
-  EllipsisVertical,
-  ExternalLink,
-  FileAudio,
-  FileImage,
-  File as FilePdf,
-  FilePenLine,
-  FileSpreadsheet,
-  FileText,
-  FileVideo,
-  Folder,
-  Trash2,
+    Download,
+    EllipsisVertical,
+    ExternalLink,
+    FileAudio,
+    FileImage,
+    File as FilePdf,
+    FilePenLine,
+    FileSpreadsheet,
+    FileText,
+    FileVideo,
+    Folder,
+    Trash2,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Popover } from "../../components/popover";
-import { getFoldersList, moveFileToFolder } from "@/lib/api/fichiers";
-import {
-  Select,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-} from "@/components/ui/select";
 
 interface FileCardProps {
   file: Fichier;
@@ -257,7 +257,8 @@ const FilePopoverContent = ({ file }: FilePopoverContentProps) => {
           results: allFolders,
         });
       } catch (error) {
-        console.error("Error fetching all folders:", error);
+console.error(error)
+        ;
         toast.error("Erreur lors de la récupération des dossiers");
       }
     };
@@ -272,7 +273,7 @@ const FilePopoverContent = ({ file }: FilePopoverContentProps) => {
       toast.success("Fichier supprimé avec succès");
       window.location.reload();
     } catch (error: unknown) {
-      console.error("Error deleting file:", error);
+      ;
       toast.error("Erreur lors de la suppression du fichier");
     }
   };
@@ -289,7 +290,7 @@ const FilePopoverContent = ({ file }: FilePopoverContentProps) => {
       toast.success("Fichier renommé avec succès");
       window.location.reload();
     } catch (error: unknown) {
-      console.error("Error updating file:", error);
+      ;
       toast.error("Erreur lors de la mise à jour du fichier");
     }
   };
@@ -299,7 +300,7 @@ const FilePopoverContent = ({ file }: FilePopoverContentProps) => {
       toast.success("Fichier déplacé avec succès");
       window.location.reload();
     } catch (error: unknown) {
-      console.error("Error moving file:", error);
+      ;
       toast.error("Erreur lors du déplacement du fichier");
     }
   };

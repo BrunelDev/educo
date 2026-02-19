@@ -10,7 +10,6 @@ import "../../../_components/editorPlugins/style.css";
 import { StepProgress } from "./stepProgress";
 
 import Editor from "@/app/_components/editor";
-import { handleFileUpload } from "@/app/actions/actions";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
@@ -149,7 +148,7 @@ export default function CreateMeeting() {
                 try {
                   toast.loading("Création de la réunion en cours...");
                   const filesToUpload = filesList.map((item) => item.file);
-                  await handleFileUpload(filesToUpload);
+                  await uploadToS3(filesToUpload);
                   const res = await uploadToS3(
                     filesList.map((item) => item.file)
                   );
@@ -167,7 +166,7 @@ export default function CreateMeeting() {
                   //hide loading toast
                   toast.dismiss();
                   toast.error("Erreur lors de la création de la réunion");
-                  console.error("Error creating meeting:", error);
+                  console.log("Error creating meeting:", error);
                   return;
                 }
                 return;
@@ -199,7 +198,7 @@ const StepOne = ({
   const [localMeetingType, setLocalMeetingType] =
     useState<MeetingType>(type_reunion);
   const [localMeetingTitle, setLocalMeetingTitle] =
-    useState<string>("Ordinaire");
+    useState<string>("Cours");
   const [localMeetingPurpose, setLocalMeetingPurpose] = useState<string>(objet);
   const [localLocation, setLocalLocation] = useState<string[]>(emplacement);
   const [localMeetingLink, setLocalMeetingLink] = useState<string>(
@@ -287,37 +286,37 @@ const StepOne = ({
         </Label>
         <RadioGroup
           value={localMeetingType}
-          defaultValue={MeetingType.Ordinary}
+          defaultValue={MeetingType.Course}
           onValueChange={(value: MeetingType) => {
             setLocalMeetingType(value);
             setLocalMeetingTitle(value);
-            if (value === MeetingType.Others) {
+            if (value === MeetingType.Consultation) {
               setLocalMeetingTitle("");
             }
           }}
           className="flex flex-wrap gap-x-6 gap-y-3"
         >
           <div className="flex items-center space-x-2">
-            <RadioGroupItem value={MeetingType.Ordinary} id="r1" />
-            <Label htmlFor="r1">Ordinaire</Label>
+            <RadioGroupItem value={MeetingType.Course} id="r1" />
+            <Label htmlFor="r1">Cours</Label>
           </div>
           <div className="flex items-center space-x-2">
-            <RadioGroupItem value={MeetingType.CSSCT} id="r2" />
-            <Label htmlFor="r2">CSSCT</Label>
+            <RadioGroupItem value={MeetingType.Concertation} id="r2" />
+            <Label htmlFor="r2">Concertation</Label>
           </div>
           <div className="flex items-center space-x-2">
-            <RadioGroupItem value={MeetingType.Extraordinal} id="r3" />
-            <Label htmlFor="r3">Extraordinaire</Label>
+            <RadioGroupItem value={MeetingType.Annonce} id="r3" />
+            <Label htmlFor="r3">Annonce</Label>
           </div>
           <div className="flex items-center space-x-2">
-            <RadioGroupItem value={MeetingType.Others} id="r4" />
-            <Label htmlFor="r4">Autres</Label>
+            <RadioGroupItem value={MeetingType.Consultation} id="r4" />
+            <Label htmlFor="r4">Consultation</Label>
           </div>
         </RadioGroup>
       </div>
       {/* Titre de la réunion */}
       <div className="space-y-2 w-full">
-        {localMeetingType === MeetingType.Others && (
+        {localMeetingType === MeetingType.Consultation && (
           <>
             <label className="text-sm font-medium text-gray-700 block mb-1">
               Titre de la réunion
@@ -333,7 +332,7 @@ const StepOne = ({
             />
           </>
         )}
-        {errors.title && localMeetingType === MeetingType.Others && (
+        {errors.title && localMeetingType === MeetingType.Consultation && (
           <p className="text-red-500 text-sm mt-1">{errors.title}</p>
         )}
       </div>

@@ -1,9 +1,8 @@
 "use client";
-import { getNotifications, deleteNotification } from "@/lib/api/notifications";
-import { Notification, NotificationApiResponse } from "@/lib/api/notifications";
+import { deleteNotification, getNotifications, Notification, NotificationApiResponse } from "@/lib/api/notifications";
+import { X } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { X } from "lucide-react";
 import { toast } from "sonner";
 
 export function Notifications() {
@@ -14,10 +13,11 @@ export function Notifications() {
     const fetchNotifications = async () => {
       try {
         const response = await getNotifications();
-        console.log(response);
+        ;
         setNotifications(response);
       } catch (error) {
-        console.error("Error fetching notifications:", error);
+console.error(error)
+        ;
       }
     };
     fetchNotifications();
@@ -37,7 +37,8 @@ export function Notifications() {
       );
       toast.success("Notification supprimée");
     } catch (error) {
-      console.error("Error deleting notification:", error);
+console.error(error)
+      ;
     }
   };
 

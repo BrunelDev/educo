@@ -128,7 +128,7 @@ export function MessageInput({
           throw new Error("No URL returned from S3 upload");
         }
       } catch (uploadError) {
-        console.error("Error uploading to S3:", uploadError);
+        ;
         setFileError("Erreur lors de l'envoi du fichier. Veuillez réessayer.");
         toast.error("Échec de l'envoi. Veuillez réessayer.");
       } finally {
@@ -137,7 +137,8 @@ export function MessageInput({
         setIsUploading(false);
       }
     } catch (error) {
-      console.error("Error in file sending process:", error);
+console.error(error)
+      ;
       setFileError("Erreur lors de l'envoi du fichier. Veuillez réessayer.");
       toast.error("Échec de l'envoi. Veuillez réessayer.");
       setIsUploading(false);

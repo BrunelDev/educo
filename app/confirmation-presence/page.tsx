@@ -1,35 +1,34 @@
 "use client";
-import React, { useCallback, useEffect, useState } from "react";
-import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { Button } from "@/components/ui/button";
 import {
-  CheckCircle2,
-  CircleX,
-  Mail,
-  UserRound,
-  RefreshCw,
-} from "lucide-react";
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card";
 import {
-  confirmPresence,
-  confirmPresenceExternalMember,
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
+import {
+    confirmPresence,
+    confirmPresenceExternalMember,
 } from "@/lib/api/organisation";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+    CheckCircle2,
+    CircleX,
+    Mail,
+    RefreshCw,
+    UserRound,
+} from "lucide-react";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
 
 type Disponibilite = "PRESENT" | "ABSENT";
 
@@ -81,7 +80,8 @@ export default function ConfirmationPresence() {
 
       setStatus("success");
     } catch (error) {
-      console.error("Error confirming presence:", error);
+console.error(error)
+      ;
       setStatus("error");
       setErrorMsg(
         "Une erreur est survenue lors de la confirmation. Veuillez réessayer."

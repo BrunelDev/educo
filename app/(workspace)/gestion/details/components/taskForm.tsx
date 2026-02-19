@@ -13,13 +13,12 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 //} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  getOrganisationMembers,
-  OrganizationMember,
+    getOrganisationMembers,
+    OrganizationMember,
 } from "@/lib/api/organisation";
 import {
-  createTask,
-  CreateTaskDto,
-  //TaskType
+    createTask,
+    CreateTaskDto,
 } from "@/lib/api/tache";
 import { useEffect, useState } from "react";
 
@@ -57,7 +56,7 @@ export default function TaskForm({
         const response = await getOrganisationMembers();
         setMembers(response);
       } catch (error: unknown) {
-        console.error("Error fetching members:", error);
+        ;
       }
     };
     fetchMembers();
@@ -75,7 +74,7 @@ export default function TaskForm({
       // Set the selected members to assigned_member_ids
       data.assigned_member_ids = selectedMembers;
 
-      console.log(data);
+      ;
       await createTask(data);
       toast("La tâche a été créée");
       onSubmitTask();

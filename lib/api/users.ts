@@ -27,10 +27,11 @@ export interface UserApiResponse {
 export const getAllusers = async (): Promise<UserApiResponse> => {
   try {
     const response = await api.get(endpoint);
-    console.log(response.data); // Replace with your desired action after fetching data.
+    ; // Replace with your desired action after fetching data.
     return response.data;
   } catch (error) {
-    console.error("Error fetching users", error);
+console.error(error)
+    ;
     return {
       count: 0,
       next: null,
@@ -45,10 +46,11 @@ export const getMembersWithNoTeam = async (): Promise<User[] | undefined> => {
     const response = await api.get<User[]>(
       "equipe/users-without-organisation/"
     );
-    console.log(response.data); // Replace with your desired action after fetching data.
+    ; // Replace with your desired action after fetching data.
     return response.data;
   } catch (error) {
-    console.error("Error fetching users", error);
+console.error(error)
+    ;
     if (error instanceof AxiosError) {
       console.error(
         "error fetching users",
@@ -84,7 +86,8 @@ export const updateProfile = async (
     });
     return response.data;
   } catch (error) {
-    console.error("Error updating profile", error);
+console.error(error)
+    ;
     throw error;
   }
 };
@@ -105,7 +108,7 @@ export const updatePassword = async (formData: {
     );
     return response.data.message;
   } catch (error: unknown) {
-    console.error("Error updating password", error);
+    console.error(error);
     //check if error is instance of AxiosError
     if (error instanceof AxiosError) {
       return JSON.stringify(error.response?.data?.error);
@@ -153,7 +156,7 @@ export const requestPasswordReset = async (
     const data = await response.json();
     return data;
   } catch (error: unknown) {
-    console.error("Error requesting password reset", error);
+    console.error(error);
     return {
       message:
         "Une erreur est survenue lors de la réinitialisation du mot de passe",
@@ -179,7 +182,7 @@ export const confirmPasswordReset = async (
   })
     .then((response) => response.json())
     .catch((error) => {
-      console.error("Error confirming password reset", error);
+      ;
       throw error;
     });
 

@@ -1,9 +1,9 @@
 import api, { endpoints } from "../api";
 import {
-  CommentsListResponse,
-  CreateCommentDto,
-  UpdateCommentDto,
-  Comment,
+    Comment,
+    CommentsListResponse,
+    CreateCommentDto,
+    UpdateCommentDto,
 } from "./reunion";
 
 export type TaskType = "a_faire" | "en_cours" | "termine";
@@ -314,9 +314,9 @@ export const createComment = async (
       ...commentData,
       tache: commentData.reunion,
     };
-    console.log("payload", _data)
+    
     const response = await api.post("/tasks/commentaires/creer/", _data);
-    console.log("--------------el f2-----------------",response.data);
+    ;
     return response.data;
   } catch (error) {
     console.error("Error creating comment:", error);

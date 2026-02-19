@@ -1,22 +1,22 @@
 "use client";
 import { Button } from "@/components/ui/button";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { getOrganization, OrganizationResponse } from "@/lib/api/organisation";
 import { login } from "@/lib/functions";
 import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react"; // Removed useEffect as it's no longer used here
 import { toast } from "sonner";
-import { getOrganization, OrganizationResponse } from "@/lib/api/organisation";
 import { AddOrganisationAfterLogin } from "../(workspace)/equipe/components/addOrganisation";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
 
 export function LoginForm() {
   const [email, setEmail] = useState("");
@@ -71,7 +71,7 @@ export function LoginForm() {
             router.push("/dashboard");
           }
         } catch (orgError) {
-          console.error("Failed to fetch organization after login:", orgError);
+          ;
           setShowAddOrgDialog(true);
         }
       }
@@ -82,7 +82,7 @@ export function LoginForm() {
       } else {
         toast.error("Une erreur est survenue lors de la connexion");
       }
-      console.error("Login error:", err);
+      ;
     } finally {
       setIsLoading(false);
     }

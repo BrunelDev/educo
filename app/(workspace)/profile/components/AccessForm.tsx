@@ -1,33 +1,33 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from "@/components/ui/form";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
-  getOrganisationMembers,
-  OrganizationMember,
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import { grantAccess } from "@/lib/api/equipe";
+import {
+    getOrganisationMembers,
+    OrganizationMember,
 } from "@/lib/api/organisation";
 import { zodResolver } from "@hookform/resolvers/zod";
+import Image from "next/image";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
-import { useEffect, useState } from "react";
-import Image from "next/image";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { grantAccess } from "@/lib/api/equipe";
 
 const accessRoles = [
   "Responsable des documents",
@@ -75,7 +75,8 @@ export function AccessForm({ handleClose }: { handleClose: () => void }) {
         const response = await getOrganisationMembers();
         setMembers(response);
       } catch (error) {
-        console.error("Error fetching organization members:", error);
+console.error(error)
+        ;
         toast.error(
           "Erreur lors de la récupération des membres de l'organisation"
         );
@@ -109,8 +110,9 @@ export function AccessForm({ handleClose }: { handleClose: () => void }) {
       handleClose();
       toast.success("Accès mis à jour avec succès");
     } catch (error) {
+console.error(error)
       toast.error("Échec de la mise à jour des accès");
-      console.error(error);
+      ;
     } finally {
       setIsLoading(false);
     }

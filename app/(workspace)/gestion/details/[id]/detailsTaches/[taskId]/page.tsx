@@ -9,16 +9,16 @@ import EmptyState from "@/app/_components/EmptyState";
 import GoBack from "@/app/_components/goback";
 import { convertLexicalJsonToHtml } from "@/app/_components/lexicalViewer";
 import {
-  createComment,
-  deleteComment,
-  getComments,
-  getTaskById,
-  removeDocumentFromTask,
-  removeMemberFromTask,
-  Task,
-  updateComment,
-  updateCompteRendu,
-  updateTask,
+    createComment,
+    deleteComment,
+    getComments,
+    getTaskById,
+    removeDocumentFromTask,
+    removeMemberFromTask,
+    Task,
+    updateComment,
+    updateCompteRendu,
+    updateTask,
 } from "@/lib/api/tache";
 import { MessageType } from "@/lib/types";
 import { RenderDocFirstPage } from "@/lib/utils/renderDocFirstPage";
@@ -62,7 +62,8 @@ export default function DetailTache({
         setTask(response);
         setCompteRenduText(response.compte_rendu || "");
       } catch (error) {
-        console.error("Error fetching data:", error);
+console.error(error)
+        ;
       }
     };
     fetchData();
@@ -80,7 +81,8 @@ export default function DetailTache({
 
       setRefresh((v) => !v);
     } catch (error) {
-      console.error("Error adding members:", error);
+console.error(error)
+      ;
       toast.dismiss();
       throw error;
     }
@@ -95,13 +97,14 @@ export default function DetailTache({
         fichiers_urls: [fileUrl],
       });
       const updatedTask = await getTaskById(parseInt(taskId));
-      console.log("updatedTask", updatedTask);
+      ;
       setTask(updatedTask);
       setRefresh3((v) => !v);
       toast.dismiss();
       toast.success("Document ajouté avec succès");
     } catch (error) {
-      console.error("Error adding document:", error);
+console.error(error)
+      ;
       toast.dismiss();
       toast.error("Erreur lors de l'ajout du document");
       throw error;
@@ -178,7 +181,8 @@ export default function DetailTache({
                     setRefresh3((v) => !v);
                     toast.dismiss();
                   } catch (error) {
-                    console.error("Error removing member:", error);
+console.error(error)
+                    ;
                     toast.dismiss();
                     toast.error("Erreur lors de la suppression du participant");
                     throw error;
@@ -233,7 +237,8 @@ export default function DetailTache({
                     toast.dismiss();
                     toast.success("Document supprimé avec succès");
                   } catch (error) {
-                    console.error("Error removing document:", error);
+console.error(error)
+                    ;
                     toast.dismiss();
                     toast.error("Erreur lors de la suppression du document");
                     throw error;
@@ -273,9 +278,9 @@ export default function DetailTache({
           })}
           handleSubmiting={async (text: string) => {
             if (!task) return;
-            console.log("text", text);
+            ;
             const res = await updateCompteRendu(task.id, text);
-            console.log("compte rendu", res);
+            ;
             setTask((prevTask) =>
               prevTask ? { ...prevTask, compte_rendu: text } : undefined
             );

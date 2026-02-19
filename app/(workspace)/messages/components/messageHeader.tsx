@@ -1,17 +1,15 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { useMessageStore } from "@/store/message";
+import { deleteGroupMessage, deleteMessage } from "@/lib/api/message";
+import { getUser, User } from "@/lib/api/users";
 import { useGroupMessageStore } from "@/store/group-message";
-import { ChevronDown, ChevronLeft, Info, Trash2 } from "lucide-react";
+import { useMessageStore } from "@/store/message";
+import { Avatar, AvatarFallback } from "@radix-ui/react-avatar";
+import { ChevronDown, ChevronLeft, Ellipsis, Info, Trash2 } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { Avatar, AvatarFallback } from "@radix-ui/react-avatar";
-import { User } from "@/lib/api/users";
-import { getUser } from "@/lib/api/users";
-import { Popover } from "../../components/popover";
-import { Ellipsis } from "lucide-react";
-import { deleteMessage, deleteGroupMessage } from "@/lib/api/message";
 import { toast } from "sonner";
+import { Popover } from "../../components/popover";
 
 const MessageHeader = () => {
   const { activeConversation, setActiveConversation } = useMessageStore();
@@ -26,7 +24,8 @@ const MessageHeader = () => {
         const res = await getUser();
         setUser(res);
       } catch (error) {
-        console.error("Error fetching user:", error);
+console.error(error)
+        ;
       }
     };
     fetchUser();
@@ -335,7 +334,8 @@ const PopoverDeleteAll = ({
         window.location.reload();
       } catch {}
     } catch (error) {
-      console.error("Error deleting all messages:", error);
+console.error(error)
+      ;
       toast.error("Erreur lors de la suppression des messages");
     } finally {
       setLoading(false);

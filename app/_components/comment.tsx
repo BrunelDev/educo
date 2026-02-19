@@ -4,36 +4,36 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
 } from "@/components/ui/dialog";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  Comment,
-  CommentsListResponse,
-  CreateCommentDto,
-  UpdateCommentDto,
+    Comment,
+    CommentsListResponse,
+    CreateCommentDto,
+    UpdateCommentDto,
 } from "@/lib/api/reunion";
 import { getUser, User } from "@/lib/api/users";
 import { isAxiosError } from "axios";
 import { formatDistanceToNow } from "date-fns";
 import { fr } from "date-fns/locale";
 import {
-  Edit,
-  MessageCircle,
-  MessageCircleMore,
-  //Heart,
-  MoreHorizontal,
-  Send,
-  Trash2,
+    Edit,
+    MessageCircle,
+    MessageCircleMore,
+    //Heart,
+    MoreHorizontal,
+    Send,
+    Trash2,
 } from "lucide-react";
 import React, { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -137,7 +137,7 @@ export const CommentItem: React.FC<CommentItemProps> = ({
   useEffect(() => {
     const getUserData = async () => {
       const userData = await getUser();
-      console.log("userData", userData);
+      ;
       setUserData(userData);
     };
     getUserData();
@@ -364,7 +364,7 @@ export const CommentForm: React.FC<CommentFormProps> = ({
           contenu: content.trim(),
           parent: parentId,
         };
-        console.log("DTO", commentData);
+        ;
         const newComment = await createComment(commentData);
         onSubmit?.(newComment);
       }
@@ -462,7 +462,7 @@ export const CommentList: React.FC<CommentListProps> = ({
     try {
       setLoading(true);
       const response = await getComments(reunionId);
-      console.log("-------Liste des commentaires---------", response);
+      ;
       setComments(response.results);
     } catch {
       toast.error("Erreur lors du chargement des commentaires");
@@ -526,7 +526,7 @@ export const CommentList: React.FC<CommentListProps> = ({
     const getUserData = async () => {
       const userData = await getUser();
       setUserData(userData);
-      console.log("userData///////////*------------------", userData);
+      ;
     };
     getUserData();
   }, []);

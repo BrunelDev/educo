@@ -1,9 +1,9 @@
+import EmptyState from "@/app/_components/EmptyState";
+import api from "@/lib/api";
 import { formatDateToFrench } from "@/lib/functions";
 import Image from "next/image";
-import api from "@/lib/api";
-import { useEffect, useState } from "react";
-import EmptyState from "@/app/_components/EmptyState";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 interface Actuality {
   id: number;
@@ -32,7 +32,8 @@ export default function Actuality() {
         const res = await api.get<ActualityResponse>("actualites/");
         setActualities(res.data.results);
       } catch (error) {
-        console.error("Error fetching actualities:", error);
+console.error(error)
+        ;
       }
     };
     fetchActualities();

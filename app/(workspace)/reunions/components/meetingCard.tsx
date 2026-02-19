@@ -4,11 +4,11 @@ import { formatDateToFrench } from "@/lib/functions";
 import { Meeting } from "@/lib/types";
 import { useMeetingStore } from "@/store/meetings";
 import {
-  CalendarDays,
-  Check,
-  Ellipsis,
-  FilePenLine,
-  Trash2,
+    CalendarDays,
+    Check,
+    Ellipsis,
+    FilePenLine,
+    Trash2,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -127,7 +127,8 @@ const PopoverContent = ({ meeting }: PopoverContentProps) => {
         toast.success("Réunion supprimée avec succès");
         window.location.reload();
       } catch (error) {
-        console.error("Error deleting meeting:", error);
+console.error(error)
+        ;
         toast.error("Erreur lors de la suppression de la réunion");
       }
     }
@@ -145,7 +146,8 @@ const PopoverContent = ({ meeting }: PopoverContentProps) => {
       toast.success("Réunion renommée avec succès");
       window.location.reload();
     } catch (error) {
-      console.error("Error updating meeting:", error);
+console.error(error)
+      ;
       toast.error("Erreur lors de la mise à jour de la réunion");
     }
   };

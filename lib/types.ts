@@ -133,10 +133,10 @@ interface Attendee {
   imageUrl: string;
 }
 enum MeetingType {
-  CSSCT = "CSSCT",
-  Ordinary = "Ordinaire",
-  Extraordinal = "Extraordinaire",
-  Others = "Autres",
+  Concertation = "Concertation",
+  Course = "Cours",
+  Annonce = "Annonce",
+  Consultation = "Consultation",
 }
 
 interface MeetingCardProps {
@@ -218,18 +218,18 @@ interface Error2 {
 }
 
 enum ConsultationType {
-  Orientation = "Orientations stratégiques de l’entreprise",
-  Situation = "Situation économique et financière",
-  Politique = "Politique sociale, conditions de travail et emploi",
-  Accord = "Accords et plans de sauvegarde de l’emploi (PSE)",
-  Introduction = "Introduction de nouvelles technologies",
-  Modification = "Modifications importantes des conditions de travail",
-  Fusion = "Fusion, acquisition, cession d’entreprise",
-  ReglementInterieur = "Règlement intérieur",
-  ActivitePartielle = "Activité partielle (chômage partiel)",
-  DemenagementReorganisationSite = "Déménagement ou réorganisation de site",
-  RisquesProfessionnels = "Risques professionnels / santé / sécurité",
-  AccordsCollectif = "Accords collectifs",
+  OrientationStrategique = "Orientations pédagogiques et stratégiques",
+  BudgetRessources = "Budget et ressources académiques",
+  PolitiqueFormation = "Politique de formation et conditions d'enseignement",
+  NouvellesTechnologies = "Introduction de nouvelles technologies pédagogiques",
+  ModificationProgrammes = "Modification des programmes d'enseignement",
+  Partenariats = "Partenariats et coopérations universitaires",
+  DeveloppementCompetences = "Développement des compétences du personnel",
+  ReglementAcademique = "Règlement intérieur académique",
+  Conventions = "Conventions et accords pédagogiques",
+  Examens = "Organisation des examens et évaluations",
+  AmenagementEspaces = "Aménagement des espaces d'enseignement",
+  QualiteVie = "Qualité de vie et conditions d'études",
 }
 
 interface ConsultationProps {

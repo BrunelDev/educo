@@ -42,7 +42,7 @@ export const addMembersToTeam = async (
       endpoints.equipes.base + `${teamId}/membres/`,
       { membres_ids }
     );
-    console.log(response.data);
+    ;
     return response.data;
   } catch (error) {
     console.error("Error adding members to team", (error as Error).message);
@@ -124,4 +124,5 @@ export const grantAccess = async (
   }
 };
 
-export type { User, Team, TeamApiResponse };
+export type { Team, TeamApiResponse, User };
+

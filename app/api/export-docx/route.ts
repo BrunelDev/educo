@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
 
     // Validate the input
     if (!params.htmlString) {
-      console.error("No htmlString provided in request");
+      ;
       return NextResponse.json(
         { error: "htmlString is required" },
         { status: 400 }
@@ -36,7 +36,8 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("Error generating DOCX:", error);
+console.error(error)
+    ;
     return NextResponse.json(
       { error: "Failed to generate document" },
       { status: 500 }

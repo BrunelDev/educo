@@ -1,14 +1,10 @@
 "use client";
-import { Conversation, Group } from "@/lib/api/message";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { getCookies } from "@/lib/utils/cookies";
+import { Conversation, Group, markGroupLastMessageAsRead, markLastMessageAsRead } from "@/lib/api/message";
 import { User } from "@/lib/api/users";
-import {
-  markLastMessageAsRead,
-  markGroupLastMessageAsRead,
-} from "@/lib/api/message";
+import { cn } from "@/lib/utils";
+import { getCookies } from "@/lib/utils/cookies";
 interface ConversationsListProps {
   conversations: Conversation[];
   groups: Group[];
@@ -29,7 +25,7 @@ export function ConversationsList({
   view,
 }: ConversationsListProps) {
   const user: User = JSON.parse(getCookies("userInfo") || "{}");
-  console.log("---test---", groups);
+  ;
 
   return (
     <ScrollArea className="h-[calc(100vh-12rem)]">

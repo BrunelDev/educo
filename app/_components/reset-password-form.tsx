@@ -3,12 +3,12 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { confirmPasswordReset } from "@/lib/api/users";
 import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation"; // Uncomment if navigation is needed after reset
 import { useState } from "react";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation"; // Uncomment if navigation is needed after reset
-import { confirmPasswordReset } from "@/lib/api/users";
 
 export function ResetPasswordForm({
   uid,
@@ -69,15 +69,16 @@ export function ResetPasswordForm({
     setIsLoading(true);
     try {
       const response = await confirmPasswordReset(uid, token, password);
-      console.log(response);
+      ;
       setIsLoading(false);
       toast.success(response.message);
       setPassword("");
       setConfirmPassword("");
       router.push("/login");
     } catch (error) {
+console.error(error)
       setIsLoading(false);
-      console.error("Error confirming password reset", error);
+      ;
       toast.error("Veuillez vérifier votre adresse e-mail et réessayez");
     }
   };

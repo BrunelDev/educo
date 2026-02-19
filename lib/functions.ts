@@ -15,7 +15,7 @@ export const login = async (email: string, password: string) => {
     if (response.ok) {
       const res = await response.json();
       document.cookie = `access_token=${res.token};path=/;Max-Age=604800`;
-      console.log("res", res);
+      ;
       document.cookie = `refresh_token=${res.refresh};path=/;Max-Age=604800`;
       document.cookie = `userInfo=${JSON.stringify(res.user)};path=/;Max-Age=604800`;
 
@@ -26,7 +26,7 @@ export const login = async (email: string, password: string) => {
     }
   } catch (error: unknown) {
     if (error instanceof Error) {
-      console.log("Error");
+      ;
       throw new Error(error.message);
     }
     throw new Error("An unknown error occurred during login");

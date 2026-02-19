@@ -12,7 +12,7 @@ export default function Formations() {
     const fetchMeetings = async () => {
       const response = await getWebinaires();
       setFormations(response.results);
-      console.log(response.results);
+      ;
     };
     fetchMeetings();
   }, []);

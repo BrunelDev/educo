@@ -1,23 +1,23 @@
 "use client";
-import { useState } from "react";
-import Link from "next/link";
 import { Ellipsis, FilePenLine, Trash2 } from "lucide-react";
+import Link from "next/link";
+import { useState } from "react";
 import { toast } from "sonner";
 
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import {
-  Popover,
-  PopoverContent as ShadcnPopoverContent,
-  PopoverTrigger,
+    Popover,
+    PopoverTrigger,
+    PopoverContent as ShadcnPopoverContent,
 } from "@/components/ui/popover";
 import { Popover as CustomPopover } from "../../components/popover";
 
 import {
-  deleteProject,
-  Project,
-  ProjectStatus,
-  updateProject,
+    deleteProject,
+    Project,
+    ProjectStatus,
+    updateProject,
 } from "@/lib/api/projets";
 
 interface ProjectCardProps {
@@ -39,7 +39,8 @@ export default function ProjectCard({
       setOpenStatus(false);
       onSubmitProject();
     } catch (error) {
-      console.error("Error updating project status:", error);
+console.error(error)
+      ;
       toast.error("Erreur lors de la mise à jour du statut du projet");
     }
   };
@@ -145,7 +146,7 @@ const PopoverMenuContent = ({ project, onSubmit }: PopoverContentProps) => {
       toast.success("Projet supprimé avec succès");
       onSubmit();
     } catch (error: unknown) {
-      console.error("Error deleting project:", error);
+      ;
       toast.error("Erreur lors de la suppression du projet");
     }
   };
@@ -161,7 +162,7 @@ const PopoverMenuContent = ({ project, onSubmit }: PopoverContentProps) => {
       toast.success("Projet renommé avec succès");
       onSubmit();
     } catch (error: unknown) {
-      console.error("Error updating project:", error);
+      ;
       toast.error("Erreur lors de la mise à jour du projet");
     }
   };

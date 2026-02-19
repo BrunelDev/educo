@@ -49,7 +49,8 @@ export const getNotifications = async ({
     });
     return response.data;
   } catch (error) {
-    console.error("Error fetching notifications:", error);
+console.error(error)
+    ;
     throw error
   }
 };
@@ -58,7 +59,8 @@ export const updateNotification = async (id: number): Promise<void> => {
   try {
     await api.put(`${endpoint}${id}/`);
   } catch (error) {
-    console.error("Error updating notification:", error);
+console.error(error)
+    ;
     throw error;
   }
 };
@@ -78,7 +80,8 @@ export const deleteNotification = async (
     );
     return response.data;
   } catch (error) {
-    console.error("Error deleting notification:", error);
+console.error(error)
+    ;
     throw error;
   }
 };

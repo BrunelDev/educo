@@ -1,12 +1,12 @@
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
 } from "@/components/ui/dialog";
 import { Minus } from "lucide-react";
 import Image from "next/image";
@@ -75,7 +75,7 @@ export default function ParticipantComponent({
                       setIsDeleteDialogOpen(false);
                     }
                   : () => {
-                      console.log("handleDelete not defined");
+                      ;
                       setIsDeleteDialogOpen(false);
                     }
               }

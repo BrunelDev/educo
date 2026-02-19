@@ -26,7 +26,8 @@ export const getGroups = async (): Promise<GroupResponse> => {
     const response = await api.get(`messagerie/groupes-fermes/`);
     return response.data;
   } catch (error) {
-    console.error("Error fetching groups:", error);
+console.error(error)
+    ;
     throw error;
   }
 }
@@ -38,7 +39,8 @@ export const createGroup = async (payload: CreateGroupPayload): Promise<Group> =
     return response.data;
     
   } catch (error) {
-    console.error("Error creating group:", error);
+console.error(error)
+    ;
     throw error;
   }
 };
@@ -49,7 +51,8 @@ export const addGroupMember = async (groupId: number, userId: number): Promise<v
     const response = await api.post(`messagerie/groupes-fermes/${groupId}/add_member/`, { user_id: userId });
     return response.data;
   } catch (error) {
-    console.error("Error adding member to group:", error);
+console.error(error)
+    ;
     throw error;
   }
 };
@@ -59,7 +62,8 @@ export const removeGroupMember = async (groupId: number, userId: number): Promis
     const response = await api.delete(`messagerie/groupes-fermes/${groupId}/remove_member/`, { data: { user_id: userId }});
     return response.data;
   } catch (error) {
-    console.error("Error removing member from group:", error);
+console.error(error)
+    ;
     throw error;
   }
 };
@@ -69,7 +73,7 @@ export interface SendMessagePayload {
 }
 
 
-import { WebSocketMessage } from '@/lib/types/websocket'; 
+import { WebSocketMessage } from '@/lib/types/websocket';
 
 
 export const sendGroupMessageREST = async (groupId: number, payload: SendMessagePayload): Promise<WebSocketMessage> => {
@@ -77,7 +81,8 @@ export const sendGroupMessageREST = async (groupId: number, payload: SendMessage
     const response = await api.post(`messagerie/groupes-fermes/${groupId}/messages/`, payload);
     return response.data;
   } catch (error) {
-    console.error("Error sending message to group:", error);
+console.error(error)
+    ;
     throw error;
   }
 };

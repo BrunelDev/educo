@@ -4,16 +4,16 @@ import { Label } from "@/components/ui/label";
 
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
 } from "@/components/ui/select";
 import {
-  getOrganization,
-  OrganizationResponse,
-  updateOrganisation,
+    getOrganization,
+    OrganizationResponse,
+    updateOrganisation,
 } from "@/lib/api/organisation";
 import { uploadToS3 } from "@/lib/s3-upload";
 import { FileInputChangeEvent } from "@/lib/types";
@@ -93,9 +93,10 @@ export default function UpdateOrganisationForm({
         setLogoUrl(urls[0]);
         toast.success("Le logo a été chargé avec succès");
       } catch (error) {
+console.error(error)
         toast.error("Nous n'avons pas réussi à charger votre logo.");
         throw error;
-        //console.error(error);
+        //;
       }
     }
   };
@@ -109,7 +110,8 @@ export default function UpdateOrganisationForm({
           setLogoUrl(response.organisation.logo || "");
         }
       } catch (error) {
-        console.error("error geting organization", error);
+console.error(error)
+        ;
       }
     };
     fun();
@@ -201,12 +203,13 @@ export default function UpdateOrganisationForm({
             // The description field is not explicitly handled here as it's not part of the added fields.
             // If it needs to be updated or cleared, specific logic would be required.
 
-            console.log("Submitting:", organizationData);
+            ;
             await updateOrganisation(orgId, organizationData);
 
             toast.success(`L'établissement a été modifié avec succès`);
             handleClose();
           } catch (error) {
+console.error(error)
             if (error instanceof z.ZodError) {
               const newErrors: Record<string, string> = {};
               error.errors.forEach((err) => {

@@ -26,7 +26,7 @@ import { uploadToS3 } from "@/lib/s3-upload";
 const files: File[] = [file1, file2];
 const urls: string[] = await uploadToS3(files);
 
-console.log("Fichiers uploadés:", urls);
+;
 // URLs publiques des fichiers uploadés sur Supabase Storage
 ```
 

@@ -28,14 +28,15 @@ export function TeamFormHandler({
           storedData = JSON.parse(getCookies("userInfo") || "{}");
         }
 
-        console.log("token", storedData);
+        ;
         const response = await getMembersWithNoTeam();
-        console.log("res", response);
+        ;
         if (response) {
           setUsers(response);
         }
       } catch (error) {
-        console.error("error geting users", error);
+console.error(error)
+        ;
       }
     };
     fun();
@@ -66,7 +67,7 @@ export function TeamFormHandler({
         return;
       }
       toast.error("Erreur lors de l'ajout des membres à l'organisation");
-      console.error(error);
+      ;
       return;
     }
   };
@@ -134,14 +135,15 @@ export function TeamFormHandlerWithMail({
           storedData = JSON.parse(getCookies("userInfo") || "{}");
         }
 
-        console.log("token", storedData);
+        ;
         const response = await getMembersWithNoTeam();
-        console.log("res", response);
+        ;
         if (response) {
           setUsers(response);
         }
       } catch (error) {
-        console.error("error geting users", error);
+console.error(error)
+        ;
       }
     };
     fun();
@@ -236,7 +238,7 @@ export function TeamFormHandlerWithMail({
         return;
       }
       toast.error("Erreur lors de l'opération. Veuillez réessayer.");
-      console.error(error);
+      ;
       return;
     }
   };

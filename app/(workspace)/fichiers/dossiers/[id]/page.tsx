@@ -2,29 +2,29 @@
 
 import { DialogComponent } from "@/app/_components/dialogComponent";
 import EmptyState from "@/app/_components/EmptyState";
+import GoBack from "@/app/_components/goback";
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbPage,
+    BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
-  createFile,
-  createFolder,
-  Dossier,
-  getOneDossiers,
+    createFile,
+    createFolder,
+    Dossier,
+    getOneDossiers,
 } from "@/lib/api/fichiers";
 import { uploadToS3 } from "@/lib/s3-upload";
 import { CirclePlus } from "lucide-react";
-import { use, useEffect, useState, Fragment } from "react";
+import { Fragment, use, useEffect, useState } from "react";
 import { toast } from "sonner";
 import FileCard from "../../components/file";
 import Folder from "../../components/folder";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import GoBack from "@/app/_components/goback";
 
 export default function DossierPage({
   params,
@@ -45,7 +45,8 @@ export default function DossierPage({
         const dossierData = await getOneDossiers(id);
         setFolderContent(dossierData);
       } catch (error) {
-        console.error("Erreur lors de la récupération du dossier:", error);
+console.error(error)
+        ;
         setError("Impossible de charger le dossier.");
       } finally {
         setLoading(false);
@@ -69,7 +70,7 @@ export default function DossierPage({
           path.unshift(parentFolder); // Add parent to the beginning of the path
           parentIdToFetch = parentFolder.parent;
         } catch (err) {
-          console.error("Error fetching parent folder for breadcrumb:", err);
+          ;
           toast.error("Erreur lors de la construction du fil d'Ariane.");
           parentIdToFetch = null; // Stop if there's an error
         }
@@ -199,11 +200,11 @@ const CreateFolder = ({ folderId }: { folderId: string }) => {
     const folderName = formData.get("nom");
     if (folderName) {
       const res = createFolder(folderName?.toString(), folderId);
-      console.log(res);
+      ;
       toast.message("Dossier créé avec succès.");
       window.location.reload();
     }
-    console.log("Creating folder:", folderName);
+    ;
   };
 
   return (
@@ -228,7 +229,7 @@ const CreateFile = ({ folderId }: { folderId: string }) => {
       try {
         // Upload file to S3
         const fileUrl = await uploadToS3([file]);
-        console.log("S3 Upload response:", fileUrl);
+        ;
         //the name should be the same as the file name
         
         const fileData = {
@@ -241,7 +242,7 @@ const CreateFile = ({ folderId }: { folderId: string }) => {
         toast.success("Fichier créé avec succès");
         window.location.reload();
       } catch (error: unknown) {
-        console.error("Error creating file", error);
+        ;
         toast.error("Erreur lors de la création du fichier");
       }
     }

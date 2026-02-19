@@ -12,28 +12,28 @@ import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { HeadingNode, QuoteNode } from "@lexical/rich-text";
 import { TableCellNode, TableNode, TableRowNode } from "@lexical/table";
 import {
-  $isTextNode,
-  DOMConversionMap,
-  DOMExportOutput,
-  DOMExportOutputMap,
-  EditorState,
-  isHTMLElement,
-  Klass,
-  LexicalEditor,
-  LexicalNode,
-  ParagraphNode,
-  TextNode,
+    $isTextNode,
+    DOMConversionMap,
+    DOMExportOutput,
+    DOMExportOutputMap,
+    EditorState,
+    isHTMLElement,
+    Klass,
+    LexicalEditor,
+    LexicalNode,
+    ParagraphNode,
+    TextNode,
 } from "lexical";
 
+import { useMeetingForm } from "@/store/meetingForm";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { useEffect, useState, useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import ExampleTheme from "./editorPlugins/ExampleTheme";
 import {
-  parseAllowedColor,
-  parseAllowedFontSize,
+    parseAllowedColor,
+    parseAllowedFontSize,
 } from "./editorPlugins/styleConfig";
 import ToolbarPlugin from "./editorPlugins/toolbarPlugin";
-import { useMeetingForm } from "@/store/meetingForm";
 
 const placeholder = "Entre du texte";
 
@@ -165,7 +165,7 @@ export default function Editor( {disabled = false, _editorStateJSON}: {disabled?
   const onChange = useCallback((editorState: EditorState) => {
     const json = JSON.stringify(editorState.toJSON());
     setEditorStateJSON(json);
-    console.log(json)
+    
   }, []);
 
   // Utilisez une dépendance stable pour le useEffect

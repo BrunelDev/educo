@@ -86,7 +86,8 @@ export const getMeetings = async (
     });
     return response.data;
   } catch (error) {
-    console.error("Error fetching meetings", error);
+console.error(error)
+    ;
     throw error;
   }
 };
@@ -94,10 +95,10 @@ export const getMeetings = async (
 export const getOneMeting = async (id: number): Promise<Meeting> => {
   try {
     const response = await api.get(`${endpoint.list}${id}/`);
-    console.log("---TEST---", response.data);
+    ;
     return response.data;
   } catch (error: unknown) {
-    console.error("Error fetching meeting", error);
+    console.error(error);
     throw error;
   }
 };
@@ -107,7 +108,8 @@ export const createMeeting = async (meeting: MeetingFormState) => {
     const response = await api.post(endpoint.create, meeting);
     return response.data;
   } catch (error) {
-    console.error("Error creating meeting", error);
+console.error(error)
+    ;
     throw error;
   }
 };
@@ -129,7 +131,8 @@ export const updateMeeting = async (
     );
     return response.data;
   } catch (error) {
-    console.error("Error updating meeting", error);
+console.error(error)
+    ;
     throw error;
   }
 };
@@ -143,7 +146,8 @@ export const deleteMeeting = async (id: number): Promise<void> => {
   try {
     await api.delete(`${endpoint.list}${id}/`);
   } catch (error) {
-    console.error("Error deleting meeting", error);
+console.error(error)
+    ;
     throw error;
   }
 };
@@ -165,7 +169,8 @@ export const deleteParticipantFromMeeting = async (
       },
     });
   } catch (error) {
-    console.error("Error deleting participant from meeting", error);
+console.error(error)
+    ;
     throw error;
   }
 };
@@ -208,7 +213,8 @@ export const addDocument = async (
     );
     return response.data;
   } catch (error) {
-    console.error("Error adding document to meeting:", error);
+console.error(error)
+    ;
     throw error;
   }
 };
@@ -222,7 +228,8 @@ export const removeDocumentFromMeeting = async (
     );
     return response.data;
   } catch (error) {
-    console.error("Error removing document from meeting:", error);
+console.error(error)
+    ;
     throw error;
   }
 };
@@ -240,7 +247,8 @@ export const addMemberToMeeting = async (
     );
     return response.data;
   } catch (error) {
-    console.error("Error adding member to meeting:", error);
+console.error(error)
+    ;
     throw error;
   }
 };
@@ -258,15 +266,16 @@ export const createComment = async (
   commentData: CreateCommentDto
 ): Promise<Comment> => {
   try {
-    console.log("payload", commentData);
+    ;
     const response = await api.post(
       "/reunion/commentaires/creer/",
       commentData
     );
-    console.log("--------------el f2-----------------", response.data);
+    ;
     return response.data;
   } catch (error) {
-    console.error("Error creating comment:", error);
+console.error(error)
+    ;
     throw error;
   }
 };
@@ -285,7 +294,8 @@ export const getMeetingComments = async (
     );
     return response.data;
   } catch (error) {
-    console.error("Error fetching meeting comments:", error);
+console.error(error)
+    ;
     throw error;
   }
 };
@@ -300,7 +310,8 @@ export const getComment = async (commentId: number): Promise<Comment> => {
     const response = await api.get(`/reunion/commentaires/${commentId}/`);
     return response.data;
   } catch (error) {
-    console.error("Error fetching comment:", error);
+console.error(error)
+    ;
     throw error;
   }
 };
@@ -322,7 +333,8 @@ export const updateComment = async (
     );
     return response.data;
   } catch (error) {
-    console.error("Error updating comment:", error);
+console.error(error)
+    ;
     throw error;
   }
 };
@@ -336,7 +348,8 @@ export const deleteComment = async (commentId: number): Promise<void> => {
   try {
     await api.delete(`/reunion/commentaires/${commentId}/`);
   } catch (error) {
-    console.error("Error deleting comment:", error);
+console.error(error)
+    ;
     throw error;
   }
 };
@@ -353,7 +366,8 @@ export const getMeetingWithComments = async (
     const response = await api.get(`/reunion/reunions/${reunionId}/`);
     return response.data;
   } catch (error) {
-    console.error("Error fetching meeting with comments:", error);
+console.error(error)
+    ;
     throw error;
   }
 };

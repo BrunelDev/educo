@@ -4,8 +4,8 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  getOrganisationMembers,
-  OrganizationMember,
+    getOrganisationMembers,
+    OrganizationMember,
 } from "@/lib/api/organisation";
 import { createProject } from "@/lib/api/projets";
 import { AxiosError } from "axios";
@@ -38,7 +38,7 @@ export default function ProjectForm({
         const response = await getOrganisationMembers();
         setMembers(response);
       } catch (error: unknown) {
-        console.error("Error fetching members:", error);
+        ;
       }
     };
     fetchMembers();
@@ -71,7 +71,7 @@ export default function ProjectForm({
         participants: selectedMembers,
         team: teamId,
       };
-      console.log(projectData);
+      ;
 
       await createProject(projectData);
       toast.success("Projet créé avec succès");
@@ -86,7 +86,7 @@ export default function ProjectForm({
         toast.error(error.response?.data.detail);
       }
 
-      console.error("Error creating project:", error);
+      ;
     }
   };
 

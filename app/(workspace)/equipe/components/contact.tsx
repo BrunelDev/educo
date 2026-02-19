@@ -15,7 +15,8 @@ export default function Contact() {
       const response = await getOrganization();
       setOrganisation(response);
     } catch (error) {
-      console.error("Error fetching organisation:", error);
+console.error(error)
+      ;
     }
   }, []);
 

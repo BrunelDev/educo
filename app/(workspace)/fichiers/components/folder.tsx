@@ -1,18 +1,18 @@
 import { Input } from "@/components/ui/input";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
 } from "@/components/ui/select";
 import {
-  deleteDossier,
-  Dossier,
-  editDossier,
-  FoldersList,
-  getFoldersList,
-  moveFolderToFolder,
+    deleteDossier,
+    Dossier,
+    editDossier,
+    FoldersList,
+    getFoldersList,
+    moveFolderToFolder,
 } from "@/lib/api/fichiers";
 import { useFolderStore } from "@/store/folders";
 import { FilePenLine, Folder, MoreHorizontal, Trash2 } from "lucide-react";
@@ -93,7 +93,7 @@ const PopoverContent = ({
       removeFolder(folder.id);
       fetchDossiers();
     } catch (error: unknown) {
-      console.error("Error deleting folder", error);
+      ;
       // You might want to add toast notification here
     }
   };
@@ -127,7 +127,8 @@ const PopoverContent = ({
           results: allFolders,
         });
       } catch (error) {
-        console.error("Error fetching all folders:", error);
+console.error(error)
+        ;
         toast.error("Erreur lors de la récupération des dossiers");
       }
     };
@@ -141,7 +142,7 @@ const PopoverContent = ({
       toast.success("Dossier déplacé avec succès");
       window.location.reload();
     } catch (error: unknown) {
-      console.error("Error moving file:", error);
+      ;
       toast.error("Erreur lors du déplacement du fichier");
     }
   };
@@ -174,13 +175,14 @@ const PopoverContent = ({
                 }}
                 onKeyDown={async (e) => {
                   if (e.key === "Enter") {
-                    console.log("Key Enter down");
+                    ;
                     try {
                       editDossier(folder.id, updatedName);
                       fetchDossiers();
                       setOpen(false);
                     } catch (error) {
-                      console.error("Error editing folder", error);
+console.error(error)
+                      ;
                     }
                   }
                 }}

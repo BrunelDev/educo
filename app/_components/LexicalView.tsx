@@ -29,7 +29,7 @@ const editorConfig = {
     LinkNode,
   ],
   onError(error: Error) {
-    console.error(error);
+    ;
   },
   theme: ExampleTheme,
 };

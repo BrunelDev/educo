@@ -5,11 +5,11 @@ import { Label } from "@/components/ui/label";
 
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
 } from "@/components/ui/select";
 import { createOrganization } from "@/lib/api/organisation";
 import { uploadToS3 } from "@/lib/s3-upload";
@@ -75,10 +75,11 @@ export default function AddOrganisation({ handleClose }: AddOrganisationProps) {
         setLogoUrl(urls[0]);
         toast.success("Logo chargé avec succès");
       } catch (error) {
+console.error(error)
         toast.error(
           "Nous n'avons pas réussi à charger votre logo. Veuillez réessayer."
         );
-        console.error(error);
+        ;
       }
     }
   };
@@ -129,12 +130,13 @@ export default function AddOrganisation({ handleClose }: AddOrganisationProps) {
               membre_ids: [],
               description: "",
             };
-            console.log("there", organizationData);
+            ;
             await createOrganization(organizationData);
 
             toast.success(`L'établissement a été créé avec succès`);
             handleClose?.();
           } catch (error) {
+console.error(error)
             if (error instanceof z.ZodError) {
               const newErrors: Record<string, string> = {};
               error.errors.forEach((err) => {
@@ -397,10 +399,11 @@ export function AddOrganisationAfterLogin({
         setLogoUrl(urls[0]);
         toast.success("Logo chargé avec succès");
       } catch (error) {
+console.error(error)
         toast.error(
           "Nous n'avons pas réussi à charger votre logo. Veuillez réessayer."
         );
-        console.error(error);
+        ;
       }
     }
   };
@@ -451,15 +454,16 @@ export function AddOrganisationAfterLogin({
               membre_ids: [],
               description: "",
             };
-            console.log("organizationData", organizationData);
-            // console.log("there", organizationData); // Kept for now, can be removed
+            ;
+            // ; // Kept for now, can be removed
             const res = await createOrganization(organizationData);
-            console.log("reponse", res);
+            ;
 
             toast.success(`L'établissement a été créé avec succès`);
             onComplete();
             //onComplete(); // Call onComplete on success
           } catch (error) {
+console.error(error)
             if (error instanceof z.ZodError) {
               const newErrors: Record<string, string> = {};
               error.errors.forEach((err) => {
@@ -481,7 +485,7 @@ export function AddOrganisationAfterLogin({
               toast.error(
                 "Une erreur inattendue est survenue lors de la création de l'établissement."
               );
-              console.error("Unexpected error creating organization:", error);
+              ;
             }
           }
         }}

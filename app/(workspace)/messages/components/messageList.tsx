@@ -2,17 +2,17 @@
 "use client";
 
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useWebSocket } from "@/hooks/useWebSocket";
 import { useGroupWebSocket } from "@/hooks/useGroupWebSocket";
-import { getMessages, getGroupMessages } from "@/lib/api/message";
+import { useWebSocket } from "@/hooks/useWebSocket";
+import { getGroupMessages, getMessages } from "@/lib/api/message";
 import { WebSocketMessage } from "@/lib/types/websocket";
+import { useGroupMessageStore } from "@/store/group-message";
 import { useMessageStore } from "@/store/message";
 import { useIntersection } from "@mantine/hooks";
+import { Loader2 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import MessageBox from "./messageBox";
 import { MessageInput } from "./messageInput";
-import { Loader2 } from "lucide-react";
-import { useGroupMessageStore } from "@/store/group-message";
 
 export default function MessageList() {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
@@ -138,7 +138,8 @@ export default function MessageList() {
           setHasMore(!!response.next);
         }
       } catch (error) {
-        console.error("Error fetching messages:", error);
+console.error(error)
+        ;
       } finally {
         setIsLoading(false);
       }
@@ -211,7 +212,7 @@ export default function MessageList() {
           )}
           <div className="w-full">
             {messages.map((message, index) => {
-              console.log("message-------------", message);
+              ;
               return (
                 <MessageBox
                   key={`${message.timestamp}-${index}`}

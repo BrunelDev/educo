@@ -1,18 +1,18 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Eye, EyeOff } from "lucide-react";
-import { useState } from "react";
 import { updatePassword } from "@/lib/api/users";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Eye, EyeOff } from "lucide-react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
@@ -41,14 +41,15 @@ export function PasswordForm({ handleClose }: { handleClose: () => void }) {
       toast.error("Les mots de passe ne correspondent pas");
       return;
     }
-    console.log(values);
+    ;
     try {
     await updatePassword(values);
       toast.success("Mot de passe mis à jour avec succès");
       handleClose()
     } catch (error) {
+console.error(error)
       toast.error("Échec de la mise à jour du mot de passe");
-      console.error(error);
+      ;
     }
   }
 

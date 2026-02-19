@@ -1,5 +1,6 @@
 "use client";
 import { DialogComponent } from "@/app/_components/dialogComponent";
+import EmptyState from "@/app/_components/EmptyState";
 import { Button } from "@/components/ui/button";
 import { getMeetings } from "@/lib/api/reunion";
 import { Meeting, MeetingType } from "@/lib/types";
@@ -7,7 +8,6 @@ import { useMeetingStore } from "@/store/meetings";
 import { useEffect, useState } from "react";
 import CreateMeeting from "./components/createMeeting";
 import MeetingCard from "./components/meetingCard";
-import EmptyState from "@/app/_components/EmptyState";
 
 export default function Reunions() {
   const [filterValue, setFilterValue] = useState<string>("all");
@@ -66,7 +66,7 @@ export default function Reunions() {
       try {
         const data = await getMeetings();
         setMeetings(data.results);
-        console.log("Fetched meetings:", data);
+        ;
       } catch (error: unknown) {
         console.error("Error fetching meetings:", (error as Error).message);
       }
@@ -92,55 +92,55 @@ export default function Reunions() {
         </Button>
         <Button
           className={`cursor-pointer ${
-            filterValue === MeetingType.CSSCT
+            filterValue === MeetingType.Concertation
               ? "bg-gradient-to-r from-[#FE6539] to-crimson-400"
               : "bg-[#FFFFFF99] border border-white-50 text-white-800 hover:bg-coral-50"
           }`}
           variant={"default"}
           onClick={() => {
-            handleClick(MeetingType.CSSCT);
+            handleClick(MeetingType.Concertation);
           }}
         >
-          CSSCT
+          Concertation
         </Button>
         <Button
           className={`cursor-pointer ${
-            filterValue === MeetingType.Ordinary
+            filterValue === MeetingType.Course
               ? "bg-gradient-to-r from-[#FE6539] to-crimson-400"
               : "bg-[#FFFFFF99] border border-white-50 text-white-800 hover:bg-coral-50"
           }`}
           variant={"default"}
           onClick={() => {
-            handleClick(MeetingType.Ordinary);
+            handleClick(MeetingType.Course);
           }}
         >
-          Ordinaire
+          Cours
         </Button>
         <Button
           className={`cursor-pointer ${
-            filterValue === MeetingType.Extraordinal
+            filterValue === MeetingType.Annonce
               ? "bg-gradient-to-r from-[#FE6539] to-crimson-400"
               : "bg-[#FFFFFF99] border border-white-50 text-white-800 hover:bg-coral-50"
           }`}
           variant={"default"}
           onClick={() => {
-            handleClick(MeetingType.Extraordinal);
+            handleClick(MeetingType.Annonce);
           }}
         >
-          Extraordinaire
+          Annonce
         </Button>
         <Button
           className={`cursor-pointer ${
-            filterValue === MeetingType.Others
+            filterValue === MeetingType.Consultation
               ? "bg-gradient-to-r from-[#FE6539] to-crimson-400"
               : "bg-[#FFFFFF99] border border-white-50 text-white-800 hover:bg-coral-50"
           }`}
           variant={"default"}
           onClick={() => {
-            handleClick(MeetingType.Others);
+            handleClick(MeetingType.Consultation);
           }}
         >
-          Autres
+          Consultation
         </Button>
       </div>
       <div>

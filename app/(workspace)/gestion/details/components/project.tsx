@@ -1,13 +1,13 @@
 import { Popover } from "@/app/(workspace)/components/popover";
 import { Input } from "@/components/ui/input";
 import { deleteTask, TaskType, TaskUser, updateTask } from "@/lib/api/tache";
+import { useDraggable } from "@dnd-kit/core";
+import { CSS } from "@dnd-kit/utilities";
 import { Ellipsis, FilePenLine, Trash2 } from "lucide-react";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
-import { useDraggable } from "@dnd-kit/core";
-import { CSS } from "@dnd-kit/utilities";
-import Image from "next/image";
 
 interface TaskCardProps {
   title: string;
@@ -39,7 +39,7 @@ export default function TaskCard({
     transform: CSS.Translate.toString(transform),
     touchAction: "none",
   };
-  console.log("participants",participant);
+  ;
 
   return (
     <div
@@ -135,7 +135,7 @@ const PopoverContent = ({
       toast.success("Tâche supprimée avec succès");
       onSubmit();
     } catch (error: unknown) {
-      console.error("Error deleting task:", error);
+      ;
       toast.error("Erreur lors de la suppression de la tâche");
     }
   };
@@ -152,7 +152,7 @@ const PopoverContent = ({
       toast.success("Tâche renommée avec succès");
       onSubmit();
     } catch (error: unknown) {
-      console.error("Error updating task:", error);
+      ;
       toast.error("Erreur lors de la mise à jour de la tâche");
     }
   };

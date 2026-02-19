@@ -1,8 +1,8 @@
 import { Button } from "@/components/ui/button";
 import {
-  subscribeToWebinaire,
-  unsubscribeFromWebinaire,
-  Webinaire,
+    subscribeToWebinaire,
+    unsubscribeFromWebinaire,
+    Webinaire,
 } from "@/lib/api/formations";
 import { Check, X } from "lucide-react";
 import Image from "next/image";
@@ -63,12 +63,13 @@ const WebinarCardBotton = ({ webinar, onChange }: WebinarCardProps) => {
           onClick={async (e) => {
             e.preventDefault();
             try {
-              console.log(webinar.id);
+              ;
               await subscribeToWebinaire(webinar.id);
               onChange();
               toast.success("Inscription réussie");
             } catch (error) {
-              console.error(error);
+console.error(error)
+              ;
               toast.error("Une erreur est survenue lors de l'inscription");
             }
           }}
@@ -89,12 +90,13 @@ const WebinarCardBotton = ({ webinar, onChange }: WebinarCardProps) => {
               onClick={async (e) => {
                 e.preventDefault();
                 try {
-                  console.log(webinar.id);
+                  ;
                   await unsubscribeFromWebinaire(webinar.id);
                   onChange();
                   toast.success("Désinscription réussie");
                 } catch (error) {
-                  console.error(error);
+console.error(error)
+                  ;
                   toast.error(
                     "Une erreur est survenue lors de la désinscription"
                   );

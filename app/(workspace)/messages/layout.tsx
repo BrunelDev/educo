@@ -1,15 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import {
-  Conversation,
-  getConversationList,
-  Group,
-  getGroups,
+    Conversation,
+    getConversationList,
+    getGroups,
+    Group,
 } from "@/lib/api/message";
-import { useMessageStore } from "@/store/message";
 import { useGroupMessageStore } from "@/store/group-message";
-import {ConversationsList} from "./components/conversationsList";
+import { useMessageStore } from "@/store/message";
+import { useEffect, useState } from "react";
+import { ConversationsList } from "./components/conversationsList";
 
 export default function MessageLayout({
   children,
@@ -29,14 +29,15 @@ export default function MessageLayout({
     const fetchData = async () => {
       try {
         const convResponse = await getConversationList();
-        console.log("conv list -----", convResponse);
+        ;
         setConversations(convResponse?.results || []);
         const groupResponse = await getGroups();
-        console.log(groupResponse);
+        ;
         setGroups(groupResponse?.results || []);
         setIsRefreshing(false);
       } catch (error) {
-        console.error("Failed to fetch conversations or groups:", error);
+console.error(error)
+        ;
         setIsRefreshing(false);
       }
     };

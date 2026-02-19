@@ -4,13 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 //import SearchBar from "../components/searchBar";
+import EmptyState from "@/app/_components/EmptyState";
+import { getOrganization, OrganizationResponse } from "@/lib/api/organisation";
+import { getCookies } from "@/lib/utils/cookies";
+import { TeamFormHandlerWithMail } from "../components/teamFormHandler";
+import AddOrganisation from "./components/addOrganisation";
 import AssociateCard from "./components/associateCard";
 import Contact from "./components/contact";
-import AddOrganisation from "./components/addOrganisation";
-import {TeamFormHandlerWithMail} from "../components/teamFormHandler";
-import { getCookies } from "@/lib/utils/cookies";
-import { getOrganization, OrganizationResponse } from "@/lib/api/organisation";
-import EmptyState from "@/app/_components/EmptyState";
 
 export default function Equipe() {
   const [isAddOrgDialogOpen, setIsAddOrgDialogOpen] = useState(false);
@@ -26,11 +26,12 @@ export default function Equipe() {
           storedData = JSON.parse(getCookies("userInfo") || "{}");
         }
 
-        console.log("token", storedData);
+        ;
         const response = await getOrganization();
         setUsers(response);
       } catch (error) {
-        console.error(error);
+console.error(error)
+        ;
       }
     };
     fun();

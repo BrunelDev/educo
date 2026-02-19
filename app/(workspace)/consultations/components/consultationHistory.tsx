@@ -1,35 +1,35 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
 } from "@/components/ui/table";
 import {
-  Consultation,
-  getConsultations,
-  deleteConsultation,
-  updateConsultation,
+    Consultation,
+    deleteConsultation,
+    getConsultations,
+    updateConsultation,
 } from "@/lib/api/consultation";
+import { formatDateToFrench } from "@/lib/functions";
 import { Ellipsis, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Popover } from "../../components/popover";
-import { formatDateToFrench } from "@/lib/functions";
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogClose,
-} from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { Popover } from "../../components/popover";
 /*const consultations: ConsultationProps[] = [
   {
     consultationType: ConsultationType.Orientation,
@@ -100,7 +100,8 @@ export default function History({refresh}: {refresh: boolean}) {
       toast.dismiss(loadingToast);
       toast.success("Consultation supprimée avec succès.");
     } catch (error) {
-      console.error("Error deleting consultation:", error);
+console.error(error)
+      ;
       toast.dismiss(loadingToast);
       toast.error("Erreur lors de la suppression de la consultation.");
     } finally {
