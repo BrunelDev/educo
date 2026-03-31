@@ -1,8 +1,11 @@
+import { deleteOneGroupMessage } from "@/lib/api/message";
+import { getUser, User } from "@/lib/api/users";
 import { Message, MessageType } from "@/lib/types";
 import { getCookies } from "@/lib/utils/cookies";
 import { formatDistanceToNow } from "date-fns";
 import { fr } from "date-fns/locale";
 import {
+  Bot,
   Download,
   ExternalLink,
   File,
@@ -14,10 +17,10 @@ import {
   ZoomIn,
 } from "lucide-react";
 import Image from "next/image";
-import { useState, useEffect, useRef } from "react";
-import { getUser, User } from "@/lib/api/users";
+import { useEffect, useRef, useState } from "react";
 import "react-h5-audio-player/lib/styles.css";
-import { deleteOneGroupMessage } from "@/lib/api/message";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { toast } from "sonner";
 
 export interface MessageSender {
@@ -70,8 +73,8 @@ export default function MessageBox({
         x,
         (typeof window !== "undefined" ? window.innerWidth : x) -
           assumedWidth -
-          margin
-      )
+          margin,
+      ),
     );
     const clampedY = Math.max(
       margin,
@@ -79,8 +82,8 @@ export default function MessageBox({
         y,
         (typeof window !== "undefined" ? window.innerHeight : y) -
           assumedHeight -
-          margin
-      )
+          margin,
+      ),
     );
     setContextMenu({ open: true, x: clampedX, y: clampedY });
   };
@@ -396,10 +399,12 @@ export default function MessageBox({
             return (
               <p
                 className={`text-gray-800 bg-white-50 p-2 w-fit ${
-                  message.sender.id ==
-                  JSON.parse(getCookies("userInfo") || "")?.id
-                    ? ""
-                    : "rounded-b-[8px] rounded-tr-[8px]"
+                  (
+                    message.sender.id ==
+                    JSON.parse(getCookies("userInfo") || "")?.id
+                  ) ?
+                    ""
+                  : "rounded-b-[8px] rounded-tr-[8px]"
                 } min-w-[100px] break-all max-w-[280px] xs:max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg`}
               >
                 {message.content}
@@ -450,47 +455,87 @@ export default function MessageBox({
           );
         }
 
-        // Regular text message
-        return (
-          <p
-            className={`text-gray-800  p-1.5 sm:p-2 w-fit text-xs sm:text-sm md:text-base ${
-              message.sender.id == JSON.parse(getCookies("userInfo") || "")?.id
-                ? "rounded-b-[8px] rounded-tl-[8px] bg-crimson-400 text-white"
-                : "rounded-b-[8px] rounded-tr-[8px] bg-gray-200"
-            } min-w-[80px] sm:min-w-[100px] break-all max-w-[240px] xs:max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg`}
-          >
-            {message.content}
-          </p>
-        );
+        // Typing indicator
+        if (message.is_typing && !message.content) {
+          return (
+            <div className="flex gap-1.5 p-3 bg-gray-200 rounded-b-[8px] rounded-tr-[8px] w-fit items-center h-[40px]">
+              <div className="w-1.5 h-1.5 bg-gray-500 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+              <div className="w-1.5 h-1.5 bg-gray-500 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+              <div className="w-1.5 h-1.5 bg-gray-500 rounded-full animate-bounce"></div>
+            </div>
+          );
+        }
+
+
+
+const MessageContent = ({ content, isStreaming }: { content: string; isStreaming: boolean }) => {
+  if (isStreaming) {
+    return (
+      <span className="whitespace-pre-wrap">
+        {content}
+        <span className="inline-block w-1.5 h-3.5 bg-current ml-0.5 animate-pulse rounded-sm" />
+      </span>
+    );
+  }
+
+  return (
+    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+      {content || ""}
+    </ReactMarkdown>
+  );
+};
+
+// Dans ton return, remplace <ReactMarkdown> par :
+return (
+  <div
+    className={`text-gray-800 p-1.5 sm:p-2 w-fit text-xs sm:text-sm md:text-base whitespace-pre-wrap ${
+      message.sender.id === JSON.parse(getCookies("userInfo") || "")?.id
+        ? "rounded-b-[8px] rounded-tl-[8px] bg-crimson-400 text-white"
+        : "rounded-b-[8px] rounded-tr-[8px] bg-gray-200"
+    } min-w-[80px] sm:min-w-[100px] break-words max-w-[240px] xs:max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg markdown-content`}
+  >
+    <MessageContent 
+      content={message.content!} 
+      isStreaming={!!message.is_typing || (message.sender.id === 0 && message.content === "")} 
+    />
+  </div>
+);
     }
   };
 
   return (
     <div
       className={`flex gap-2 sm:gap-4 p-3 sm:p-4 w-fit ${className} my-6 sm:my-8 ${
-        message.sender.id == JSON.parse(getCookies("userInfo") || "")?.id
-          ? "ml-auto "
-          : ""
+        message.sender.id == JSON.parse(getCookies("userInfo") || "")?.id ?
+          "ml-auto "
+        : ""
       }`}
     >
-      <Image
-        src={
-          message.sender.image ? message.sender.image : "/userProfile-img.png"
-        }
-        alt={message.sender.name!}
-        width={30}
-        height={30}
-        style={{ objectFit: "cover", flexShrink: 0 }}
-        className="rounded-full w-[25px] h-[25px] sm:w-[30px] sm:h-[30px]"
-      />
+      {message.sender.id === 0 ?
+        <div className="w-[25px] h-[25px] sm:w-[30px] sm:h-[30px] rounded-full bg-crimson-100 flex items-center justify-center text-crimson-600 flex-shrink-0">
+          <Bot size={18} />
+        </div>
+      : <Image
+          src={
+            message.sender.image ? message.sender.image : "/userProfile-img.png"
+          }
+          alt={message.sender.name!}
+          width={30}
+          height={30}
+          style={{ objectFit: "cover", flexShrink: 0 }}
+          className="rounded-full w-[25px] h-[25px] sm:w-[30px] sm:h-[30px]"
+        />
+      }
       <div className="flex-1">
         <div className="flex items-center gap-1 sm:gap-2 mb-1">
           <span
             className={`font-medium text-xs sm:text-sm md:text-base ${
-              new Date().getTime() - new Date(message.timestamp).getTime() <
-              1000 * 31
-                ? "min-w-[120px]"
-                : ""
+              (
+                new Date().getTime() - new Date(message.timestamp).getTime() <
+                1000 * 31
+              ) ?
+                "min-w-[120px]"
+              : ""
             }`}
           >
             {message.sender.name ||
@@ -542,7 +587,6 @@ export default function MessageBox({
             {formatDistanceToNow(message.timestamp, {
               locale: fr,
               addSuffix: true,
-              
             })}
           </span>
           {/*<Ellipsis size={18} className="absolute top-1 -right-6" />*/}

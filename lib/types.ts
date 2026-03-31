@@ -295,7 +295,7 @@ interface User {
 
 // Interface for Message
 interface Message {
-  id: number;
+  id: string;
   room: number ;
   sender: Sender;
   content?: string;
@@ -321,6 +321,7 @@ interface Message {
   timestamp: Date;
   is_read: boolean;
   is_deleted: boolean;
+  is_typing?: boolean;
 }
 
 // Props interface for MessageBox component

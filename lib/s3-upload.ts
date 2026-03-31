@@ -29,7 +29,7 @@ export async function uploadToS3(files: File[]): Promise<string[]> {
       const fileBuffer = await file.arrayBuffer();
 
       // Upload to Supabase Storage
-      const { data, error } = await supabase.storage
+      const { error } = await supabase.storage
         .from(BUCKET_NAME)
         .upload(fileKey, fileBuffer, {
           contentType: file.type,

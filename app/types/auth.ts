@@ -4,7 +4,7 @@ export interface User {
         first_name: string;
         last_name: string;
         telephone: string;
-        type_utilisateur: "EMPLOYE" | "ADMIN" | "MEMBRE_CSE";
+        type_utilisateur: "ADMIN" | "MEMBRE";
         image: string | null;
         est_actif: boolean;
       }

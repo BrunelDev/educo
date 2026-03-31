@@ -5,11 +5,11 @@ import { Label } from "@/components/ui/label";
 
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import { createOrganization } from "@/lib/api/organisation";
 import { uploadToS3 } from "@/lib/s3-upload";
@@ -21,15 +21,15 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 
-const institutionTypes = [
-  "Université publique",
-  "Université privée",
-  "Grande École",
-  "Institut de recherche",
-  "Lycée technique",
-  "Centre de formation",
-  "Autre établissement d'enseignement",
-] as const;
+// const institutionTypes = [
+//   "Université publique",
+//   "Université privée",
+//   "Grande École",
+//   "Institut de recherche",
+//   "Lycée technique",
+//   "Centre de formation",
+//   "Autre établissement d'enseignement",
+// ] as const;
 
 interface AddOrganisationProps {
   handleClose?: () => void;
@@ -41,26 +41,7 @@ export default function AddOrganisation({ handleClose }: AddOrganisationProps) {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const organisationSchema = z.object({
-    nom_entreprise: z.string().min(1, "Le nom de l'établissement est requis"),
-    secteur_activite: z.string().min(1, "Le secteur d'activité est requis"),
-    taille: z
-      .string()
-      .regex(/^[1-9]\d*$/, "La taille doit être un nombre entier positif")
-      .min(1, "La taille est requise"),
-    adresse_siege: z.string().min(1, "L'adresse est requise"),
-    code_postal: z
-      .string()
-      .length(5, "Le code postal doit contenir 5 chiffres"),
-    ville: z.string().min(1, "La ville est requise"),
-    annee_election: z
-      .string()
-      .regex(
-        /^\d{4}$/,
-        "La dernière année d'élection doit être valide (ex: 2024)"
-      ),
-    convention_collective: z
-      .string()
-      .min(1, "La convention collective est requise"),
+    nom_entreprise: z.string().min(1, "Le nom de l'organisation est requis"),
     membres_cse_invites: z.string().optional(),
   });
 
@@ -75,7 +56,7 @@ export default function AddOrganisation({ handleClose }: AddOrganisationProps) {
         setLogoUrl(urls[0]);
         toast.success("Logo chargé avec succès");
       } catch (error) {
-console.error(error)
+        console.error(error)
         toast.error(
           "Nous n'avons pas réussi à charger votre logo. Veuillez réessayer."
         );
@@ -94,13 +75,7 @@ console.error(error)
 
           try {
             organisationSchema.parse({
-              nom_entreprise: formData.get("nom_entreprise"), // Corrected: was formData.get("nom")
-              secteur_activite: formData.get("secteur_activite"),
-              taille: formData.get("taille"),
-              adresse_siege: formData.get("adresse_siege"),
-              code_postal: formData.get("code_postal"),
-              ville: formData.get("ville"),
-              annee_election: formData.get("annee_election"),
+              nom_entreprise: formData.get("nom_entreprise"),
               convention_collective: formData.get("convention_collective"),
               membres_cse_invites: formData.get("membres_cse_invites"),
             });
@@ -115,17 +90,11 @@ console.error(error)
             const organizationData = {
               nom: formData.get("nom_entreprise") as string,
               nom_entreprise: formData.get("nom_entreprise") as string,
-              secteur_activite: formData.get("secteur_activite") as string,
-              taille: formData.get("taille") as string,
-              adresse_siege: formData.get("adresse_siege") as string,
-              code_postal: formData.get("code_postal") as string,
-              ville: formData.get("ville") as string,
-              annee_election: formData.get("annee_election") as string,
               collective: formData.get("convention_collective") as string,
               invites: ((formData.get("membres_cse_invites") as string) || "")
                 .split(",")
                 .map((email) => email.trim())
-                .filter((email) => email), // Process to string array, remove empty strings
+                .filter((email) => email),
               logo: logoUrl,
               membre_ids: [],
               description: "",
@@ -136,7 +105,7 @@ console.error(error)
             toast.success(`L'établissement a été créé avec succès`);
             handleClose?.();
           } catch (error) {
-console.error(error)
+            console.error(error)
             if (error instanceof z.ZodError) {
               const newErrors: Record<string, string> = {};
               error.errors.forEach((err) => {
@@ -159,7 +128,7 @@ console.error(error)
         }}
       >
         <div className="flex flex-col gap-3">
-          <Label htmlFor="nom_entreprise">Nom de l&apos;établissement</Label>
+          <Label htmlFor="nom_entreprise">Nom de l&apos;organisation</Label>
           <Input
             id="nom_entreprise"
             name="nom_entreprise"
@@ -171,7 +140,7 @@ console.error(error)
             </span>
           )}
         </div>
-        <div className="flex flex-col sm:flex-row sm:justify-between gap-5">
+        {/*<div className="flex flex-col sm:flex-row sm:justify-between gap-5">
           <div className="flex flex-col gap-3 w-full sm:w-[48%]">
             <Label htmlFor="secteur_activite">Type d&apos;établissement</Label>
             <Select name="secteur_activite">
@@ -234,7 +203,7 @@ console.error(error)
             )}
           </div>
         </div>
-        {/* Année d’élection */}
+        {/* Année d’élection
         <div className="flex flex-col gap-3">
           <Label htmlFor="annee_election">Dernière année d’élection</Label>
           <Input
@@ -250,6 +219,7 @@ console.error(error)
             </span>
           )}
         </div>
+        */}
 
         {/* Département */}
         <div className="flex flex-col gap-3">
@@ -267,10 +237,10 @@ console.error(error)
           )}
         </div>
 
-        {/* Invitez le personnel académique */}
+        {/* Invitez les membres */}
         <div className="flex flex-col gap-3">
           <Label htmlFor="membres_cse_invites">
-            Invitez le personnel académique (emails séparés par virgule)
+            Invitez les membres (emails séparés par virgule)
           </Label>
           <Input
             id="membres_cse_invites"
@@ -287,12 +257,11 @@ console.error(error)
 
         <div>
           <label className="font-medium text-white-800 text-xs">
-            Logo de l&apos;établissement
+            Logo de l&apos;organisation
           </label>
           <div
-            className={`relative rounded-[8px] overflow-hidden border border-dashed border-white-300 w-full h-[136px] ${
-              logoUrl ? "border-none" : ""
-            } flex justify-center items-center`}
+            className={`relative rounded-[8px] overflow-hidden border border-dashed border-white-300 w-full h-[136px] ${logoUrl ? "border-none" : ""
+              } flex justify-center items-center`}
           >
             {logoUrl ? (
               <div className="relative w-full h-full">
@@ -365,23 +334,7 @@ export function AddOrganisationAfterLogin({
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const organisationSchema = z.object({
-    nom_entreprise: z.string().min(1, "Le nom de l'établissement est requis"),
-    secteur_activite: z.string().min(1, "Le secteur d'activité est requis"),
-    taille: z
-      .string()
-      .regex(/^[1-9]\d*$/, "La taille doit être un nombre entier positif")
-      .min(1, "La taille est requise"),
-    adresse_siege: z.string().min(1, "L'adresse est requise"),
-    code_postal: z
-      .string()
-      .length(5, "Le code postal doit contenir 5 chiffres"),
-    ville: z.string().min(1, "La ville est requise"),
-    annee_election: z
-      .string()
-      .regex(
-        /^\d{4}$/,
-        "La dernière année d'élection doit être valide (ex: 2024)"
-      ),
+    nom_entreprise: z.string().min(1, "Le nom de l'organisation est requis"),
     convention_collective: z
       .string()
       .min(1, "La convention collective est requise"),
@@ -399,7 +352,7 @@ export function AddOrganisationAfterLogin({
         setLogoUrl(urls[0]);
         toast.success("Logo chargé avec succès");
       } catch (error) {
-console.error(error)
+        console.error(error)
         toast.error(
           "Nous n'avons pas réussi à charger votre logo. Veuillez réessayer."
         );
@@ -419,12 +372,6 @@ console.error(error)
           try {
             organisationSchema.parse({
               nom_entreprise: formData.get("nom_entreprise"),
-              secteur_activite: formData.get("secteur_activite"),
-              taille: formData.get("taille"),
-              adresse_siege: formData.get("adresse_siege"),
-              code_postal: formData.get("code_postal"),
-              ville: formData.get("ville"),
-              annee_election: formData.get("annee_election"),
               convention_collective: formData.get("convention_collective"),
               membres_cse_invites: formData.get("membres_cse_invites"),
             });
@@ -439,12 +386,6 @@ console.error(error)
             const organizationData = {
               nom: formData.get("nom_entreprise") as string,
               nom_entreprise: formData.get("nom_entreprise") as string,
-              secteur_activite: formData.get("secteur_activite") as string,
-              taille: formData.get("taille") as string,
-              adresse_siege: formData.get("adresse_siege") as string,
-              code_postal: formData.get("code_postal") as string,
-              ville: formData.get("ville") as string,
-              annee_election: formData.get("annee_election") as string,
               collective: formData.get("convention_collective") as string,
               invites: ((formData.get("membres_cse_invites") as string) || "")
                 .split(",")
@@ -463,7 +404,7 @@ console.error(error)
             onComplete();
             //onComplete(); // Call onComplete on success
           } catch (error) {
-console.error(error)
+            console.error(error)
             if (error instanceof z.ZodError) {
               const newErrors: Record<string, string> = {};
               error.errors.forEach((err) => {
@@ -491,7 +432,7 @@ console.error(error)
         }}
       >
         <div className="flex flex-col gap-3">
-          <Label htmlFor="nom_entreprise">Nom de l&apos;établissement</Label>
+          <Label htmlFor="nom_entreprise">Nom de l&apos;organisation</Label>
           <Input
             id="nom_entreprise"
             name="nom_entreprise"
@@ -503,7 +444,7 @@ console.error(error)
             </span>
           )}
         </div>
-        <div className="flex flex-col sm:flex-row sm:justify-between gap-5">
+        {/*<div className="flex flex-col sm:flex-row sm:justify-between gap-5">
           <div className="flex flex-col gap-3 w-full sm:w-[48%]">
             <Label htmlFor="secteur_activite">Type d&apos;établissement</Label>
             <Select name="secteur_activite">
@@ -580,7 +521,7 @@ console.error(error)
               {errors.annee_election}
             </span>
           )}
-        </div>
+        </div>*/}
         <div className="flex flex-col gap-3">
           <Label htmlFor="convention_collective">Département</Label>
           <Input
@@ -597,7 +538,7 @@ console.error(error)
         </div>
         <div className="flex flex-col gap-3">
           <Label htmlFor="membres_cse_invites">
-            Invitez le personnel académique (emails séparés par virgule)
+            Invitez les membres (emails séparés par virgule)
           </Label>
           <Input
             id="membres_cse_invites"
@@ -613,12 +554,11 @@ console.error(error)
         </div>
         <div>
           <label className="font-medium text-white-800 text-xs">
-            Logo de l&apos;établissement
+            Logo de l&apos;organisation
           </label>
           <div
-            className={`relative rounded-[8px] overflow-hidden border border-dashed border-white-300 w-full h-[136px] ${
-              logoUrl ? "border-none" : ""
-            } flex justify-center items-center`}
+            className={`relative rounded-[8px] overflow-hidden border border-dashed border-white-300 w-full h-[136px] ${logoUrl ? "border-none" : ""
+              } flex justify-center items-center`}
           >
             {logoUrl ? (
               <div className="relative w-full h-full">

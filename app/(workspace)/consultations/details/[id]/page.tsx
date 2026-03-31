@@ -261,7 +261,7 @@ console.error(error)
             </div>
           </div>
         </div>
-        <CompteRendu
+        {/* <CompteRendu
           firstPage={RenderDocFirstPage({
             title: consultation.type_consultation_display || "Consultation",
             object:
@@ -292,7 +292,7 @@ console.error(error)
             setRefresh(!refresh);
           }}
           initialCompteRendu={consultation.compte_rendu || ""}
-        />
+        /> */}
       </div>
     );
   }

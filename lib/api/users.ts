@@ -6,7 +6,7 @@ const endpoint = endpoints.auth.allUsers;
 export interface User {
   id: number;
   email: string;
-  type_utilisateur: "EMPLOYE" | "ADMIN" | "MEMBRE_CSE";
+  type_utilisateur: "ADMIN" | "MEMBRE";
   telephone: string;
   first_name: string;
   last_name: string;

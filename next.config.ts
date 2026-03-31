@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 module.exports = {
+  devIndicators: false,
   images: {
     remotePatterns: [
       {

@@ -26,12 +26,10 @@ export default function Equipe() {
           storedData = JSON.parse(getCookies("userInfo") || "{}");
         }
 
-        ;
         const response = await getOrganization();
         setUsers(response);
       } catch (error) {
-console.error(error)
-        ;
+        console.error(error);
       }
     };
     fun();
@@ -40,22 +38,20 @@ console.error(error)
   return (
     <div className="flex relative flex-col gap-6 w-full px-4 sm:px-6">
       <h6 className="text-xl sm:text-2xl font-semibold">Equipe</h6>
-      <Contact />
+      {users?.organisation && <Contact />}
 
       {/* Header section with responsive layout */}
       <div className="flex flex-col sm:flex-row justify-between gap-4 sm:gap-0">
-        {users?.membres ? (
+        {users?.membres ?
           <h6 className="text-lg font-medium">
             {users.membres?.length - 1} membres
             {users.membres?.length - 1 > 1 ? "s" : ""}
           </h6>
-        ) : (
-          <h6 className="text-lg font-medium">Aucun groupe liée.</h6>
-        )}
+        : <h6 className="text-lg font-medium">Aucune organisation liée.</h6>}
 
         {/* Actions container with responsive adjustments */}
         <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
-          {users?.membres ? (
+          {users?.membres ?
             <div className="w-full sm:w-auto">
               {/*<SearchBar
                   value={searchValue}
@@ -63,7 +59,7 @@ console.error(error)
                   placeholder={"Rechercher"}
                 />*/}
             </div>
-          ) : null}
+          : null}
 
           {/* Organization button - repositioned for mobile */}
           {!users?.organisation && (
@@ -95,7 +91,7 @@ console.error(error)
 
           {/* Add member button */}
           <div className="w-full sm:w-auto">
-            {users?.organisation?.id ? (
+            {users?.organisation?.id ?
               <DialogComponent
                 open={isAddMemberDialogOpen}
                 onOpenChange={setIsAddMemberDialogOpen}
@@ -116,14 +112,14 @@ console.error(error)
                 }
                 dialogTitle={null}
               />
-            ) : null}
+            : null}
           </div>
         </div>
       </div>
 
       {/* Cards grid with responsive sizing */}
       <div className="flex flex-wrap gap-4">
-        {users ? (
+        {users ?
           users.membres?.map((user, index) => (
             <AssociateCard
               refresh={() => setRefresh(!refresh)}
@@ -132,14 +128,13 @@ console.error(error)
               associate={user}
             />
           ))
-        ) : (
-          <div className="col-span-full flex justify-center items-center py-8">
+        : <div className="col-span-full flex justify-center items-center py-8">
             <EmptyState
               title={"Vous n'appartenez à aucune organisation"}
               description={"Veuillez créer une organisation pour commencer."}
             />
           </div>
-        )}
+        }
       </div>
       {/*<div className="flex flex-wrap gap-6">
           {associates.map((associate, index) => (

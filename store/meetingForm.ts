@@ -66,7 +66,7 @@ const initialState = {
   lien_reunion: "",
   date_heure_debut: "",
   date_heure_fin: undefined,
-  frequence: "",
+  frequence: "Une fois",
   documents: [],
   participants: [],
   ordre_du_jour: [],

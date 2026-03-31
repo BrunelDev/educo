@@ -51,33 +51,11 @@ export default function UpdateOrganisationForm({
   const organisationSchema = z.object({
     nom_entreprise: z
       .string()
-      .min(1, "Le nom de l'établissement est requis")
-      .optional(),
-    secteur_activite: z
-      .string()
-      .min(1, "Le secteur d'activité est requis")
-      .optional(),
-    taille: z
-      .string()
-      .regex(/^[1-9]\d*$/, "La taille doit être un nombre entier positif")
-      .min(1, "La taille est requise")
-      .optional(),
-    adresse_siege: z.string().min(1, "L'adresse est requise").optional(),
-    code_postal: z
-      .string()
-      .length(5, "Le code postal doit contenir 5 chiffres")
-      .optional(),
-    ville: z.string().min(1, "La ville est requise").optional(),
-    annee_election: z
-      .string()
-      .regex(
-        /^\d{4}$/,
-        "La dernière année d'élection doit être valide (ex: 2024)"
-      )
+      .min(1, "Le nom de l'organisation est requis")
       .optional(),
     convention_collective: z
       .string()
-      .min(1, "La convention collective est requise")
+      .min(1, "Le département est requis")
       .optional(),
     membres_cse_invites: z.string().optional(),
   });
@@ -128,12 +106,6 @@ console.error(error)
           try {
             organisationSchema.parse({
               nom_entreprise: formData.get("nom_entreprise") || undefined,
-              secteur_activite: formData.get("secteur_activite") || undefined,
-              taille: formData.get("taille") || undefined,
-              adresse_siege: formData.get("adresse_siege") || undefined,
-              code_postal: formData.get("code_postal") || undefined,
-              ville: formData.get("ville") || undefined,
-              annee_election: formData.get("annee_election") || undefined,
               convention_collective:
                 formData.get("convention_collective") || undefined,
               membres_cse_invites:
@@ -143,12 +115,6 @@ console.error(error)
             const organizationData: Partial<{
               nom: string;
               nom_entreprise: string;
-              secteur_activite: string;
-              taille: string;
-              adresse_siege: string;
-              code_postal: string;
-              ville: string;
-              annee_election: string;
               collective: string;
               invites: string[];
               logo: string;
@@ -160,24 +126,6 @@ console.error(error)
               organizationData.nom = nomEntreprise;
               organizationData.nom_entreprise = nomEntreprise;
             }
-
-            const secteur = formData.get("secteur_activite") as string;
-            if (secteur) organizationData.secteur_activite = secteur;
-
-            const tailleValue = formData.get("taille") as string;
-            if (tailleValue) organizationData.taille = tailleValue;
-
-            const adresse = formData.get("adresse_siege") as string;
-            if (adresse) organizationData.adresse_siege = adresse;
-
-            const codePostalValue = formData.get("code_postal") as string;
-            if (codePostalValue) organizationData.code_postal = codePostalValue;
-
-            const villeValue = formData.get("ville") as string;
-            if (villeValue) organizationData.ville = villeValue;
-
-            const anneeElection = formData.get("annee_election") as string;
-            if (anneeElection) organizationData.annee_election = anneeElection;
 
             const conventionCollective = formData.get(
               "convention_collective"
@@ -232,7 +180,7 @@ console.error(error)
         }}
       >
         <div className="flex flex-col gap-3">
-          <Label htmlFor="nom_entreprise">Nom de l&apos;établissement</Label>
+          <Label htmlFor="nom_entreprise">Nom de l&apos;organisation</Label>
           <Input
             defaultValue={organization?.organisation.nom_entreprise}
             id="nom_entreprise"
@@ -245,7 +193,7 @@ console.error(error)
             </span>
           )}
         </div>
-        <div className="flex flex-col sm:flex-row sm:justify-between gap-5">
+        {/*<div className="flex flex-col sm:flex-row sm:justify-between gap-5">
           <div className="flex flex-col gap-3 w-full sm:w-[48%]">
             <Label htmlFor="secteur_activite">Type d&apos;établissement</Label>
             <Select
@@ -338,7 +286,7 @@ console.error(error)
               {errors.annee_election}
             </span>
           )}
-        </div>
+        </div>*/}
         <div className="flex flex-col gap-3">
           <Label htmlFor="convention_collective">Département</Label>
           <Input
@@ -356,7 +304,7 @@ console.error(error)
         </div>
         <div className="flex flex-col gap-3">
           <Label htmlFor="membres_cse_invites">
-            Invitez le personnel académique (emails séparés par virgule)
+            Invitez les membres (emails séparés par virgule)
           </Label>
           <Input
             id="membres_cse_invites"
@@ -372,7 +320,7 @@ console.error(error)
         </div>
         <div>
           <label className="font-medium text-white-800 text-xs">
-            Logo de l&apos;établissement
+            Logo de l&apos;organisation
           </label>
           <div
             className={`relative rounded-[8px] overflow-hidden border border-dashed border-white-300 w-full h-[136px] ${

@@ -1,7 +1,7 @@
 import { DialogComponent } from "@/app/_components/dialogComponent";
 import { Button } from "@/components/ui/button";
 import { getOrganization, OrganizationResponse } from "@/lib/api/organisation";
-import { Mail, MapPin, Phone } from "lucide-react";
+import { Building, Mail, MapPin, Phone } from "lucide-react";
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 import UpdateOrganisationForm from "./updateOrganisation";
@@ -67,12 +67,8 @@ console.error(error)
       {/* Contact information section */}
       <div className="flex flex-col sm:flex-row sm:justify-between gap-3 sm:gap-2 text-sm font-medium">
         <div className="flex items-center gap-2">
-          <Phone className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0 text-gray-500" />
-          <h6 className="text-[12px] sm:text-sm truncate">{organisation.organisation.createur.telephone || "-"}</h6>
-        </div>
-        <div className="flex items-center gap-2">
-          <MapPin className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0 text-gray-500" />
-          <h6 className="text-[12px] sm:text-sm truncate max-w-[200px] sm:max-w-[250px]">{organisation.organisation.adresse_siege}</h6>
+          <Building className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0 text-gray-500" />
+          <h6 className="text-[12px] sm:text-sm truncate">{organisation.organisation.collective || "-"}</h6>
         </div>
         <div className="flex items-center gap-2">
           <Mail className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0 text-gray-500" />

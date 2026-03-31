@@ -109,7 +109,7 @@ console.error(error)
     <div className="mt-6">
       <div className="flex justify-between items-center mb-3">
         <h2 className="text-md font-semibold">Compte Rendu</h2>
-        <Button
+        {/* <Button
           onClick={() => {
             if (isEditingCompteRendu) {
               submitCompteRendu();
@@ -125,9 +125,9 @@ console.error(error)
           }`}
         >
           {isEditingCompteRendu ? "Confirmer" : "Modifier"}
-        </Button>
+        </Button> */}
       </div>
-      <div className="mt-4 w-full">
+      {/* <div className="mt-4 w-full">
         {isEditingCompteRendu ? (
           <textarea
             value={compteRenduText}
@@ -140,7 +140,7 @@ console.error(error)
             {compteRenduText || "Aucun compte rendu pour le moment."}
           </div>
         )}
-      </div>
+      </div> */}
       <Editor />
       <div>
         <Button className="sm:ml-auto" onClick={handleDownload}>

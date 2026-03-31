@@ -4,20 +4,20 @@ import { DialogComponent } from "@/app/_components/dialogComponent";
 import EmptyState from "@/app/_components/EmptyState";
 import GoBack from "@/app/_components/goback";
 import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbPage,
-    BreadcrumbSeparator,
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
-    createFile,
-    createFolder,
-    Dossier,
-    getOneDossiers,
+  createFile,
+  createFolder,
+  Dossier,
+  getOneDossiers,
 } from "@/lib/api/fichiers";
 import { uploadToS3 } from "@/lib/s3-upload";
 import { CirclePlus } from "lucide-react";
@@ -45,8 +45,7 @@ export default function DossierPage({
         const dossierData = await getOneDossiers(id);
         setFolderContent(dossierData);
       } catch (error) {
-console.error(error)
-        ;
+        console.error(error);
         setError("Impossible de charger le dossier.");
       } finally {
         setLoading(false);
@@ -70,7 +69,6 @@ console.error(error)
           path.unshift(parentFolder); // Add parent to the beginning of the path
           parentIdToFetch = parentFolder.parent;
         } catch (err) {
-          ;
           toast.error("Erreur lors de la construction du fil d'Ariane.");
           parentIdToFetch = null; // Stop if there's an error
         }
@@ -112,13 +110,12 @@ console.error(error)
             <Fragment key={folder.id}>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                {index === breadcrumbPath.length - 1 ? (
+                {index === breadcrumbPath.length - 1 ?
                   <BreadcrumbPage>{folder.nom}</BreadcrumbPage>
-                ) : (
-                  <BreadcrumbLink href={`/fichiers/dossiers/${folder.id}`}>
+                : <BreadcrumbLink href={`/fichiers/dossiers/${folder.id}`}>
                     {folder.nom}
                   </BreadcrumbLink>
-                )}
+                }
               </BreadcrumbItem>
             </Fragment>
           ))}
@@ -140,20 +137,19 @@ console.error(error)
           </div>
         </div>
         <ul className="flex gap-5 flex-wrap">
-          {folderContent && folderContent?.fichiers.length > 0 ? (
+          {folderContent && folderContent?.fichiers.length > 0 ?
             folderContent?.fichiers.map((file) => (
               <li key={file.id}>
                 <FileCard file={file} />
               </li>
             ))
-          ) : (
-            <div className="w-full flex justify-center items-center">
+          : <div className="w-full flex justify-center items-center">
               <EmptyState
                 title={"Aucun fichier pour le moment."}
                 description={"Veuillez créez un fihier."}
               />
             </div>
-          )}
+          }
         </ul>
       </div>
       <div>
@@ -173,20 +169,19 @@ console.error(error)
         </div>
 
         <ul className="flex gap-5 flex-wrap">
-          {folderContent && folderContent?.sous_dossiers.length > 0 ? (
+          {folderContent && folderContent?.sous_dossiers.length > 0 ?
             folderContent?.sous_dossiers.map((folder) => (
               <li key={folder.id}>
                 <Folder folder={folder} fetchDossiers={fetchDossiers} />
               </li>
             ))
-          ) : (
-            <div className="w-full flex justify-center items-center">
+          : <div className="w-full flex justify-center items-center">
               <EmptyState
                 title={"Aucun dossier pour le moment."}
                 description={"Veuillez créez un dossier."}
               />
             </div>
-          )}
+          }
         </ul>
       </div>
     </div>
@@ -200,11 +195,9 @@ const CreateFolder = ({ folderId }: { folderId: string }) => {
     const folderName = formData.get("nom");
     if (folderName) {
       const res = createFolder(folderName?.toString(), folderId);
-      ;
       toast.message("Dossier créé avec succès.");
       window.location.reload();
     }
-    ;
   };
 
   return (
@@ -223,15 +216,14 @@ const CreateFile = ({ folderId }: { folderId: string }) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const file = formData.get("media") as File;
-    const fileName = file.name
+    const fileName = file.name;
 
     if (fileName && file) {
       try {
         // Upload file to S3
         const fileUrl = await uploadToS3([file]);
-        ;
         //the name should be the same as the file name
-        
+
         const fileData = {
           nom: fileName.toString(),
           type_fichier: "DOCUMENT",
@@ -242,7 +234,6 @@ const CreateFile = ({ folderId }: { folderId: string }) => {
         toast.success("Fichier créé avec succès");
         window.location.reload();
       } catch (error: unknown) {
-        ;
         toast.error("Erreur lors de la création du fichier");
       }
     }
@@ -250,7 +241,6 @@ const CreateFile = ({ folderId }: { folderId: string }) => {
 
   return (
     <form action="" className="flex flex-col gap-3" onSubmit={handleSubmit}>
-
       <div>
         <label className="font-medium text-white-800 text-xs">Fichier</label>
         <div className="relative rounded-[8px] overflow-hidden border border-dashed border-white-300">

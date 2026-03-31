@@ -11,15 +11,6 @@ import { StepProgress } from "./stepProgress";
 
 import Editor from "@/app/_components/editor";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { extractFilenameFromUrl } from "@/lib/api/fichiers";
 import {
   getOrganisationMembers,
@@ -276,7 +267,11 @@ const StepOne = ({
     }
   };
 
-  // Add this to handle form submission
+  const generateMeetSlug = (meetTitle: string) => {
+    const finalSlug = meetTitle.trim().toLowerCase().replaceAll(" ", "_")
+    return "http://localhost:8001/" + finalSlug
+
+  }
 
   return (
     <div className="flex flex-col gap-5 w-full">
@@ -388,6 +383,10 @@ const StepOne = ({
               onChange={(e) => {
                 if (e.target.checked) {
                   setLocalLocation((prev) => [...prev, "EN_LIGNE"]);
+                  if (lien_reunion === "") {
+                    setLocalMeetingLink(generateMeetSlug(localMeetingPurpose))
+
+                  }
                 } else {
                   setLocalLocation((prev) =>
                     prev.filter((item) => item !== "EN_LIGNE")
@@ -409,7 +408,8 @@ const StepOne = ({
           Lien de la réunion
         </label>
         <Input
-          required
+          required={!(localLocation.length === 1 && localLocation.includes("PHYSIQUE"))}
+          disabled={localLocation.length === 1 && localLocation.includes("PHYSIQUE")}
           type="text"
           value={localMeetingLink}
           onChange={(e) => {
@@ -439,7 +439,7 @@ const StepTwo = ({
   const [localDate, setLocalDate] = useState<string>("");
   const [localTime, setLocalTime] = useState<string>("");
   const [localFrequency, setLocalFrequency] = useState<string>(frequence);
-  const [showEndDate, setShowEndDate] = useState<boolean>(false);
+  // const [showEndDate, setShowEndDate] = useState<boolean>(false);
   const [localEndDate, setLocalEndDate] = useState<string>("");
   const [localEndTime, setLocalEndTime] = useState<string>("");
 
@@ -547,7 +547,7 @@ const StepTwo = ({
             <p className="text-red-500 text-sm mt-1">{errors.time}</p>
           )}
         </div>
-        <div className="w-full sm:w-1/3">
+        {/* <div className="w-full sm:w-1/3">
           <label className="font-medium text-white-800 text-xs block mb-1">
             Fréquence
           </label>
@@ -571,9 +571,9 @@ const StepTwo = ({
           {errors.frequency && (
             <p className="text-red-500 text-sm mt-1">{errors.frequency}</p>
           )}
-        </div>
+        </div> */}
       </div>
-      <div className="w-full flex items-center gap-2">
+      {/* <div className="w-full flex items-center gap-2">
         <Label htmlFor="endDate">Ajouter une date de fin</Label>
         <Checkbox
           id="endDate"
@@ -615,7 +615,7 @@ const StepTwo = ({
             id="endTime"
           />
         </div>
-      </div>
+      </div> */}
       <div className="w-full">
         <label className="font-medium text-white-800 text-xs block mb-2">
           Pièces jointes

@@ -50,14 +50,16 @@ console.error(error)
 export interface CreateOrganizationDto {
   nom: string;
   nom_entreprise: string;
-  secteur_activite: string;
-  taille: string;
-  adresse_siege: string;
-  code_postal: string;
-  ville: string;
+  secteur_activite?: string;
+  taille?: string;
+  adresse_siege?: string;
+  code_postal?: string;
+  ville?: string;
   logo?: string | null;
   description?: string;
   membre_ids?: number[];
+  collective?: string;
+  invites?: string[];
 }
 interface CreateOrganization extends OrganizationResponse {
   date_creation: Date;
@@ -123,6 +125,7 @@ export interface UpdateOrganizationDto {
   description?: string;
   membre_ids?: number[];
   invites?: string[];
+  collective?: string;
 }
 
 export const updateOrganisation = async (

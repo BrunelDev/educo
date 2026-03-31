@@ -33,7 +33,6 @@ export default function MeetingCard({ meeting }: MeetingCardProps) {
               <div className="w-2 h-2 rounded-full bg-coral-100"></div>{" "}
               <h6 className="text-xs font-semibold">{meeting.type_reunion}</h6>
             </div>
-            <h3 className="font-bold">{meeting.titre}</h3>
             <p className="text-sm text-gray-600">{meeting.objet}</p>
           </div>
         </div>

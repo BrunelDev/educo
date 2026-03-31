@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { uploadToS3 } from "@/lib/s3-upload";
 import { MessageType } from "@/lib/types";
-import { Paperclip, Send, X } from "lucide-react";
+import { Send, X } from "lucide-react";
 import Image from "next/image";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
@@ -16,6 +16,7 @@ interface MessageInputProps {
   }) => void;
   isConnected: boolean;
   isLoading?: boolean;
+  disabled?: boolean;
 }
 
 // Maximum file size in bytes (5MB)
@@ -25,6 +26,7 @@ export function MessageInput({
   onSendMessage,
   isConnected,
   isLoading: externalLoading = false,
+  disabled = false,
 }: MessageInputProps) {
   const [message, setMessage] = useState("");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -78,11 +80,9 @@ export function MessageInput({
 
       // Show loading toast
       const loadingToast = toast.loading(
-        isImage
-          ? "Envoi de l'image en cours..."
-          : isAudio
-          ? "Envoi de l'audio en cours..."
-          : "Envoi du fichier en cours..."
+        isImage ? "Envoi de l'image en cours..."
+        : isAudio ? "Envoi de l'audio en cours..."
+        : "Envoi du fichier en cours...",
       );
 
       try {
@@ -102,24 +102,19 @@ export function MessageInput({
           onSendMessage({
             type: "message",
             message:
-              messageType === MessageType.FILE
-                ? "fichier"
-                : messageType === MessageType.IMAGE
-                ? "image"
-                : messageType === MessageType.AUDIO
-                ? "audio"
-                : "", // Use the S3 URL directly
+              messageType === MessageType.FILE ? "fichier"
+              : messageType === MessageType.IMAGE ? "image"
+              : messageType === MessageType.AUDIO ? "audio"
+              : "", // Use the S3 URL directly
             type_message: messageType,
             file_url: fileUrl,
           });
 
           // Show success toast
           toast.success(
-            isImage
-              ? "Image envoyée avec succès"
-              : isAudio
-              ? "Audio envoyé avec succès"
-              : "Fichier envoyé avec succès"
+            isImage ? "Image envoyée avec succès"
+            : isAudio ? "Audio envoyé avec succès"
+            : "Fichier envoyé avec succès",
           );
 
           // Reset after sending
@@ -128,7 +123,6 @@ export function MessageInput({
           throw new Error("No URL returned from S3 upload");
         }
       } catch (uploadError) {
-        ;
         setFileError("Erreur lors de l'envoi du fichier. Veuillez réessayer.");
         toast.error("Échec de l'envoi. Veuillez réessayer.");
       } finally {
@@ -137,8 +131,7 @@ export function MessageInput({
         setIsUploading(false);
       }
     } catch (error) {
-console.error(error)
-      ;
+      console.error(error);
       setFileError("Erreur lors de l'envoi du fichier. Veuillez réessayer.");
       toast.error("Échec de l'envoi. Veuillez réessayer.");
       setIsUploading(false);
@@ -163,7 +156,7 @@ console.error(error)
       setFileError(
         `Le fichier est trop volumineux. Taille maximale: ${
           MAX_FILE_SIZE / (1024 * 1024)
-        }MB`
+        }MB`,
       );
       return;
     }
@@ -195,7 +188,7 @@ console.error(error)
         {imagePreview && (
           <div className="mx-4 mb-2 absolute top-0 -translate-y-[100%]">
             <div className="flex items-start gap-2 p-2 border rounded-md">
-              {fileToSend?.type.startsWith("image/") ? (
+              {fileToSend?.type.startsWith("image/") ?
                 <div className="relative w-24 h-24 sm:w-32 sm:h-32 overflow-hidden">
                   <Image
                     src={imagePreview || "/placeholder-image.png"}
@@ -217,8 +210,7 @@ console.error(error)
                     </div>
                   )}
                 </div>
-              ) : (
-                <div
+              : <div
                   className={`p-2 bg-gray-100 rounded-md max-w-[80%] break-words ${
                     isUploading ? "opacity-50" : ""
                   }`}
@@ -230,7 +222,7 @@ console.error(error)
                     </div>
                   )}
                 </div>
-              )}
+              }
               <Button
                 type="button"
                 variant="ghost"
@@ -245,15 +237,15 @@ console.error(error)
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="p-4 border-t flex gap-2">
-          <input
+        <form onSubmit={handleSubmit} className="px-4 py-0 flex items-center gap-2">
+          {/*<input
             type="file"
             ref={fileInputRef}
             onChange={handleFileUpload}
             className="hidden"
             accept="image/*,audio/*,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
           />
-          <Button
+           <Button
             type="button"
             variant="ghost"
             size="icon"
@@ -261,7 +253,7 @@ console.error(error)
             disabled={!isConnected || isLoading}
           >
             <Paperclip className="h-5 w-5" />
-          </Button>
+          </Button> */}
 
           <Input
             value={message}
@@ -277,11 +269,9 @@ console.error(error)
               (!message.trim() && !fileToSend) || !isConnected || isLoading
             }
           >
-            {isUploading ? (
+            {isUploading ?
               <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div>
-            ) : (
-              <Send className="h-5 w-5" />
-            )}
+            : <Send className="h-5 w-5" />}
           </Button>
         </form>
       </div>
